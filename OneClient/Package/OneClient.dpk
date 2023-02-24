@@ -1,0 +1,71 @@
+package OneClient;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  vcl,
+  rtl,
+  dbrtl,
+  RESTComponents,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon,
+  soaprtl,
+  DesignIDE;
+
+contains
+  OneClientConnect in 'OneClientConnect.pas',
+  OneClientConst in 'OneClientConst.pas',
+  OneClientRegister in 'OneClientRegister.pas',
+  OneClientResult in 'OneClientResult.pas',
+  Neon.Core.Attributes in 'NeonSerialization\Neon.Core.Attributes.pas',
+  Neon.Core.DynamicTypes in 'NeonSerialization\Neon.Core.DynamicTypes.pas',
+  Neon.Core.Nullables in 'NeonSerialization\Neon.Core.Nullables.pas',
+  Neon.Core.Persistence.JSON in 'NeonSerialization\Neon.Core.Persistence.JSON.pas',
+  Neon.Core.Persistence.JSON.Schema in 'NeonSerialization\Neon.Core.Persistence.JSON.Schema.pas',
+  Neon.Core.Persistence in 'NeonSerialization\Neon.Core.Persistence.pas',
+  Neon.Core.Serializers.DB in 'NeonSerialization\Neon.Core.Serializers.DB.pas',
+  Neon.Core.Serializers.Nullables in 'NeonSerialization\Neon.Core.Serializers.Nullables.pas',
+  Neon.Core.Serializers.RTL in 'NeonSerialization\Neon.Core.Serializers.RTL.pas',
+  Neon.Core.TypeInfo in 'NeonSerialization\Neon.Core.TypeInfo.pas',
+  Neon.Core.Types in 'NeonSerialization\Neon.Core.Types.pas',
+  Neon.Core.Utils in 'NeonSerialization\Neon.Core.Utils.pas',
+  OneNeonHelper in 'NeonSerialization\OneNeonHelper.pas',
+  OneClientDataInfo in 'baseLib\OneClientDataInfo.pas',
+  OneStreamString in 'baseLib\OneStreamString.pas',
+  OneClientDataSet in 'OneClientDataSet.pas',
+  OneSQLCrypto in 'baseLib\OneSQLCrypto.pas',
+  OneClientHelper in 'OneClientHelper.pas',
+  OneClientVirtualFile in 'OneClientVirtualFile.pas',
+  OneFileHelper in 'baseLib\OneFileHelper.pas',
+  OneCrypto in 'baseLib\OneCrypto.pas',
+  OneLog in 'baseLib\OneLog.pas',
+  OneILog in 'baseLib\OneILog.pas',
+  OneThread in 'baseLib\OneThread.pas';
+
+end.

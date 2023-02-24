@@ -1,0 +1,7 @@
+1.编绎控件包package->OneClient,并发装控件
+   把控件包相关源码加到lib路径,
+   包括
+   OneClient\Package
+   OneClient\Package\NeonSerialization
+   OneClient\Package\baseLib
+2.编绎CleintDemo 运行起来看效果

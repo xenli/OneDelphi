@@ -1,0 +1,120 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{BBF94FA8-4D6C-43C1-9627-68F702AD0B0E}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Package\OneClient.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneClientDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneCleintDemoDatas.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneCleintDemoCustTran.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneCleintDemoPostGet.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneCleintDemoAsync.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneClientDemoVirtualFile.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneClientDemoUpDownChunt.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="OneClient">
+        <MSBuild Projects="Package\OneClient.dproj"/>
+    </Target>
+    <Target Name="OneClient:Clean">
+        <MSBuild Projects="Package\OneClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClient:Make">
+        <MSBuild Projects="Package\OneClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneClientDemo">
+        <MSBuild Projects="ClientDemo\OneClientDemo.dproj"/>
+    </Target>
+    <Target Name="OneClientDemo:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemo:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneCleintDemoDatas">
+        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj"/>
+    </Target>
+    <Target Name="OneCleintDemoDatas:Clean">
+        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneCleintDemoDatas:Make">
+        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTran">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTran.dproj"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTran:Clean">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTran.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTran:Make">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTran.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneCleintDemoPostGet">
+        <MSBuild Projects="ClientDemo\OneCleintDemoPostGet.dproj"/>
+    </Target>
+    <Target Name="OneCleintDemoPostGet:Clean">
+        <MSBuild Projects="ClientDemo\OneCleintDemoPostGet.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneCleintDemoPostGet:Make">
+        <MSBuild Projects="ClientDemo\OneCleintDemoPostGet.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneCleintDemoAsync">
+        <MSBuild Projects="ClientDemo\OneCleintDemoAsync.dproj"/>
+    </Target>
+    <Target Name="OneCleintDemoAsync:Clean">
+        <MSBuild Projects="ClientDemo\OneCleintDemoAsync.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneCleintDemoAsync:Make">
+        <MSBuild Projects="ClientDemo\OneCleintDemoAsync.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneClientDemoVirtualFile">
+        <MSBuild Projects="ClientDemo\OneClientDemoVirtualFile.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoVirtualFile:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoVirtualFile.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoVirtualFile:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoVirtualFile.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneClientDemoUpDownChunt">
+        <MSBuild Projects="ClientDemo\OneClientDemoUpDownChunt.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoUpDownChunt:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoUpDownChunt.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoUpDownChunt:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoUpDownChunt.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="OneClient;OneClientDemo;OneCleintDemoDatas;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="OneClient:Clean;OneClientDemo:Clean;OneCleintDemoDatas:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="OneClient:Make;OneClientDemo:Make;OneCleintDemoDatas:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
