@@ -1,0 +1,2 @@
+*.pas linguist-language=pascal
+*.dfm linguist-language=Delphi
