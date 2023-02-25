@@ -1,13 +1,13 @@
 # OneDelphi
 ## OneDelphi基于Delphi IDE开发的三层中间件，一个MVC及传统DataSet框架，Mormot2的HTTP通讯
 
-                                                 叫兽(FLM)出品
-                                                 QQ:378464060
+>                                                 叫兽(FLM)出品
+>                                                 QQ:378464060
                                                  
 环境是基于 D11的，其它低版本，可能系统库 部份不兼容
 ### 1.控件包mormot2下载，群文件里面也有直接到群下载也行
   https://github.com/synopse/mORMot2
-###2.控件包mormot2源码路径加到Lib
+### 2.控件包mormot2源码路径加到Lib
 
 ----以上多是基础操作不会的不要问，没时间回答-----
 ### 3.打开 OneService.dpr 工程
@@ -15,12 +15,16 @@
 ### 5.目前做好了MVC基础功能看源码单元httpServer->Controller->Demo-> DemoController.pas
    // 注册到路由 DemoController.initialization部份，路由如何注册
    // 注意，路由名称 不要一样，否则会判定已注册过，跳过
+   
   // 多例模式注册
   OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoA',TDemoController, 100, CreateNewDemoController);
+  
   // 单例模式注册
   OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('DemoB',TDemoController, 100, CreateNewDemoController);
+  
   // 方法注册
  OneHttpRouterManage.GetInitRouterManage().AddHTTPEvenWork('DemoEven',HelloWorldEven, 10);
+ 
 ### 6.直接用http页面输入地址请求相关url或者相关HTTP请求工具
   例:  http://127.0.0.1:9090/DemoA/GetPersonListT
 
