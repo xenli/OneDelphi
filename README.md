@@ -138,13 +138,11 @@ OneDelphi正式版,正式发布.
 	如下 oneweb特定标识，表明要访问运行目录  OnePlatform\oneWeb 下文件  
 	http://127.0.0.1:9090/oneweb/admin/index.html  
                 最终访问: D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\oneWeb\admin\index.html  
-	
 	第二种:把文件放在虚拟目录下  
 	例: 虚拟路径代码(TEST)---实际物理路径(D:\test)  
 	如下 onewebv特定标识,表明要访问虚拟路径文件 /test/ 虚拟路径代码  admin/index.html 路径代码  
                 http://127.0.0.1:9090/onewebv/test/admin/index.html  
 	最终访问:D:\test\admin\index.html  
-
 	2.增加文件访问Demo  
 	 DemoWebFileController  
 
