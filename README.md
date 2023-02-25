@@ -45,7 +45,6 @@
 ### 6.虚拟文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
-<<<<<<< HEAD
 ## 更新日志
 
 ************2020-02-24***********  
@@ -70,38 +69,6 @@ oneuniapp客户端:
 	
 客户端:  
 	1.增加Demo->OneClientDemoVirtualFile删除文件的功能  
-=======
-## 更新记录
-
-************2020-02-24***********
-
-服务端:
-	1.优化 OneMultipart 对multipart/form-data解析，以及BUG，
-	   此单元值得你拥有, 解析multipart函数,D基本没有
-	2.优化 THTTPCtxt.FRequestInContent: RawByteString; 由string改成RawByteString保持原本接收到的字符串
-	3.UniGoodsController增加
-      //文件上传示例
-    	function PostGoodsImg(QFormData: TOneMultipartDecode): TActionResult<string>;
- 	    //获取文件示例
-    	function OneGetGoodsImg(imgid: string): TActionResult<string>;
-	4.以及一些BUG和优化
-客户端:
-
-oneuniapp客户端:
-	1.增加商品编辑,文件上传
-	2.优化一些函数
-
-************2023-02-17***********
-
-服务端:
-	1.增加OneUniDemo与oneUniapp相关单元对接
-	   在线地址:http://house.callbaba.cn/#/
-                   或安装OneUniApp.apk在开源群里有
-	2.服务端增加删除虚拟文件的功能
-	
-客户端:
-	1.增加Demo->OneClientDemoVirtualFile删除文件的功能
->>>>>>> 3534846d7651edd1a6a40a03094eb6abfb4e7ad8
 	
 OneUniApp客户端:  
 	1.增加制作订单交互流程Demo  
@@ -110,7 +77,6 @@ OneUniApp客户端:
 QQ群：193878346  
 	
 
-<<<<<<< HEAD
 *************2023-02-09**************  
 服务端:  
 	1.统一返回值类名称及参数大小写叫法与OneLaz,OneuniApp一至,	如果有需要OneUniapp联系**叫兽(FLM)QQ:378464060**一年399  
@@ -132,42 +98,6 @@ QQ群：193878346
 服务端: 修正文件名称是中文返回错误(oneweb,oneweb)虚拟路径输出静态文件  
 
 *************2023-01-29**************  
-=======
-*************2023-02-09**************
-
-服务端:
-	1.统一返回值类名称及参数大小写叫法与OneLaz,OneuniApp一至
-	如果有需要OneUniapp联系我，一年399
-	2. OneLaz同步增加线程变量及参数结果释放优先问题
-	3.OneLaz同步支持Uos,depbian系统
-	4.OneLaz修复各种接口
-客户端:
-	1.统一返回值类名称及参数大小写叫法
-	
-*************2023-02-06**************
-
-服务端:
-	1.优化MVC 参数和返回结果参数的释放优先问题
-	2.增加MVC 线程变量的使用,可以在无HTTP上下文参数，直接调用HTTP上下文参数
-	3.增加对接OneUniApp的Demo单元,服务端 UniDemoController
-客户端:
-	1.增加OneUniApp目前只对OneLaz VIP会员免费开放
-             
-*************2023-02-01**************
-
-服务端: 修正文件名称是中文返回错误(oneweb,oneweb)虚拟路径输出静态文件
-
-*************2023-01-29**************
-
-服务端： 
-	增强web表单上传，后台接收处理
-	参考服务端Demo->DemoWebFileController
-              // 解析 multipart/form-data提交的数据,只需要参数类型是 TOneMultipartDecode就行，                 其它的交给底程处理解析
-               function WebPostFormData(QFormData: TOneMultipartDecode): TResult<string>;
-
-*************2023-01-28**************
-
->>>>>>> 3534846d7651edd1a6a40a03094eb6abfb4e7ad8
 服务端： 
 	增强web表单上传，后台接收处理  
 	参考服务端Demo->DemoWebFileController  
@@ -181,7 +111,6 @@ QQ群：193878346
 	增强文件分块上传下载,及批量文件上传功能  
 	增强Demo-OneClientDemoUpDownChunt  
  
-<<<<<<< HEAD
 *************2023-01-03**************  
 OneDelphi正式版,正式发布.  
 服务端:  
@@ -298,143 +227,3 @@ OneDelphi正式版,正式发布.
   3.增加异步Demo	 
 	4.增加Api使用Demo  
   5.优化一些功能
-=======
-
-*************2023-01-03**************
-
-OneDelphi正式版,正式发布.
-服务端:
-	1.完善Token功能
-	2.服务端主界面增加Token查看管理
-	3.服务端主界面增加win一些启动功能
-	4.其它优化和修正
-客户端:
-	1.OneCelint包增加与服务端交互的验证的机制功能
-	       OneClientConnect.MakeUrl安全机制，有兴趣的去看，在其URL拼接 ?token=xx&time=xxx&sing=xxxx
-	       lSign := self.FToKenID + lTimeStr + self.FPrivateKey  MD5换算来的
-	       ToKenID和PrivateKey由DoConnect连接向服务端申请的安全码和秘钥，秘钥不传输，只能参与签名
-
-
-
-*************2023-01-01**************
-
-首先在这边祝大家新的一年合家欢乐，新年新气象
-服务端:
-	1.完善ORM功能
-	2.增加Demo-> DemoOrmController
-
-
-*************2022-12-29**************
-
-服务端:
-	1.增加静态站点功能
-	第一种:把文件放在运行目录 OnePlatform\oneWeb 目录下面
-	如下 oneweb特定标识，表明要访问运行目录  OnePlatform\oneWeb 下文件
-	http://127.0.0.1:9090/oneweb/admin/index.html
-                最终访问: D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\oneWeb\admin\index.html
-	
-	第二种:把文件放在虚拟目录下
-	例: 虚拟路径代码(TEST)---实际物理路径(D:\test)
-	如下 onewebv特定标识,表明要访问虚拟路径文件 /test/ 虚拟路径代码  admin/index.html 路径代码
-                http://127.0.0.1:9090/onewebv/test/admin/index.html
-	最终访问:D:\test\admin\index.html
-
-	2.增加文件访问Demo
-	 DemoWebFileController
-
-*************2022-12-28**************
-
-服务端:
-	1.界面增加路由情况查看,以及路由注册失败原因
- 	2.MVC增加方法能数为 TJsonObject,TJsonArray,TJSonValue参数，有且只能有一个参数系统单元system.json
-	例:DemoJsonController=> function GetJsonParam(QJsonObj: TJsonObject): string;
-	3.新增的ORM在11版本以下不兼容，进行了修正兼容。
-	4.优化 OneHttpRouterManage.TOneRouterItem相关方法及属性
-	5.其它修正及优化
-	
-*************2022-12-27**************
-
-服务端:
-	1.完成orm查询测式 Demo：DemoOrmController
-	
-*************2022-12-26**************
-
-有事外出处理事情
-
-*************2022-12-25**************
-
-有事外出处理事情
-
-*************2022-12-24**************
-
-在次感谢
-今天收到QQ群友的  蓝色  一万元赞助，算是今年中最幸运的一件事吧。倒霉了一年，希望有个新的开始,
-谢谢支持鼓励
-
-*************2022-12-23**************
-
-在次感谢
-今天收到QQ群友的  蓝色  一万元赞助，算是今年中最幸运的一件事吧。倒霉了一年，希望有个新的开始,
-谢谢支持鼓励
-
-*************2022-12-22**************
-
-今天收到QQ群友的  蓝色  一万元赞助，算是今年中最幸运的一件事吧。倒霉了一年，希望有个新的开始,
-谢谢支持鼓励
-
-*************2022-12-21**************
-
-搭建ORM基类
-
-*************2022-12-20**************
-
-搭建ORM基类
-
-*************2022-12-19**************
-
-搭建ORM基类
-
-*************2022-12-18**************
-
-服务端:
-	1.增加对接OneClient分块上传下载功能
-客户端:
-	1.增加对接服务端分块上传下载的功能
-	2.增加Demo文件分块上传下载
-
-今天收到QQ群友(790166332)的两箱橙子，挺好吃的,愉快的一天，谢谢对作者的支持和鼓励。
-
-*************2022-12-17**************
-
-休息
-
-*************2022-12-16**************
-
-服务端:
-	1.增加对接OneClient文件上传下载(小文件), 单元 VirtualFileController
-	 2.修正一些功能
-客户端:
-	1.增加对接服务端小文件上传下载，一次性上传下载
-	2.增加文件上传下载Demo
-	3.修正一些功能
-
-*************2022-12-15**************
-
-心累，休息。 
-
-*************2022-12-14**************
-
-心累，休息。
-
-*************2022-12-13**************
-
-服务端:
-	1.加快openData取数据文件下载模式压缩，直接压缩流.
-	2.返回的JSON数据不在采用uncoide编码 \uxxxx 直接UTF8编码
-客户端:
-	1.修正自定义事务控制DemoBUG及异常，纠正DEMO写法
-                2.增加DataSet.OpenAsync,DataSet.SaveAsync
-                3.增加异步Demo	
-	4.增加Api使用Demo
-                5.优化一些功能
->>>>>>> 3534846d7651edd1a6a40a03094eb6abfb4e7ad8
