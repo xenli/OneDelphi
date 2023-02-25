@@ -64,7 +64,8 @@ oneuniapp客户端:
 
 ************2023-02-17***********  
 服务端:  
-	1.增加OneUniDemo与oneUniapp相关单元对接, 在线地址:http://house.callbaba.cn/#/,或安装OneUniApp.apk,在开源群里有
+	1.增加OneUniDemo与oneUniapp相关单元对接, 在线地址:http://house.callbaba.cn/#/
+	 或安装OneUniApp.apk,在开源群里有  
 	2.服务端增加删除虚拟文件的功能  
 	
 客户端:  
