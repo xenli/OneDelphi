@@ -1,6 +1,6 @@
-# OneDelphi
-## OneDelphi基于Delphi IDE开发的三层中间件，一个MVC及传统DataSet框架，Mormot2的HTTP通讯
-
+# OneDelphi 
+## OneDelphi是叫兽(FLM)QQ:378464060基于Delphi IDE开发的三层中间件，开源免费，支持MVC及传统DataSet框架，使用的是Mormot2的HTTP通讯
+### Delphi三层中间件 Dephi中间件 Delphi开源中间件
 >                                                 叫兽(FLM)出品
 >                                                 QQ:378464060
 
