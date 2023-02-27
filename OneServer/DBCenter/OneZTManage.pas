@@ -1514,8 +1514,8 @@ begin
         for lZTItem in lZTItemList.Values do
         begin
           // 自定义事务的,是由客户端自由控制
-          if lZTItem.FCustTran then
-            lZTItem.ADConnection.StartTransaction;
+          if not lZTItem.FCustTran then
+            lZTItem.ADTransaction.StartTransaction;
         end;
         // 循环提交的数据，处理
         for i := 0 to QSaveDMLDatas.Count - 1 do
@@ -1678,7 +1678,7 @@ begin
         for lZTItem in lZTItemList.Values do
         begin
           if not lZTItem.FCustTran then
-            lZTItem.ADConnection.Commit;
+            lZTItem.ADTransaction.Commit;
         end;
         QOneDataResult.ResultOK := true;
         isCommit := true;
@@ -1698,7 +1698,7 @@ begin
         for lZTItem in lZTItemList.Values do
         begin
           if not lZTItem.FCustTran then
-            lZTItem.ADConnection.Rollback;
+            lZTItem.ADTransaction.Rollback;
         end;
       end;
     end;

@@ -47,6 +47,20 @@
 
 ## 更新日志
 
+************2023-02-26***********  
+服务端:  
+	1.修正 SaveData事务处理多个数据集前面提交后面出错，前面事务未回滚问题。在迁移代码，漏了个not  
+客户端:  
+	1.OneCleint包控件TOneDataSet增加  
+	一次性打开多个数据集  
+	   function OpenDatas(QOpenDatas: array of TOneDataSet): boolean;  
+	示例  
+	  if not qryModule.OpenDatas([qryModule, qryData, qryUI, qryControl, qryButton, qryButtonpop]) then  
+	2.OneCleint包控件TOneDataSet增加  
+	  function SaveDatas(QOpenDatas: array of TOneDataSet): boolean;  
+	示例  
+	  qryModule.SaveDatas([qryModule, qryData, qryUI, qryControl, qryButton, qryButtonpop])  
+
 ************2020-02-24***********  
 服务端:  
 	1.优化 OneMultipart 对multipart/form-data解析，以及BUG，此单元值得你拥有, 解析multipart函数,D基本没有  

@@ -180,6 +180,7 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function OpenData: boolean;
+    function OpenDatas(QOpenDatas: array of TOneDataSet): boolean;
     /// <summary>
     /// 异步打开数据集，返回所有数据，如果Pagesize和PageIndex设置，则返回分页数据
     /// </summary>
@@ -195,6 +196,7 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function SaveData: boolean;
+    function SaveDatas(QOpenDatas: array of TOneDataSet): boolean;
     procedure SaveDataAsync(QCallEven: EvenOKCallBack);
     /// <summary>
     /// 执行DML语句,update,insert,delete语句
@@ -440,6 +442,37 @@ begin
   Result := Self.FDataInfo.FConnection.OpenData(Self);
 end;
 
+function TOneDataSet.OpenDatas(QOpenDatas: array of TOneDataSet): boolean;
+var
+  QList: TList<TObject>;
+  i: Integer;
+  lErrMsg: string;
+begin
+  Result := False;
+  if Self.FDataInfo.FConnection = nil then
+    Self.FDataInfo.FConnection := OneClientConnect.Unit_Connection;
+  if Self.FDataInfo.FConnection = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集Connection=nil';
+    exit;
+  end;
+  QList := TList<TObject>.Create;
+  try
+    for i := Low(QOpenDatas) to High(QOpenDatas) do
+    begin
+      QList.Add(QOpenDatas[i]);
+    end;
+    Result := Self.FDataInfo.FConnection.OpenDatas(QList, lErrMsg);
+    if not Result then
+    begin
+      Self.DataInfo.ErrMsg := lErrMsg;
+    end;
+  finally
+    QList.Clear;
+    QList.Free;
+  end;
+end;
+
 procedure TOneDataSet.OpenDataAsync(QCallEven: EvenOKCallBack);
 var
   aTask: ITask;
@@ -483,6 +516,37 @@ begin
     exit;
   end;
   Result := Self.FDataInfo.FConnection.SaveData(Self);
+end;
+
+function TOneDataSet.SaveDatas(QOpenDatas: array of TOneDataSet): boolean;
+var
+  QList: TList<TObject>;
+  i: Integer;
+  lErrMsg: string;
+begin
+  Result := False;
+  if Self.FDataInfo.FConnection = nil then
+    Self.FDataInfo.FConnection := OneClientConnect.Unit_Connection;
+  if Self.FDataInfo.FConnection = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集Connection=nil';
+    exit;
+  end;
+  QList := TList<TObject>.Create;
+  try
+    for i := Low(QOpenDatas) to High(QOpenDatas) do
+    begin
+      QList.Add(QOpenDatas[i]);
+    end;
+    Result := Self.FDataInfo.FConnection.SaveDatas(QList, lErrMsg);
+    if not Result then
+    begin
+      Self.DataInfo.ErrMsg := lErrMsg;
+    end;
+  finally
+    QList.Clear;
+    QList.Free;
+  end;
 end;
 
 procedure TOneDataSet.SaveDataAsync(QCallEven: EvenOKCallBack);

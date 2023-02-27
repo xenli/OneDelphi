@@ -1,15 +1,15 @@
-::刪除D7中臨時文件
-Rem 刪除Delphi臨時文件,*.db,*.mb,
+::删除D7中临时文件
+Rem 删除Delphi临时文件,*.db,*.mb,
 Rem ****************************
 @dir/w/s *.~*,*.dcu
-@echo 以上為當前目錄及子目錄臨時文件,請按任意鍵確認刪除!
+@echo 以上为当前目录及子目录临时文件,请按任意键确认删除!
 @pause
 @for /r . %%a in (.) do @if exist "%%a\*.~*" del "%%a\*.~*"
 ::@for /r . %%a in (.) do @if exist "%%a\*.db" del "%%a\*.db"
 ::@for /r . %%a in (.) do @if exist "%%a\*.mb" del "%%a\*.mb"
 @for /r . %%a in (.) do @if exist "%%a\*.dcu" del "%%a\*.dcu"
-@echo 刪除成功!
-::刪除D10中臨時文件
-del /s/f/q __history
-
-
+@echo 删除成功!
+::删除D10中临时文件
+del __recovery /s
+del __history /s
+pause
