@@ -1,6 +1,5 @@
 # OneDelphi 
 ## OneDelphi是叫兽(FLM)QQ:378464060基于Delphi IDE开发的三层中间件，开源免费，支持MVC及传统DataSet框架，使用的是Mormot2的HTTP通讯
-### Delphi三层中间件 Dephi中间件 Delphi开源中间件
 >                                                 叫兽(FLM)出品
 >                                                 QQ:378464060
 
@@ -236,7 +235,8 @@ OneDelphi正式版,正式发布.
 	2.返回的JSON数据不在采用uncoide编码 \uxxxx 直接UTF8编码  
 客户端:  
 	1.修正自定义事务控制DemoBUG及异常，纠正DEMO写法  
-  2.增加DataSet.OpenAsync,DataSet.SaveAsync  
-  3.增加异步Demo	 
-	4.增加Api使用Demo  
-  5.优化一些功能
+        2.增加DataSet.OpenAsync,DataSet.SaveAsync  
+        3.增加异步Demo	 
+        4.增加Api使用Demo  
+        5.优化一些功能  
+### Delphi三层中间件 Dephi中间件 Delphi开源中间件
