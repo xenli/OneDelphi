@@ -71,12 +71,14 @@ uses
   UniGoodsController in 'OneUniDemo\UniGoodsController.pas',
   UniBillSendController in 'OneUniDemo\UniBillSendController.pas',
   UniClass in 'OneUniDemo\UniClass.pas',
-  UniSendReceivController in 'OneUniDemo\UniSendReceivController.pas';
+  UniSendReceivController in 'OneUniDemo\UniSendReceivController.pas',
+  OneFastModuleManage in 'OneFastCleint\OneFastModuleManage.pas',
+  OneFastModuleController in 'OneFastCleint\OneFastModuleController.pas',
+  ZTManageController in 'httpServer\Controller\ZTManageController.pas';
 
 var
   lpStartupInfo: TStartupInfo;
   lpProcessInformation: TProcessInformation;
-
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;

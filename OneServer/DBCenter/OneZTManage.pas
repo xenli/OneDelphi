@@ -1322,6 +1322,7 @@ begin
             LZTQuery.FetchOptions.RecsSkip := -1;
             LZTQuery.FetchOptions.RecsMax := -1;
             lSQL := ClearOrderBySQL(lOpenData.OpenSQL);
+            lSQL := lSQL.Replace(' * ', ' 1 as one_zsys_temp_aaa ');
             lSQL := 'select count(1) from ( ' + lSQL + ' ) tempCount';
             LZTQuery.SQL.Text := lSQL;
             for iParam := 0 to LZTQuery.Params.Count - 1 do

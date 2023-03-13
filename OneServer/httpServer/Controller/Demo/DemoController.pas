@@ -95,8 +95,7 @@ type
     function OneGetPersonListResult(): TPersonListResult;
     // 圈套类 提交的数据 TPersonResult对象含有对象属性
     // 在 TPersonResult.create要先创建好 FPerson :=  TPersonDemo.Create; 方可接收参数
-    function OnePostPersonListResult(personListResult
-      : TPersonListResult): string;
+    function OnePostPersonListResult(personListResult: TPersonListResult): string;
   end;
 
 function CreateNewDemoController(QRouterItem: TOneRouterItem): TObject;
@@ -144,8 +143,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TDemoController.HelloWorld(QHTTPCtxt: THTTPCtxt;
-  QHTTPResult: THTTPResult);
+procedure TDemoController.HelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
 begin
   // 默认JSON输出，ResultData=QHTTPResult.ResultOut;
   // 最终结果:{ResultCode: "0001", ResultMsg: "", ResultCount: 0, ResultData: "欢迎来到HelloWorld"}
@@ -153,8 +151,7 @@ begin
   QHTTPResult.SetHTTPResultTrue();
 end;
 
-procedure TDemoController.HelloWorldStr(QHTTPCtxt: THTTPCtxt;
-  QHTTPResult: THTTPResult);
+procedure TDemoController.HelloWorldStr(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
 begin
   QHTTPResult.ResultOut := '欢迎来到HelloWorld';
   // 最终结果只输出文本:欢迎来到HelloWorld
@@ -162,8 +159,7 @@ begin
   QHTTPResult.SetHTTPResultTrue();
 end;
 
-procedure TDemoController.person(QHTTPCtxt: THTTPCtxt;
-  QHTTPResult: THTTPResult);
+procedure TDemoController.person(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
 var
   lPersonDemo: TPersonDemo;
 begin
@@ -375,8 +371,7 @@ end;
 
 // 混合参数
 // 以OnePost开头只支持post访问,混合参数person,name取自提交的JSON数据{person:{name: "范联满1", age: 32},name:"范联满2"}反射成類 TPersonDemo
-function TDemoController.OnePostPersonB(person: TPersonDemo; name: string)
-  : TPersonDemo;
+function TDemoController.OnePostPersonB(person: TPersonDemo; name: string): TPersonDemo;
 var
   lPersonDemo: TPersonDemo;
 begin
@@ -388,8 +383,7 @@ begin
   result := lPersonDemo;
 end;
 
-function TDemoController.OnePostPersonList(persons: TList<TPersonDemo>)
-  : TList<TPersonDemo>;
+function TDemoController.OnePostPersonList(persons: TList<TPersonDemo>): TList<TPersonDemo>;
 var
   lPersonDemo: TPersonDemo;
   i: integer;
@@ -415,8 +409,7 @@ begin
   result.person.age := 19;
 end;
 
-function TDemoController.OnePostPersonResult(personResult
-  : TPersonResult): string;
+function TDemoController.OnePostPersonResult(personResult: TPersonResult): string;
 begin
   result := '收到数据成功 code->' + personResult.resultCode;
   if personResult.person <> nil then
@@ -443,8 +436,7 @@ begin
 
 end;
 
-function TDemoController.OnePostPersonListResult(personListResult
-  : TPersonListResult): string;
+function TDemoController.OnePostPersonListResult(personListResult: TPersonListResult): string;
 begin
   result := '收到数据成功 code->' + personListResult.resultCode;
   if personListResult.persons <> nil then
@@ -475,14 +467,11 @@ initialization
 
 // 注意，路由名称 不要一样，否则会判定已注册过，跳过
 // 多例模式注册
-OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoA',
-  TDemoController, 100, CreateNewDemoController);
+OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoA', TDemoController, 100, CreateNewDemoController);
 // 单例模式注册
-OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('DemoB',
-  TDemoController, 100, CreateNewDemoController);
+OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('DemoB', TDemoController, 100, CreateNewDemoController);
 // 方法注册
-OneHttpRouterManage.GetInitRouterManage().AddHTTPEvenWork('DemoEven',
-  HelloWorldEven, 10);
+OneHttpRouterManage.GetInitRouterManage().AddHTTPEvenWork('DemoEven', HelloWorldEven, 10);
 
 finalization
 

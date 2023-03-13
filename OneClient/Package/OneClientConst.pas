@@ -27,7 +27,7 @@ type
   // upDownListEnd批量文件上传结束
   emUpDownMode = (UpLoad, DownLoad);
   emUpDownChunkStatus = (upDownUnknow, upDownErr, upDownStart, upDownProcess, upDownEnd, upDownListStar, upDownListProcess, upDownListEnd);
-  EvenUpDownChunkCallBack =reference to procedure(QUpDownMode: emUpDownMode; QStatus: emUpDownChunkStatus; QTotalSize: int64; QPosition: int64; QErrmsg: string);
+  EvenUpDownChunkCallBack = reference to procedure(QUpDownMode: emUpDownMode; QStatus: emUpDownChunkStatus; QTotalSize: int64; QPosition: int64; QErrmsg: string);
 
   EvenOKCallBack = reference to procedure(QIsOK: boolean; QErrmsg: string);
 
@@ -85,6 +85,15 @@ type
     property NewFileName: string read FNewFileName write FNewFileName;
     property ErrMsg: string read FErrMsg write FErrMsg;
     property IsEnd: boolean read FIsEnd write FIsEnd;
+  end;
+
+  TZTInfo = class
+  private
+    FZTCode: string;
+    FZTCaption: string;
+  public
+    property ZTCode: string read FZTCode write FZTCode;
+    property ZTCaption: string read FZTCaption write FZTCaption;
   end;
 
 implementation

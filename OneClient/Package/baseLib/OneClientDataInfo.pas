@@ -125,14 +125,10 @@ type
     property OtherKeys: string read FOtherKeys write FOtherKeys;
     property saveData: string read FSaveData write FSaveData;
     property UpdateMode: string read FUpdateMode write FUpdateMode;
-    property AffectedMaxCount: Integer read FAffectedMaxCount
-      write FAffectedMaxCount;
-    property AffectedMustCount: Integer read FAffectedMustCount
-      write FAffectedMustCount;
-    property SaveDataInsertSQL: string read FSaveDataInsertSQL
-      write FSaveDataInsertSQL;
-    property SaveDataUpdateSQL: string read FSaveDataUpdateSQL
-      write FSaveDataUpdateSQL;
+    property AffectedMaxCount: Integer read FAffectedMaxCount write FAffectedMaxCount;
+    property AffectedMustCount: Integer read FAffectedMustCount write FAffectedMustCount;
+    property SaveDataInsertSQL: string read FSaveDataInsertSQL write FSaveDataInsertSQL;
+    property SaveDataUpdateSQL: string read FSaveDataUpdateSQL write FSaveDataUpdateSQL;
     property SaveDataDelSQL: string read FSaveDataDelSQL write FSaveDataDelSQL;
     property IsReturnData: Boolean read FIsReturnData write FIsReturnData;
     property IsAutoID: Boolean read FIsAutoID write FIsAutoID;
@@ -156,14 +152,12 @@ type
     procedure SetStream(QStream: TMemoryStream);
   public
     property ResultPage: Boolean read FResultPage write FResultPage;
-    property ResultDataCount: Integer read FResultDataCount
-      write FResultDataCount;
+    property ResultDataCount: Integer read FResultDataCount write FResultDataCount;
     property ResultTotal: Integer read FResultTotal write FResultTotal;
     property RecordCount: Integer read FRecordCount write FRecordCount;
     property ResultDataMode: string read FResultDataMode write FResultDataMode;
     property ResultContext: string read FResultContext write FResultContext;
-    property ResultParams: TList<TOneParam> read FResultParams
-      write FResultParams;
+    property ResultParams: TList<TOneParam> read FResultParams write FResultParams;
   end;
 
   // 返回结果
@@ -183,8 +177,7 @@ type
     property ResultMsg: string read FResultMsg write FResultMsg;
     property ResultData: string read FResultData write FResultData;
     property ResultCount: Integer read FResultCount write FResultCount;
-    property ResultItems: TList<TOneDataResultItem> read FResultItems
-      write FResultItems;
+    property ResultItems: TList<TOneDataResultItem> read FResultItems write FResultItems;
   end;
 
 implementation
@@ -308,8 +301,7 @@ begin
     begin
       if lDataResultItem.FTempStream <> nil then
       begin
-        lDataResultItem.ResultContext := OneStreamString.StreamToBase64Str
-          (lDataResultItem.FTempStream);
+        lDataResultItem.ResultContext := OneStreamString.StreamToBase64Str(lDataResultItem.FTempStream);
         // 即时释放内存
         lDataResultItem.FTempStream.Clear;
         lDataResultItem.FTempStream.Free;

@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 75
     Width = 886
     Height = 517
-    ActivePage = tabServerReamk
+    ActivePage = tabHTTPServer
     Align = alClient
     TabOrder = 0
     ExplicitWidth = 882
@@ -1131,8 +1131,8 @@ object frmMain: TfrmMain
     end
   end
   object plZTSet: TPanel
-    Left = 218
-    Top = 178
+    Left = 225
+    Top = 217
     Width = 401
     Height = 232
     Color = clSkyBlue

@@ -5,6 +5,7 @@ interface
 uses system.StrUtils, system.SysUtils;
 
 const
+  HTTP_Status_TokenFail = 498;
   HTTP_ResultCode_True = '0001';
   HTTP_ResultCode_Fail = '0002';
   HTTP_ResultCode_TokenFail = 'TokenFail';

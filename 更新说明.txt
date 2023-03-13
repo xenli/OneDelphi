@@ -1,6 +1,39 @@
-------OneDelphi基于Delphi IDE开发的
-------OneLaz基于Lazarus+fpc相当于D7开发的
-------OneUniApp基于uniApp开发的快速对接OneDelphi与OneLaz
+------OneDelphi  MVC及DataSet双架构
+        	基于Delphi IDE开发的 免费开源 QQ群:193878346
+------OneLaz  MVC及DataSet双架构	
+	基于Lazarus+fpc相当于D7开发的 收费899年费
+------OneUniApp
+	基于uniApp开发的快速对接OneDelphi与OneLaz   
+------OneFastCleint
+	快速开发框架,或报表或原型快速演示
+
+************2023-03-13***********
+服务端:
+	1.主要增加OneFastCleint相关对接单元
+	2.增加TOneTokenManage.TokenTimeOutSec Token失效时间功能处理
+	3.增加 ZTManageController开放获取账套信息
+	4.以及一些优化修正
+客户端:
+	1.OneCleint包控件TOneDataSet增加
+                   跟据SQL检测某个字段是否重复
+	   function CheckRepeat(QSQL: string; QParamValues: array of Variant; QSourceValue: string): boolean;
+	   执行DML语句,update,insert,delete语句，依托于DataSet但不会影响本身DataSet任何东东
+                   function ExecDMLSQL(QSQL: string; QParamValues: array of Variant; QMustOneAffected: boolean = true): boolean;
+                   及一些功能增加
+                2.TOneConnection
+                    //验证失败回调事件,比如回调登陆界面
+                    FTokenFailCallBack
+                    获取账套信息能力
+                    function OneGetZTList(Var QErrMsg: string): TList<TZTInfo>;
+                    function OneGetZTStringList(Var QErrMsg: string): TStringList;
+                     //功能扩展
+                     function GetResultBytes(const QUrl: string): TOneResultBytes;
+                     及一些功能增加和修正
+                 3.OneFastClient
+                     是的，一个快速开发
+有的东东我增加了，我忘了大体功能或什么的。。。不在以上描述，自已对比大体代码
+                
+
 ************2023-02-26***********
 服务端:
 	1.修正 SaveData事务处理多个数据集前面提交后面出错，前面事务未回滚问题。在迁移代码，漏了个not

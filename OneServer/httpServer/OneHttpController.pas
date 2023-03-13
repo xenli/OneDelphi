@@ -45,7 +45,8 @@ type
     { 验证Token 签名 合法性 }
     function CheckSign(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean; virtual;
     // 获取方法参数值   var QParamNewObjs: TList<Tobject>
-    function DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti; QParamObjRttiList: TList<TRttiType>; QParamNewObjList: TList<TObject>; Var QErrMsg: string): TArray<TValue>;
+    function DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti; QParamObjRttiList: TList<TRttiType>; QParamNewObjList: TList<TObject>;
+      Var QErrMsg: string): TArray<TValue>;
     { 执行相关方法 }
     procedure DoMethodFreeParams(QParamObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>);
     procedure DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>); virtual;
@@ -397,6 +398,7 @@ begin
           // URL包括Token的参数,对token进行验证
           if not self.CheckToken(QHTTPCtxt, QHTTPResult) then
           begin
+            QHTTPResult.ResultStatus := HTTP_Status_TokenFail;
             exit;
           end;
           if not self.CheckSign(QHTTPCtxt, QHTTPResult) then
@@ -457,7 +459,8 @@ begin
 end;
 
 // ;var QParamNewObjs: TList<Tobject>
-function TOneControllerBase.DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti; QParamObjRttiList: TList<TRttiType>; QParamNewObjList: TList<TObject>; Var QErrMsg: string): TArray<TValue>;
+function TOneControllerBase.DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti; QParamObjRttiList: TList<TRttiType>; QParamNewObjList: TList<TObject>;
+  Var QErrMsg: string): TArray<TValue>;
 var
   lArgs: TArray<TValue>;
   lParameters: TArray<TRttiParameter>;
@@ -584,7 +587,7 @@ begin
           // 判断是不是JSON格式
           if QHTTPCtxt.RequestInContent = '' then
           begin
-            QErrMsg := 'post提交无任何数据';
+            QErrMsg := '此接口需提供相关参数,当前POST提交的数据为空';
             exit;
           end;
           // 转成JSON参数

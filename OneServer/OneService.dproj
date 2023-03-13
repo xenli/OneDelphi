@@ -196,6 +196,9 @@
         <DCCReference Include="OneUniDemo\UniBillSendController.pas"/>
         <DCCReference Include="OneUniDemo\UniClass.pas"/>
         <DCCReference Include="OneUniDemo\UniSendReceivController.pas"/>
+        <DCCReference Include="OneFastCleint\OneFastModuleManage.pas"/>
+        <DCCReference Include="OneFastCleint\OneFastModuleController.pas"/>
+        <DCCReference Include="httpServer\Controller\ZTManageController.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

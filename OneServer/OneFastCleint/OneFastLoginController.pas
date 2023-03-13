@@ -113,6 +113,7 @@ begin
       lOneTokenItem.SetZTCode(QLogin.loginZTCode); // 指定账套
       lOneTokenItem.SetSysUserID(QLogin.loginCode);
       lOneTokenItem.SetSysUserName('超级管理员');
+      lOneTokenItem.SetSysUserType('超级管理员');
       lOneTokenItem.SetSysUserCode(QLogin.loginCode);
       // 返回信息设置
       result.resultData := TFastLogin.Create;
@@ -143,7 +144,8 @@ begin
     // 从账套获取现成的FDQuery,已绑定好 connetion,也无需释放
     lFDQuery := lZTItem.ADQuery;
     // 这边改成你的用户表
-    lFDQuery.SQL.Text := 'select FAdminID,FAdminCode,FAdminName,FAdminPass,FAdminType,FIsEnable,FIsLimit,FLimtStartTime,FLimtEndTime from onefast_admin where FAdminCode=:FAdminCode';
+    lFDQuery.SQL.Text := 'select FAdminID,FAdminCode,FAdminName,FAdminPass,FAdminType,FIsEnable,FIsLimit,FLimtStartTime,FLimtEndTime,FIsMultiLogin ' +
+      ' from onefast_admin where FAdminCode=:FAdminCode';
     lFDQuery.Params[0].AsString := QLogin.loginCode;
     lFDQuery.Open;
     if lFDQuery.RecordCount = 0 then
@@ -188,7 +190,7 @@ begin
     // 正确增加Token返回相关的toeknID及私钥
     lOneTokenManage := TOneGlobal.GetInstance().TokenManage;
     // true允许同个账号共用token,测试接口共享下防止踢来踢去
-    lOneTokenItem := lOneTokenManage.AddLoginToken('fastClient', QLogin.loginCode, true, lErrMsg);
+    lOneTokenItem := lOneTokenManage.AddLoginToken('fastClient', QLogin.loginCode, lFDQuery.FieldByName('FIsMultiLogin').AsBoolean, lErrMsg);
     if lOneTokenItem = nil then
     begin
       result.resultMsg := lErrMsg;
@@ -200,6 +202,7 @@ begin
     lOneTokenItem.SetSysUserID(lFDQuery.FieldByName('FAdminID').AsString);
     lOneTokenItem.SetSysUserName(lFDQuery.FieldByName('FAdminName').AsString);
     lOneTokenItem.SetSysUserCode(lFDQuery.FieldByName('FAdminCode').AsString);
+    lOneTokenItem.SetSysUserType(lFDQuery.FieldByName('FAdminType').AsString);
     // 返回信息设置
     result.resultData := TFastLogin.Create;
     result.resultData.loginCode := QLogin.loginCode;

@@ -73,8 +73,7 @@ initialization
 
 // 注意，路由名称 不要一样，否则会判定已注册过，跳过
 // 多例模式注册
-OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoData',
-  TDemoDataController, 10, CreateNewDemoDataController);
+OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('DemoData', TDemoDataController, 0, CreateNewDemoDataController);
 
 finalization
 

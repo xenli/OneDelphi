@@ -19,6 +19,7 @@ type
     FMenuOpenMode_: string;
     FMenuModuleCode_: string;
     FMenuScript_: string;
+    FMenuStatus_: string;
     FChilds_: TList<TFastMenu>;
   public
     constructor Create;
@@ -32,12 +33,13 @@ type
     property FMenuOpenMode: string read FMenuOpenMode_ write FMenuOpenMode_;
     property FMenuModuleCode: string read FMenuModuleCode_ write FMenuModuleCode_;
     property FMenuScript: string read FMenuScript_ write FMenuScript_;
+    property FMenuStatus: string read FMenuStatus_ write FMenuStatus_;
     property FChilds: TList<TFastMenu> read FChilds_ write FChilds_;
   end;
 
   TFastAdminController = class(TOneControllerBase)
   private
-    function MenuRemoveByID(QMenu: TFastMenu; QMenuID: string): boolean;
+    function MenuRemove(QMenu: TFastMenu): boolean;
   public
     function GetAdminMenu(): TActionResult<TFastMenu>;
   end;
@@ -76,24 +78,41 @@ begin
   result := lController;
 end;
 
-function TFastAdminController.MenuRemoveByID(QMenu: TFastMenu; QMenuID: string): boolean;
+function TFastAdminController.MenuRemove(QMenu: TFastMenu): boolean;
 var
   i: integer;
+  lFastMenu: TFastMenu;
+  lIsCanDel: boolean;
 begin
   result := false;
-  for i := 0 to QMenu.FChilds.Count - 1 do
+  for i := QMenu.FChilds.Count - 1 downto 0 do
   begin
-    if QMenu.FChilds[i].FMenuID = QMenuID then
+    lIsCanDel := false;
+    lFastMenu := QMenu.FChilds[i];
+    if lFastMenu.FChilds.Count = 0 then
     begin
-      // 明细child.child由child释放
-      QMenu.FChilds[i].Free;
-      result := false;
-      exit;
+      if (lFastMenu.FMenuStatus = '未启用') or (lFastMenu.FMenuStatus = '禁用') then
+      begin
+        lIsCanDel := true;
+      end
+      else
+      begin
+        // 有启用的
+        result := true;
+      end;
     end
     else
     begin
-      if self.MenuRemoveByID(QMenu.FChilds[i], QMenuID) then
-        exit;
+      if not self.MenuRemove(lFastMenu) then
+      begin
+        // 无任何启用的删除节点
+        lIsCanDel := true;
+      end;
+    end;
+    if lIsCanDel then
+    begin
+      lFastMenu.Free;
+      QMenu.FChilds.Delete(i);
     end;
   end;
 end;
@@ -154,6 +173,7 @@ begin
       lTempMenu.FMenuOpenMode := lFDQuery.FieldByName('FMenuOpenMode').AsString;
       lTempMenu.FMenuModuleCode := lFDQuery.FieldByName('FMenuModuleCode').AsString;
       lTempMenu.FMenuScript := lFDQuery.FieldByName('FMenuScript').AsString;
+      lTempMenu.FMenuStatus := '未启用';
       if lFPMenuID = '' then
       begin
         lDictMenus.Add(lFMenuID, lTempMenu);
@@ -173,43 +193,33 @@ begin
       end;
       lFDQuery.Next;
     end;
-    // 角色启用禁用
-    lFDQuery := lZTItem.ADQuery;
-    lFDQuery.SQL.Text := 'select ' + ' B.FStatus,C.FMenuID,C.FPMenuID,C.FMenuTreeCode,C.FMenuCaption,C.FMenuImgIndex,C.FMenuOpenMode,C.FMenuModuleCode,C.FMenuScript ' + ' from onefast_admin_role A ' +
-      ' inner join onefast_role_menu B on(A.FRoleID=B.FRoleID) ' + ' inner join onefast_menu C on(B.FMenuID=C.FMenuID) ' + ' order by C.FMenuTreeCode asc';
-    lFDQuery.Open;
-    // 多角色组合权限,有一个启用就算启用
-    lDictMenus.Clear;
-    lFDQuery.First;
-    while not lFDQuery.Eof do
+    // 非超级管理员还得处理个人角色或个人菜单权限
+    if LTokenItem.SysUserType() <> '超级管理员' then
     begin
-      lStatus := lFDQuery.FieldByName('FStatus').AsString;
-      lFMenuID := lFDQuery.FieldByName('FMenuID').AsString;
-      if lStatus = '禁用' then
-      begin
-        lDictMenus.Add(lFMenuID, nil);
-      end;
-      lFDQuery.Next;
-    end;
+      // 角色启用禁用
+      lFDQuery := lZTItem.ADQuery;
+      lFDQuery.SQL.Text := 'select ' +
+        ' B.FStatus,C.FMenuID,C.FPMenuID,C.FMenuTreeCode,C.FMenuCaption,C.FMenuImgIndex,C.FMenuOpenMode,C.FMenuModuleCode,C.FMenuScript ' +
+        ' from onefast_admin A inner join onefast_role_menu B on(A.FRoleID=B.FRoleID) ' +
+        ' inner join onefast_menu C on(B.FMenuID=C.FMenuID) ' +
+        ' where A.FAdminID=:FAdminID ' +
+        ' order by C.FMenuTreeCode asc';
+      lFDQuery.Params[0].AsString := LTokenItem.SysUserID;
+      lFDQuery.Open;
 
-    lFDQuery.First;
-    while not lFDQuery.Eof do
-    begin
-      lStatus := lFDQuery.FieldByName('FStatus').AsString;
-      lFMenuID := lFDQuery.FieldByName('FMenuID').AsString;
-      if lStatus = '启用' then
+      lFDQuery.First;
+      while not lFDQuery.Eof do
       begin
-        if lDictMenus.ContainsKey(lFMenuID) then
+        lStatus := lFDQuery.FieldByName('FStatus').AsString;
+        lFMenuID := lFDQuery.FieldByName('FMenuID').AsString;
+        if lDictMenus.TryGetValue(lFMenuID, lTempMenu) then
         begin
-          lDictMenus.Remove(lFMenuID);
+          lTempMenu.FMenuStatus := lStatus;
         end;
+        lFDQuery.Next;
       end;
-      lFDQuery.Next;
-    end;
-    // 删除禁用的
-    for lFMenuID in lDictMenus.Keys do
-    begin
-      self.MenuRemoveByID(result.ResultData, lFMenuID);
+      // 删除掉未启用的,及禁用的
+      self.MenuRemove(result.ResultData);
     end;
     result.SetResultTrue;
   finally

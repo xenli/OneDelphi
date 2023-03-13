@@ -57,30 +57,34 @@ begin
   result := lController;
 end;
 
-function TOneDataController.OpenDatas(QDataOpens: TList<TOneDataOpen>)
-  : TOneDataResult;
+function TOneDataController.OpenDatas(QDataOpens: TList<TOneDataOpen>): TOneDataResult;
 var
   lOneGlobal: TOneGlobal;
   i: Integer;
 begin
   result := TOneDataResult.Create;
-  lOneGlobal := TOneGlobal.GetInstance();
+  try
+    lOneGlobal := TOneGlobal.GetInstance();
+    for i := 0 to QDataOpens.Count - 1 do
+    begin
+      // 客户端提交的 SQL还原
+      QDataOpens[i].OpenSQL := OneSQLCrypto.SwapDecodeCrypto(QDataOpens[i].OpenSQL);
+    end;
+    // 打开数据
+    if not lOneGlobal.ZTManage.OpenDatas(QDataOpens, result) then
+    begin
+      exit;
+    end;
+    // 解析相关数据
+    if result.ResultOK then
+    begin
+      result.DoResultitems();
+    end;
+  except
+    on e: Exception do
+    begin
 
-  for i := 0 to QDataOpens.Count - 1 do
-  begin
-    // 客户端提交的 SQL还原
-    QDataOpens[i].OpenSQL := OneSQLCrypto.SwapDecodeCrypto
-      (QDataOpens[i].OpenSQL);
-  end;
-  // 打开数据
-  if not lOneGlobal.ZTManage.OpenDatas(QDataOpens, result) then
-  begin
-    exit;
-  end;
-  // 解析相关数据
-  if result.ResultOK then
-  begin
-    result.DoResultitems();
+    end;
   end;
 end;
 
@@ -103,8 +107,7 @@ begin
   end;
 end;
 
-function TOneDataController.SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>)
-  : TOneDataResult;
+function TOneDataController.SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>): TOneDataResult;
 var
   lOneGlobal: TOneGlobal;
   i: Integer;
@@ -139,8 +142,7 @@ begin
     result.ResultMsg := '文件ID为空';
     exit;
   end;
-  lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' +
-    fileID + '.zip');
+  lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' + fileID + '.zip');
   if not fileExists(lFileName) then
   begin
     result.ResultMsg := '文件已不存在';
@@ -159,8 +161,7 @@ begin
   begin
     exit;
   end;
-  lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' +
-    fileID + '.data');
+  lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' + fileID + '.data');
   if fileExists(lFileName) then
   begin
     DeleteFile(lFileName);
@@ -180,8 +181,7 @@ begin
   lTranID := '';
   if QTranInfo.MaxSpan <= 0 then
     QTranInfo.MaxSpan := -1;
-  lTranID := lOneGlobal.ZTManage.LockTranItem(QTranInfo.ZTCode,
-    QTranInfo.MaxSpan, lErrMsg);
+  lTranID := lOneGlobal.ZTManage.LockTranItem(QTranInfo.ZTCode, QTranInfo.MaxSpan, lErrMsg);
   result.ResultMsg := lErrMsg;
   if lTranID <> '' then
   begin
@@ -260,8 +260,7 @@ begin
 end;
 
 // 5.回滚账套连接事务
-function TOneDataController.RollbackTranItem(QTranInfo: TOneTran)
-  : TOneDataResult;
+function TOneDataController.RollbackTranItem(QTranInfo: TOneTran): TOneDataResult;
 var
   lOneGlobal: TOneGlobal;
   lErrMsg: string;
@@ -286,8 +285,7 @@ end;
 initialization
 
 // 单例模式注册
-OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('OneServer/Data',
-  TOneDataController, 0, CreateNewOneDataController);
+OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('OneServer/Data', TOneDataController, 0, CreateNewOneDataController);
 
 finalization
 

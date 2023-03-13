@@ -166,6 +166,7 @@ type
   public
     property TokenList: TDictionary<string, IOneTokenItem> read FTokenList;
     property OnLine: Integer read FOnLine;
+    property TokenTimeOutSec: Integer read FTimeOutSec write FTimeOutSec;
   end;
 
 implementation

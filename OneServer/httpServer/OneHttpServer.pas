@@ -6,7 +6,8 @@ uses
   SysUtils, System.Net.URLClient, System.Classes, OneHttpCtxtResult,
   System.Diagnostics, Web.HTTPApp, System.ZLib,
   mormot.Net.server, mormot.Net.http, mormot.Net.async, mormot.core.os,
-  mormot.Net.sock, mormot.core.buffers, oneILog, OneFileHelper, mormot.core.zip, mormot.core.base;
+  mormot.Net.sock, mormot.core.buffers, oneILog, OneFileHelper, mormot.core.zip, mormot.core.base,
+  OneHttpConst;
 
 type
   TOneHttpServer = class
@@ -250,6 +251,11 @@ begin
         begin
           // 服务端异常不处理结果
           Ctxt.OutContent := UTF8Encode(lHTTPResult.ResultException);
+        end
+        else if Result = HTTP_Status_TokenFail then
+        begin
+          // 验证Token失败
+          Ctxt.OutContent := UTF8Encode('Token验证失败,请重新登陆!!!');
         end
         else if lHTTPResult.ResultOutMode = THTTPResultMode.OUTFILE then
         begin

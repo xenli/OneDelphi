@@ -150,6 +150,7 @@ begin
   FZTManage := TOneZTManage.Create(self.FLog);
 
   FTokenManage := TOneTokenManage.Create(self.FLog);
+  FTokenManage.TokenTimeOutSec := self.FServerSet.FTokenIntervalSec;
   FVirtualManage := TOneVirtualManage.Create();
   // 给ORM提供ZT取数据功能
   OneOrm.unit_OrmZTManage := self.FZTManage;

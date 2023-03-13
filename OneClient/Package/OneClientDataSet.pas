@@ -37,7 +37,7 @@ type
     // 数据集打开数据模式
     FOpenMode: TDataOpenMode;
     //
-    FIsPost:boolean;
+    FIsPost: boolean;
     // 保存数据集模式
     FSaveMode: TDataSaveMode;
     // 服务端返回数据模式
@@ -106,7 +106,7 @@ type
     property OtherKeys: string read FOtherKeys write FOtherKeys;
     /// <param name="OpenMode">数据集打开模式</param>
     property OpenMode: TDataOpenMode read FOpenMode write FOpenMode;
-    property IsPost:boolean read FIsPost write FIsPost;
+    property IsPost: boolean read FIsPost write FIsPost;
     /// <param name="SaveMode">保存数据集模式,数据集delate和DML操作语句</param>
     property SaveMode: TDataSaveMode read FSaveMode write FSaveMode;
     /// <param name="DataReturnMode">数据集返回模式</param>
@@ -180,12 +180,18 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function OpenData: boolean;
-    function OpenDatas(QOpenDatas: array of TOneDataSet): boolean;
+    function OpenDatas(QOpenDatas: array of TOneDataSet): boolean; overload;
+    function OpenDatas(QOpenDatas: TList<TOneDataSet>): boolean; overload;
     /// <summary>
     /// 异步打开数据集，返回所有数据，如果Pagesize和PageIndex设置，则返回分页数据
     /// </summary>
     /// <returns>成功失败多调用 QCallEven</returns>
     procedure OpenDataAsync(QCallEven: EvenOKCallBack);
+    /// <summary>
+    /// 检重复,输入SQL和参数还有原值,是否有重复的字段，依托于DataSet但不会影响本身DataSet任何东东
+    /// </summary>
+    /// <returns>成功失败多调用 QCallEven</returns>
+    function CheckRepeat(QSQL: string; QParamValues: array of Variant; QSourceValue: string): boolean;
     /// <summary>
     /// 保存数据
     /// </summary>
@@ -196,14 +202,20 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function SaveData: boolean;
-    function SaveDatas(QOpenDatas: array of TOneDataSet): boolean;
+    function SaveDatas(QOpenDatas: array of TOneDataSet): boolean; overload;
+    function SaveDatas(QOpenDatas: TList<TOneDataSet>): boolean; overload;
     procedure SaveDataAsync(QCallEven: EvenOKCallBack);
     /// <summary>
     /// 执行DML语句,update,insert,delete语句
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function ExecDML: boolean;
-
+    /// <summary>
+    /// 执行DML语句,update,insert,delete语句，依托于DataSet但不会影响本身DataSet任何东东
+    /// QMustOneAffected:是否有一条必需受影响
+    /// </summary>
+    /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
+    function ExecDMLSQL(QSQL: string; QParamValues: array of Variant; QMustOneAffected: boolean = true): boolean;
     /// <summary>
     /// 执行存储过程，返回数据
     /// </summary>
@@ -266,7 +278,7 @@ end;
 constructor TOneDataSet.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Self.CachedUpdates := True;
+  Self.CachedUpdates := true;
   FParams := TFDParams.Create;
   FCommandText := TStringList.Create;
   FCommandText.TrailingLineBreak := False;
@@ -340,7 +352,7 @@ begin
     LNewParams := TParams.Create(Self);
     LOldFDParams := TFDParams.Create;
     try
-      LNewParams.ParseSQL(FCommandText.Text, True);
+      LNewParams.ParseSQL(FCommandText.Text, true);
       // 值拷贝
       for i := 0 to FParams.Count - 1 do
       begin
@@ -439,7 +451,14 @@ begin
     Self.FDataInfo.FErrMsg := '数据集DataInfo.SQL=空';
     exit;
   end;
-  Result := Self.FDataInfo.FConnection.OpenData(Self);
+  if Self.DataInfo.OpenMode = TDataOpenMode.OpenStored then
+  begin
+    Result := Self.FDataInfo.FConnection.ExecStored(Self);
+  end
+  else
+  begin
+    Result := Self.FDataInfo.FConnection.OpenData(Self);
+  end;
 end;
 
 function TOneDataSet.OpenDatas(QOpenDatas: array of TOneDataSet): boolean;
@@ -459,6 +478,37 @@ begin
   QList := TList<TObject>.Create;
   try
     for i := Low(QOpenDatas) to High(QOpenDatas) do
+    begin
+      QList.Add(QOpenDatas[i]);
+    end;
+    Result := Self.FDataInfo.FConnection.OpenDatas(QList, lErrMsg);
+    if not Result then
+    begin
+      Self.DataInfo.ErrMsg := lErrMsg;
+    end;
+  finally
+    QList.Clear;
+    QList.Free;
+  end;
+end;
+
+function TOneDataSet.OpenDatas(QOpenDatas: TList<TOneDataSet>): boolean;
+var
+  QList: TList<TObject>;
+  i: Integer;
+  lErrMsg: string;
+begin
+  Result := False;
+  if Self.FDataInfo.FConnection = nil then
+    Self.FDataInfo.FConnection := OneClientConnect.Unit_Connection;
+  if Self.FDataInfo.FConnection = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集Connection=nil';
+    exit;
+  end;
+  QList := TList<TObject>.Create;
+  try
+    for i := 0 to QOpenDatas.Count - 1 do
     begin
       QList.Add(QOpenDatas[i]);
     end;
@@ -500,6 +550,50 @@ begin
   aTask.Start;
 end;
 
+function TOneDataSet.CheckRepeat(QSQL: string; QParamValues: array of Variant; QSourceValue: string): boolean;
+var
+  lData: TOneDataSet;
+  i: Integer;
+begin
+  Result := true;
+  lData := TOneDataSet.Create(nil);
+  try
+    lData.DataInfo.FConnection := Self.DataInfo.FConnection;
+    lData.DataInfo.ZTCode := Self.DataInfo.ZTCode;
+    lData.SQL.Text := QSQL;
+    for i := Low(QParamValues) to High(QParamValues) do
+    begin
+      lData.Params[i].value := QParamValues[i];
+    end;
+    if not lData.Open then
+    begin
+      Self.DataInfo.ErrMsg := lData.DataInfo.ErrMsg;
+      exit;
+    end;
+    if lData.RecordCount >= 2 then
+    begin
+      Self.DataInfo.ErrMsg := '数据重复';
+      exit;
+    end;
+    if lData.RecordCount = 1 then
+    begin
+      if lData.FieldCount > 1 then
+      begin
+        Self.DataInfo.ErrMsg := '有且只能判断一个字段,请纠正判断语句,只能代一个字段';
+        exit;
+      end;
+      if lData.Fields[0].AsString <> QSourceValue then
+      begin
+        Self.DataInfo.ErrMsg := '数据重复';
+        exit;
+      end;
+    end;
+    Result := False;
+  finally
+    lData.Free;
+  end;
+end;
+
 function TOneDataSet.Save: boolean;
 begin
   Result := Self.SaveData;
@@ -535,6 +629,37 @@ begin
   QList := TList<TObject>.Create;
   try
     for i := Low(QOpenDatas) to High(QOpenDatas) do
+    begin
+      QList.Add(QOpenDatas[i]);
+    end;
+    Result := Self.FDataInfo.FConnection.SaveDatas(QList, lErrMsg);
+    if not Result then
+    begin
+      Self.DataInfo.ErrMsg := lErrMsg;
+    end;
+  finally
+    QList.Clear;
+    QList.Free;
+  end;
+end;
+
+function TOneDataSet.SaveDatas(QOpenDatas: TList<TOneDataSet>): boolean;
+var
+  QList: TList<TObject>;
+  i: Integer;
+  lErrMsg: string;
+begin
+  Result := False;
+  if Self.FDataInfo.FConnection = nil then
+    Self.FDataInfo.FConnection := OneClientConnect.Unit_Connection;
+  if Self.FDataInfo.FConnection = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集Connection=nil';
+    exit;
+  end;
+  QList := TList<TObject>.Create;
+  try
+    for i := 0 to QOpenDatas.Count - 1 do
     begin
       QList.Add(QOpenDatas[i]);
     end;
@@ -597,6 +722,34 @@ begin
   end;
 end;
 
+function TOneDataSet.ExecDMLSQL(QSQL: string; QParamValues: array of Variant; QMustOneAffected: boolean = true): boolean;
+var
+  lData: TOneDataSet;
+  i: Integer;
+begin
+  Result := False;
+  lData := TOneDataSet.Create(nil);
+  try
+    lData.DataInfo.FConnection := Self.DataInfo.FConnection;
+    lData.DataInfo.ZTCode := Self.DataInfo.ZTCode;
+    if QMustOneAffected then
+      lData.DataInfo.AffectedMustCount := 1;
+    lData.SQL.Text := QSQL;
+    for i := Low(QParamValues) to High(QParamValues) do
+    begin
+      lData.Params[i].value := QParamValues[i];
+    end;
+    if not lData.ExecDML then
+    begin
+      Self.DataInfo.ErrMsg := lData.DataInfo.ErrMsg;
+      exit;
+    end;
+    Result := true;
+  finally
+    lData.Free;
+  end;
+end;
+
 function TOneDataSet.OpenStored: boolean;
 begin
   Result := False;
@@ -612,7 +765,7 @@ begin
     Self.FDataInfo.FErrMsg := '未设置存储过程名称';
     exit;
   end;
-  Self.FDataInfo.IsReturnData := True;
+  Self.FDataInfo.IsReturnData := true;
   Result := Self.FDataInfo.FConnection.ExecStored(Self);
 end;
 
