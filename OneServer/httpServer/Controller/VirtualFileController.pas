@@ -22,13 +22,13 @@ type
     function GetFileMd5(QVirtualInfo: TVirtualInfo): TActionResult<string>;
   end;
 
-function CreateNewVirtualFileController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewVirtualFileController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneFileHelper, OneStreamString;
 
-function CreateNewVirtualFileController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewVirtualFileController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TOneVirtualFileController;
 begin

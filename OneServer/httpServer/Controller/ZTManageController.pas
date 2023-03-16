@@ -21,13 +21,13 @@ type
     function OneGetZTList(): TActionResult<TList<TZTInfo>>;
   end;
 
-function CreateNewOneZTController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewOneZTController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage;
 
-function CreateNewOneZTController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewOneZTController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TOneZTController;
 begin

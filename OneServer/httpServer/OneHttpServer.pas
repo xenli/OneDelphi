@@ -76,7 +76,7 @@ var
   lURI: System.Net.URLClient.TURI;
   lUrlPath: string; // URL路径
   lRouterUrlPath: TOneRouterUrlPath; // URL路径对应的路由信息
-  lRouterItem: TOneRouterItem;
+  lRouterWorkItem: TOneRouterWorkItem;
   lWorkObj: TObject; // 控制器对象
   lOneControllerWork: TOneControllerBase; // 控制器对象
   lEvenControllerProcedure: TEvenControllerProcedure; // 控制器是方法时回调
@@ -110,14 +110,15 @@ begin
       lRouterUrlPath := OneHttpRouterManage.GetInitRouterManage().GetRouterUrlPath(lUrlPath, lErrMsg);
       if lRouterUrlPath <> nil then
       begin
-        lRouterItem := lRouterUrlPath.RouterItem;
+        lRouterWorkItem := lRouterUrlPath.RouterWorkItem;
         lHTTPResult := CreateNewHTTPResult;
         lHTTPCtxt := CreateNewHTTPCtxt(Ctxt);
+        lHTTPCtxt.UrlPath := lUrlPath;
         lHTTPCtxt.ControllerMethodName := lRouterUrlPath.MethodName;
         // 跟据路由模式锁定不同模式干活
-        if (lRouterItem.RouterMode = emRouterMode.pool) or (lRouterItem.RouterMode = emRouterMode.single) then
+        if (lRouterWorkItem.RouterMode = emRouterMode.pool) or (lRouterWorkItem.RouterMode = emRouterMode.single) then
         begin
-          lWorkObj := lRouterItem.LockWorkItem(lErrMsg);
+          lWorkObj := lRouterWorkItem.LockWorkItem(lErrMsg);
           if lErrMsg <> '' then
           begin
             Ctxt.OutContent := UTF8Encode(lErrMsg);
@@ -145,15 +146,15 @@ begin
               exit;
             end;
             lOneControllerWork := TOneControllerBase(lWorkObj);
-            Result := lOneControllerWork.DoWork(lHTTPCtxt, lHTTPResult, lRouterItem);
+            Result := lOneControllerWork.DoWork(lHTTPCtxt, lHTTPResult, lRouterWorkItem);
           finally
             // 归还控制器
-            lRouterItem.UnLockWorkItem(lWorkObj);
+            lRouterWorkItem.UnLockWorkItem(lWorkObj);
           end;
         end
-        else if lRouterItem.RouterMode = emRouterMode.even then
+        else if lRouterWorkItem.RouterMode = emRouterMode.even then
         begin
-          lEvenControllerProcedure := lRouterItem.LockWorkEven(lErrMsg);
+          lEvenControllerProcedure := lRouterWorkItem.LockWorkEven(lErrMsg);
           if lErrMsg <> '' then
           begin
             Ctxt.OutContent := UTF8Encode(lErrMsg);
@@ -179,7 +180,7 @@ begin
             Result := lHTTPResult.ResultStatus;
           finally
             // 归还控制器
-            lRouterItem.UnLockWorkItem(nil)
+            lRouterWorkItem.UnLockWorkItem(nil)
           end;
         end
         else
@@ -354,7 +355,8 @@ begin
   // 创建HTTP服务
   try
     // hsoEnableTls开始ssl证书
-    self.FHttpServer := THttpAsyncServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi', self.FThreadPoolCount, self.FKeepAliveTimeOut, [hsoNoXPoweredHeader]);
+    self.FHttpServer := THttpAsyncServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi',
+      self.FThreadPoolCount, self.FKeepAliveTimeOut, [hsoNoXPoweredHeader]);
     self.FHttpServer.HttpQueueLength := self.FHttpQueueLength;
     self.FHttpServer.OnRequest := self.OnRequest;
     self.FHttpServer.RegisterCompress(CompressDeflate);

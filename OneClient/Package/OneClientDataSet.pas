@@ -210,6 +210,7 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function ExecDML: boolean;
+    function ExecDMLs(QDMLDatas: array of TOneDataSet): boolean;
     /// <summary>
     /// 执行DML语句,update,insert,delete语句，依托于DataSet但不会影响本身DataSet任何东东
     /// QMustOneAffected:是否有一条必需受影响
@@ -720,6 +721,17 @@ begin
   finally
     Self.FDataInfo.SaveMode := lOldSaveMode;
   end;
+end;
+
+function TOneDataSet.ExecDMLs(QDMLDatas: array of TOneDataSet): boolean;
+var
+  i: Integer;
+begin
+  for i := 0 to High(QDMLDatas) do
+  begin
+    QDMLDatas[i].DataInfo.SaveMode := TDataSaveMode.saveDML;
+  end;
+  Result := Self.SaveDatas(QDMLDatas);
 end;
 
 function TOneDataSet.ExecDMLSQL(QSQL: string; QParamValues: array of Variant; QMustOneAffected: boolean = true): boolean;

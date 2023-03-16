@@ -98,7 +98,7 @@ type
     function OnePostPersonListResult(personListResult: TPersonListResult): string;
   end;
 
-function CreateNewDemoController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoController(QRouterItem: TOneRouterWorkItem): TObject;
 // 方法类型注册
 procedure HelloWorldEven(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
 
@@ -445,7 +445,7 @@ begin
   end;
 end;
 
-function CreateNewDemoController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TDemoController;
 begin

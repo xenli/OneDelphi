@@ -15,9 +15,10 @@ type
   // OneAll代表没有以下面为特殊规则的，不控制什么HTTPMethod可以访问,低版不采用注解
   // 方法头部 OneGetxxxx代表只支持Get方法
   // 方法头部 OnePost代表只支持Post方法
+  // 方法头部 OnePath 代表 参数放在ulr路径 xxxx/参数1/参数2
   // 方法头部 OneForm代表只支持Post方法,且数据是表单形式 key1=value1&key2=value2&...
   // 方法头部 OneUpload代表是MulitePart提交包含文件
-  emOneHttpMethodMode = (OneAll, OneGet, OnePost, OneForm, OneUpload, OneDownload);
+  emOneHttpMethodMode = (OneAll, OneGet, OnePost, OneForm, OnePath, OneDownload);
 
 type
   TOneMethodRtti = class;
@@ -25,11 +26,14 @@ type
 
   TOneMethodRtti = class
   private
+    FMethodName: string;
+    FUrlMethod: string;
     FMethodType: emOneMethodType;
     FHttpMethodType: emOneHttpMethodMode;
     FRttiMethod: TRttiMethod;
     //
     FHaveClassParam: boolean;
+    FParamCount: integer;
     FParamClassList: TList<TClass>;
     FParamIsArryList: TList<boolean>;
     //
@@ -44,10 +48,13 @@ type
     constructor Create();
     destructor Destroy; override;
   public
+    property MethodName: string read FMethodName;
+    property UrlMethod: string read FUrlMethod write FUrlMethod;
     property MethodType: emOneMethodType read FMethodType;
     property HttpMethodType: emOneHttpMethodMode read FHttpMethodType;
     property RttiMethod: TRttiMethod read FRttiMethod;
     property HaveClassParam: boolean read FHaveClassParam;
+    property ParamCount: integer read FParamCount;
     property ParamClassList: TList<TClass> read FParamClassList;
     property ParamIsArryList: TList<boolean> read FParamIsArryList;
     property ResultType: emOneMethodResultType read FResultType;
@@ -91,13 +98,14 @@ implementation
 constructor TOneMethodRtti.Create();
 begin
   inherited Create;
+  FParamCount := 0;
   FParamClassList := TList<TClass>.Create;
   FParamIsArryList := TList<boolean>.Create;
 end;
 
 destructor TOneMethodRtti.Destroy;
 var
-  i: Integer;
+  i: integer;
 begin
   for i := 0 to FParamClassList.Count - 1 do
   begin
@@ -395,7 +403,7 @@ var
   vRttiMethod: TRttiMethod;
   lParameters: TArray<TRttiParameter>;
   lParam: TRttiParameter;
-  i, iMethod, iParam: Integer;
+  i, iMethod, iParam: integer;
   lOneMethodRtti: TOneMethodRtti;
 begin
   FRttiContext := TRttiContext.Create;
@@ -429,6 +437,7 @@ begin
     lOneMethodRtti.FRttiMethod := vRttiMethod;
     lOneMethodRtti.FHaveClassParam := false;
     lOneMethodRtti.FResultRtti := vRttiMethod.ReturnType;
+    lOneMethodRtti.FParamCount := Length(lParameters);
     // 分析方法名称
     // emOneHttpMethodMode =(OneAll,OneGet,OnePost,OneForm, OneFile);
     if lMethodName.StartsWith('oneget') then
@@ -439,13 +448,17 @@ begin
     begin
       lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OnePost;
     end
+    else if lMethodName.StartsWith('onepath') then
+    begin
+      lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OnePath;
+    end
     else if lMethodName.StartsWith('oneform') then
     begin
       lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneForm;
     end
     else if lMethodName.StartsWith('oneupload') then
     begin
-      lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneUpload;
+      // lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneUpload;
     end
     else if lMethodName.StartsWith('onedownload') then
     begin
@@ -529,6 +542,7 @@ begin
 
     if not FMethodList.ContainsKey(lMethodName) then
     begin
+      lOneMethodRtti.FMethodName := lMethodName;
       { 增加RTTI方法,参数,返回值,自定义属性 }
       FMethodList.Add(lMethodName, lOneMethodRtti);
     end

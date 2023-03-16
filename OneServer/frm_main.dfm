@@ -3,8 +3,8 @@ object frmMain: TfrmMain
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'OneDelphi-'#20013#38388#20214
-  ClientHeight = 592
-  ClientWidth = 886
+  ClientHeight = 591
+  ClientWidth = 882
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,20 +19,18 @@ object frmMain: TfrmMain
   object pageMain: TPageControl
     Left = 0
     Top = 75
-    Width = 886
-    Height = 517
+    Width = 882
+    Height = 516
     ActivePage = tabHTTPServer
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 882
-    ExplicitHeight = 516
     object tabServerReamk: TTabSheet
       Caption = #20013#38388#20214#35828#26126
       object Memo1: TMemo
         Left = 0
         Top = 0
-        Width = 878
-        Height = 487
+        Width = 874
+        Height = 486
         Align = alClient
         Lines.Strings = (
           'OneDelphi:'
@@ -55,11 +53,12 @@ object frmMain: TfrmMain
       object GroupBox2: TGroupBox
         Left = 0
         Top = 0
-        Width = 878
+        Width = 874
         Height = 249
         Align = alTop
         Caption = #24050#27491#30830#27880#20876#36335#30001#29366#24577#26597#30475
         TabOrder = 0
+        ExplicitWidth = 878
         object dbGridRouter: TDBGrid
           Left = 2
           Top = 49
@@ -131,8 +130,8 @@ object frmMain: TfrmMain
       object GroupBox6: TGroupBox
         Left = 0
         Top = 249
-        Width = 878
-        Height = 238
+        Width = 874
+        Height = 237
         Align = alClient
         Caption = #38169#35823#20449#24687
         Ctl3D = True
@@ -141,8 +140,8 @@ object frmMain: TfrmMain
         object edRouterErrMsg: TMemo
           Left = 2
           Top = 17
-          Width = 874
-          Height = 219
+          Width = 870
+          Height = 218
           Align = alClient
           Lines.Strings = (
             #27880#20876#36335#30001#26080#38169#35823#20449#24687)
@@ -157,7 +156,7 @@ object frmMain: TfrmMain
       object groupHTTP: TGroupBox
         Left = 0
         Top = 0
-        Width = 878
+        Width = 874
         Height = 183
         Align = alTop
         Caption = 'HTTP'#37197#32622'-'#20445#23384#37197#32622#22914#38656#29983#25928','#35831#37325#26032#21551#21160#20013#38388#23618
@@ -171,7 +170,6 @@ object frmMain: TfrmMain
         ParentColor = False
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 874
         object Label1: TLabel
           Left = 3
           Top = 56
@@ -322,13 +320,11 @@ object frmMain: TfrmMain
       object groupWebSocket: TGroupBox
         Left = 0
         Top = 313
-        Width = 878
-        Height = 174
+        Width = 874
+        Height = 173
         Align = alClient
         Caption = #20854#23427#37197#32622
         TabOrder = 1
-        ExplicitWidth = 874
-        ExplicitHeight = 173
         object chWinTaskStart: TCheckBox
           Left = 15
           Top = 30
@@ -357,12 +353,11 @@ object frmMain: TfrmMain
       object GroupBox1: TGroupBox
         Left = 0
         Top = 183
-        Width = 878
+        Width = 874
         Height = 130
         Align = alTop
         Caption = 'WebSocket(WS)'#37197#32622
         TabOrder = 2
-        ExplicitWidth = 874
       end
     end
     object tabZTManage: TTabSheet
@@ -1011,11 +1006,10 @@ object frmMain: TfrmMain
   object plTop: TPanel
     Left = 0
     Top = 0
-    Width = 886
+    Width = 882
     Height = 75
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 882
     object Image1: TImage
       Left = 1
       Top = 1
@@ -1089,7 +1083,7 @@ object frmMain: TfrmMain
     end
     object BtnRes: TBitBtn
       AlignWithMargins = True
-      Left = 643
+      Left = 639
       Top = 6
       Width = 112
       Height = 63
@@ -1106,11 +1100,10 @@ object frmMain: TfrmMain
       ParentFont = False
       TabOrder = 0
       OnClick = BtnResClick
-      ExplicitLeft = 639
     end
     object btnClose: TBitBtn
       AlignWithMargins = True
-      Left = 763
+      Left = 759
       Top = 6
       Width = 112
       Height = 63
@@ -1127,7 +1120,6 @@ object frmMain: TfrmMain
       ParentFont = False
       TabOrder = 1
       OnClick = HookCloseMainClick
-      ExplicitLeft = 759
     end
   end
   object plZTSet: TPanel

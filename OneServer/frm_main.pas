@@ -238,8 +238,8 @@ uses OneGlobal, OneZTManage, OneGUID, OneVirtualFile, OneTokenManage, OneWinReg;
 procedure TfrmMain.tbRouterSelectClick(Sender: TObject);
 var
   lRouterManage: TOneRouterManage;
-  lRouterItems: TDictionary<string, TOneRouterItem>;
-  lRouterItem: TOneRouterItem;
+  lRouterItems: TDictionary<string, TOneRouterWorkItem>;
+  lRouterItem: TOneRouterWorkItem;
 begin
   if qryRouter.Active then
     qryRouter.Close;

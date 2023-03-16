@@ -66,7 +66,7 @@ begin
   inherited Destroy;
 end;
 
-function CreateNewFastAdminController(QRouterItem: TOneRouterItem): Tobject;
+function CreateNewFastAdminController(QRouterItem: TOneRouterWorkItem): Tobject;
 var
   lController: TFastAdminController;
 begin

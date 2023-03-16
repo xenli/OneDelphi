@@ -35,13 +35,13 @@ type
     function RollbackTranItem(QTranInfo: TOneTran): TOneDataResult;
   end;
 
-function CreateNewOneDataController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewOneDataController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneSQLCrypto;
 
-function CreateNewOneDataController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewOneDataController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TOneDataController;
 begin

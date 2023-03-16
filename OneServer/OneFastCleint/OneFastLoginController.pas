@@ -44,13 +44,13 @@ type
     function LoginOut(QLogin: TFastLogin): TActionResult<string>;
   end;
 
-function CreateNewFastLoginController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewFastLoginController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage, OneCrypto;
 
-function CreateNewFastLoginController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewFastLoginController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TFastLoginController;
 begin

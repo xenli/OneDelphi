@@ -16,11 +16,11 @@ type
     function GetQuery(): TFDQuery;
   end;
 
-function CreateNewDemoDataController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoDataController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
-function CreateNewDemoDataController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoDataController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TDemoDataController;
 begin

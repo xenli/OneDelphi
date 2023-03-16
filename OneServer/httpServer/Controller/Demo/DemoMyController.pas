@@ -26,7 +26,7 @@ type
 
 implementation
 
-function CreateNewDemoMyController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoMyController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TDemoMyController;
 begin

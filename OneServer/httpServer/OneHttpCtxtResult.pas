@@ -90,8 +90,10 @@ type
     FClientIP: string;
     // 客户端MAC地址
     FClientMAC: string;
-    // URL路径
+    // URL路径 有参数代参数 ?xxxx=zzzz
     FUrl: String;
+    //url不代参数 ？?xxxx=zzzz
+    FUrlPath: string;
     // URL请求的参数
     FUrlParams: TStringList;
     // 头部参数
@@ -119,6 +121,7 @@ type
   public
     procedure AddCustomerHead(QHead: string; QConnect: string);
     property URL: String read FUrl write FUrl;
+    property URLPath: String read FUrlPath write FUrlPath;
     property ClientIP: String read FClientIP write FClientIP;
     property ClientMAC: String read FClientMAC write FClientMAC;
     property UrlParams: TStringList read FUrlParams write FUrlParams;

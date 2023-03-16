@@ -12,10 +12,10 @@ type
 
 type
   TOneRouterUrlPath = class;
-  TOneRouterItem = class;
+  TOneRouterWorkItem = class;
   TOneRouterManage = class;
   // 创建控制层对象回调函数
-  TEvenCreaNewController = function(QRouterItem: TOneRouterItem): TObject;
+  TEvenCreaNewController = function(QRouterItem: TOneRouterWorkItem): TObject;
 
   TOneRouterUrlPath = class
   private
@@ -24,14 +24,14 @@ type
     // 方法名称
     FMethodName: string;
     // 挂载的路由
-    FRouterItem: TOneRouterItem;
+    FRouterWorkItem: TOneRouterWorkItem;
   public
     property RootName: string read FRootName;
     property MethodName: string read FMethodName;
-    property RouterItem: TOneRouterItem read FRouterItem;
+    property RouterWorkItem: TOneRouterWorkItem read FRouterWorkItem;
   end;
 
-  TOneRouterItem = class(TObject)
+  TOneRouterWorkItem = class(TObject)
   private
     // 多例模式下,锁
     FLockObj: TObject;
@@ -83,16 +83,19 @@ type
   TOneRouterManage = class(TObject)
   private
     // 路由信息控制(路由,路由信息)
-    FRouterItems: TDictionary<string, TOneRouterItem>;
+    FRouterWorkItems: TDictionary<string, TOneRouterWorkItem>;
+    // 路由由注册路径+方法名称
     FRouterUrlPath: TDictionary<string, TOneRouterUrlPath>;
+    // 路由代方法名称和参数值
+    FRouterUrlPathWithParams: TDictionary<string, TOneRouterUrlPath>;
     FErrMsg: string;
   public
     constructor Create; overload;
     destructor Destroy; override;
   public
     // 跟据路由获取路由名称
-    function GetRouterItem(QRootName: string; Var QErrMsg: string): TOneRouterItem;
-    function GetRouterItems(): TDictionary<string, TOneRouterItem>;
+    function GetRouterItem(QRootName: string; Var QErrMsg: string): TOneRouterWorkItem;
+    function GetRouterItems(): TDictionary<string, TOneRouterWorkItem>;
     // 跟据URL路径获取对应路由信息
     function GetRouterUrlPath(QUrlPath: string; Var QErrMsg: string): TOneRouterUrlPath;
     // 增加池工作模式
@@ -131,7 +134,7 @@ begin
 end;
 
 // 单个路由创建
-constructor TOneRouterItem.Create;
+constructor TOneRouterWorkItem.Create;
 begin
   inherited Create;
   self.FLockObj := TObject.Create;
@@ -146,7 +149,7 @@ begin
 end;
 
 // 单个路由销毁
-destructor TOneRouterItem.Destroy;
+destructor TOneRouterWorkItem.Destroy;
 begin
   inherited Destroy;
   if FLockObj <> nil then
@@ -171,7 +174,7 @@ begin
 end;
 
 // 池模式锁定工作数量
-function TOneRouterItem.LockPoolWorkCount(): boolean;
+function TOneRouterWorkItem.LockPoolWorkCount(): boolean;
 begin
   result := false;
   TMonitor.Enter(self.FLockObj);
@@ -196,7 +199,7 @@ begin
 end;
 
 // 池模式释放工作数量
-procedure TOneRouterItem.UnLockPoolWorkCount();
+procedure TOneRouterWorkItem.UnLockPoolWorkCount();
 begin
   TMonitor.Enter(self.FLockObj);
   try
@@ -206,7 +209,7 @@ begin
   end;
 end;
 
-function TOneRouterItem.GetClassName(): string;
+function TOneRouterWorkItem.GetClassName(): string;
 begin
   if self.FPersistentClass <> nil then
   begin
@@ -219,7 +222,7 @@ begin
 end;
 
 // 锁定一个控制器出来干活
-function TOneRouterItem.LockWorkItem(Var QErrMsg: string): TObject;
+function TOneRouterWorkItem.LockWorkItem(Var QErrMsg: string): TObject;
 var
   tempObj: TObject;
 begin
@@ -303,7 +306,7 @@ begin
 end;
 
 // 获取一个控制函数来干活
-function TOneRouterItem.LockWorkEven(Var QErrMsg: string)
+function TOneRouterWorkItem.LockWorkEven(Var QErrMsg: string)
   : TEvenControllerProcedure;
 begin
   result := nil;
@@ -339,7 +342,7 @@ begin
 end;
 
 // 称释放一个控制器
-procedure TOneRouterItem.UnLockWorkItem(QObject: TObject);
+procedure TOneRouterWorkItem.UnLockWorkItem(QObject: TObject);
 begin
   // 路由模式判断
   case self.FRouterMode of
@@ -374,7 +377,7 @@ begin
   end;
 end;
 
-function TOneRouterItem.GetRttiMethod(QMethodName: string): TOneMethodRtti;
+function TOneRouterWorkItem.GetRttiMethod(QMethodName: string): TOneMethodRtti;
 begin
   result := nil;
   if self.FControllerRtti = nil then
@@ -391,7 +394,8 @@ constructor TOneRouterManage.Create;
 begin
   inherited Create;
   FRouterUrlPath := TDictionary<string, TOneRouterUrlPath>.Create;
-  FRouterItems := TDictionary<string, TOneRouterItem>.Create;
+  FRouterUrlPathWithParams := TDictionary<string, TOneRouterUrlPath>.Create;
+  FRouterWorkItems := TDictionary<string, TOneRouterWorkItem>.Create;
   FErrMsg := '';
 end;
 
@@ -399,34 +403,42 @@ end;
 destructor TOneRouterManage.Destroy;
 var
   lItemPath: TOneRouterUrlPath;
-  lItem: TOneRouterItem;
+  lItem: TOneRouterWorkItem;
 begin
   //
   for lItemPath in FRouterUrlPath.Values do
   begin
-    lItemPath.FRouterItem := nil;
+    lItemPath.FRouterWorkItem := nil;
     lItemPath.Free;
   end;
   FRouterUrlPath.Clear;
   FRouterUrlPath.Free;
   //
-  for lItem in FRouterItems.Values do
+  for lItem in FRouterWorkItems.Values do
   begin
     lItem.Free;
   end;
-  FRouterItems.Clear;
-  FRouterItems.Free;
+  FRouterWorkItems.Clear;
+  FRouterWorkItems.Free;
+
+  for lItemPath in FRouterUrlPathWithParams.Values do
+  begin
+    lItemPath.FRouterWorkItem := nil;
+    lItemPath.Free;
+  end;
+  FRouterUrlPathWithParams.Clear;
+  FRouterUrlPathWithParams.Free;
   inherited Destroy;
 end;
 
 // 跟据路由获取路由名称
-function TOneRouterManage.GetRouterItem(QRootName: string; Var QErrMsg: string): TOneRouterItem;
+function TOneRouterManage.GetRouterItem(QRootName: string; Var QErrMsg: string): TOneRouterWorkItem;
 var
-  lItem: TOneRouterItem;
+  lItem: TOneRouterWorkItem;
 begin
   result := nil;
   QErrMsg := '';
-  if FRouterItems.TryGetValue(QRootName, lItem) then
+  if FRouterWorkItems.TryGetValue(QRootName, lItem) then
   begin
     if (lItem = nil) then
     begin
@@ -441,14 +453,16 @@ begin
   end;
 end;
 
-function TOneRouterManage.GetRouterItems(): TDictionary<string, TOneRouterItem>;
+function TOneRouterManage.GetRouterItems(): TDictionary<string, TOneRouterWorkItem>;
 begin
-  result := self.FRouterItems;
+  result := self.FRouterWorkItems;
 end;
 
 function TOneRouterManage.GetRouterUrlPath(QUrlPath: string; Var QErrMsg: string): TOneRouterUrlPath;
 var
   lItem: TOneRouterUrlPath;
+  tempUrl: string;
+  i: Integer;
 begin
   result := nil;
   QErrMsg := '';
@@ -463,8 +477,19 @@ begin
   end
   else
   begin
-    QErrMsg := '无效的URL路径->' + QUrlPath;
+    // OnePath匹配,参数也在Url上
+    for tempUrl in self.FRouterUrlPathWithParams.Keys do
+    begin
+      if QUrlPath.StartsWith(tempUrl + '/') then
+      begin
+        FRouterUrlPathWithParams.TryGetValue(tempUrl, lItem);
+        result := lItem;
+        break;
+      end;
+    end;
   end;
+  if result = nil then
+    QErrMsg := '无效的URL路径->' + QUrlPath;
 end;
 
 function TOneRouterManage.FormatRootName(QRootName: string): string;
@@ -479,21 +504,22 @@ procedure TOneRouterManage.AddHTTPPoolWork(QRootName: string;
   QClass: TPersistentClass; QPoolCount: Integer;
   QEvenCreateNew: TEvenCreaNewController);
 var
-  lItem: TOneRouterItem;
+  lItem: TOneRouterWorkItem;
   lRootName: string;
   lObj: TObject;
   lMethodName: string;
   lPathMethod: string;
   lRouterUrlPath: TOneRouterUrlPath;
+  lOneMethodRtti: TOneMethodRtti;
 begin
   lRootName := self.FormatRootName(QRootName);
   if lRootName = '' then
     exit;
-  if not FRouterItems.TryGetValue(lRootName, lItem) then
+  if not FRouterWorkItems.TryGetValue(lRootName, lItem) then
   begin
     // 创建路由信息
-    lItem := TOneRouterItem.Create;
-    FRouterItems.Add(lRootName, lItem);
+    lItem := TOneRouterWorkItem.Create;
+    FRouterWorkItems.Add(lRootName, lItem);
     lItem.FRootName := lRootName;
     lItem.FPoolMaxCount := QPoolCount;
     lItem.FEvenCreateNew := QEvenCreateNew;
@@ -503,16 +529,32 @@ begin
     begin
       // 挂载RTTI信息
       lItem.FControllerRtti := TOneControllerRtti.Create(QClass);
-      for lMethodName in lItem.FControllerRtti.MethodList.Keys do
+      for lOneMethodRtti in lItem.FControllerRtti.MethodList.Values do
       begin
+        lMethodName := lOneMethodRtti.MethodName;
         lPathMethod := lRootName + '/' + lMethodName;
-        if not self.FRouterUrlPath.ContainsKey(lPathMethod) then
+        lOneMethodRtti.UrlMethod := lPathMethod;
+        if lOneMethodRtti.HttpMethodType = emOneHttpMethodMode.OnePath then
         begin
-          lRouterUrlPath := TOneRouterUrlPath.Create;
-          lRouterUrlPath.FRootName := lRootName;
-          lRouterUrlPath.FMethodName := lMethodName;
-          lRouterUrlPath.FRouterItem := lItem;
-          self.FRouterUrlPath.Add(lPathMethod, lRouterUrlPath);
+          if not self.FRouterUrlPathWithParams.ContainsKey(lPathMethod) then
+          begin
+            lRouterUrlPath := TOneRouterUrlPath.Create;
+            lRouterUrlPath.FRootName := lRootName;
+            lRouterUrlPath.FMethodName := lMethodName;
+            lRouterUrlPath.FRouterWorkItem := lItem;
+            self.FRouterUrlPathWithParams.Add(lPathMethod, lRouterUrlPath);
+          end;
+        end
+        else
+        begin
+          if not self.FRouterUrlPath.ContainsKey(lPathMethod) then
+          begin
+            lRouterUrlPath := TOneRouterUrlPath.Create;
+            lRouterUrlPath.FRootName := lRootName;
+            lRouterUrlPath.FMethodName := lMethodName;
+            lRouterUrlPath.FRouterWorkItem := lItem;
+            self.FRouterUrlPath.Add(lPathMethod, lRouterUrlPath);
+          end;
         end;
       end;
     end;
@@ -531,21 +573,22 @@ procedure TOneRouterManage.AddHTTPSingleWork(QRootName: string;
   QClass: TPersistentClass; QWorkMaxCount: Integer;
   QEvenCreateNew: TEvenCreaNewController);
 var
-  lItem: TOneRouterItem;
+  lItem: TOneRouterWorkItem;
   lRootName: string;
   lObj: TObject;
   lMethodName: string;
   lPathMethod: string;
   lRouterUrlPath: TOneRouterUrlPath;
+  lOneMethodRtti: TOneMethodRtti;
 begin
   lRootName := self.FormatRootName(QRootName);
   if lRootName = '' then
     exit;
-  if not FRouterItems.TryGetValue(lRootName, lItem) then
+  if not FRouterWorkItems.TryGetValue(lRootName, lItem) then
   begin
     // 创建路由信息
-    lItem := TOneRouterItem.Create;
-    FRouterItems.Add(lRootName, lItem);
+    lItem := TOneRouterWorkItem.Create;
+    FRouterWorkItems.Add(lRootName, lItem);
     lItem.FRootName := lRootName;
     lItem.FPoolMaxCount := QWorkMaxCount;
     lItem.FEvenCreateNew := QEvenCreateNew;
@@ -555,16 +598,32 @@ begin
     begin
       // 挂载RTTI信息
       lItem.FControllerRtti := TOneControllerRtti.Create(QClass);
-      for lMethodName in lItem.FControllerRtti.MethodList.Keys do
+      for lOneMethodRtti in lItem.FControllerRtti.MethodList.Values do
       begin
+        lMethodName := lOneMethodRtti.MethodName;
         lPathMethod := lRootName + '/' + lMethodName;
-        if not self.FRouterUrlPath.ContainsKey(lPathMethod) then
+        lOneMethodRtti.UrlMethod := lPathMethod;
+        if lOneMethodRtti.HttpMethodType = emOneHttpMethodMode.OnePath then
         begin
-          lRouterUrlPath := TOneRouterUrlPath.Create;
-          lRouterUrlPath.FRootName := lRootName;
-          lRouterUrlPath.FMethodName := lMethodName;
-          lRouterUrlPath.FRouterItem := lItem;
-          self.FRouterUrlPath.Add(lPathMethod, lRouterUrlPath);
+          if not self.FRouterUrlPathWithParams.ContainsKey(lPathMethod) then
+          begin
+            lRouterUrlPath := TOneRouterUrlPath.Create;
+            lRouterUrlPath.FRootName := lRootName;
+            lRouterUrlPath.FMethodName := lMethodName;
+            lRouterUrlPath.FRouterWorkItem := lItem;
+            self.FRouterUrlPathWithParams.Add(lPathMethod, lRouterUrlPath);
+          end;
+        end
+        else
+        begin
+          if not self.FRouterUrlPath.ContainsKey(lPathMethod) then
+          begin
+            lRouterUrlPath := TOneRouterUrlPath.Create;
+            lRouterUrlPath.FRootName := lRootName;
+            lRouterUrlPath.FMethodName := lMethodName;
+            lRouterUrlPath.FRouterWorkItem := lItem;
+            self.FRouterUrlPath.Add(lPathMethod, lRouterUrlPath);
+          end;
         end;
       end;
     end;
@@ -581,7 +640,7 @@ end;
 procedure TOneRouterManage.AddHTTPEvenWork(QRootName: string;
   QEvenController: TEvenControllerProcedure; QWorkMaxCount: Integer);
 var
-  lItem: TOneRouterItem;
+  lItem: TOneRouterWorkItem;
   lRootName: string;
   lObj: TObject;
 
@@ -591,11 +650,11 @@ begin
   lRootName := self.FormatRootName(QRootName);
   if lRootName = '' then
     exit;
-  if not FRouterItems.TryGetValue(lRootName, lItem) then
+  if not FRouterWorkItems.TryGetValue(lRootName, lItem) then
   begin
     // 创建路由信息
-    lItem := TOneRouterItem.Create;
-    FRouterItems.Add(lRootName, lItem);
+    lItem := TOneRouterWorkItem.Create;
+    FRouterWorkItems.Add(lRootName, lItem);
     lItem.FRootName := lRootName;
     lItem.FPoolMaxCount := QWorkMaxCount;
     lItem.FEvenCreateNew := nil;
@@ -606,7 +665,7 @@ begin
     lRouterUrlPath := TOneRouterUrlPath.Create;
     lRouterUrlPath.FRootName := lRootName;
     lRouterUrlPath.FMethodName := '';
-    lRouterUrlPath.FRouterItem := lItem;
+    lRouterUrlPath.FRouterWorkItem := lItem;
     self.FRouterUrlPath.Add(lRootName, lRouterUrlPath);
   end
   else

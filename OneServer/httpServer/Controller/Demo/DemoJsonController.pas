@@ -20,11 +20,11 @@ type
     function GetJsonParam(QJsonObj: TJsonObject): string;
   end;
 
-function CreateNewDemoJsonController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoJsonController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
-function CreateNewDemoJsonController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoJsonController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TDemoJsonController;
 begin
