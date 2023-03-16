@@ -47,7 +47,18 @@
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
 ## 更新日志
+************2023-03-16***********  
+服务端:  
+	1.增加UrlPath风格的请求,单元示例 DemoUrlPathController  
+    		// 请求 url xxxx/DemoUrlPath/OnePathTest/flm123  
+    		function OnePathTest(id: string): string;  
+    		// 请求 url xxxx/DemoUrlPath/OnePathTest/flm123/18  
+    		function OnePathTest2(id: string; age: integer): string;  
+	2. OneHttpRouterManage中的类TOneRouterItem改成TOneRouterWorkItem  
 
+客户端:
+	1.OneClientConnect post数据增加zlib压缩,以及zlib解压
+	
 ************2023-03-13***********  
 服务端:  
 	1.主要增加OneFastCleint相关对接单元  

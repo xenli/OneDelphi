@@ -15,13 +15,13 @@ type
     function SaveData(QPersons: TList<TPersonDemo>): TActionResult<string>;
   end;
 
-function CreateNewDemoZTController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoZTController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage;
 
-function CreateNewDemoZTController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoZTController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TDemoZTController;
 begin

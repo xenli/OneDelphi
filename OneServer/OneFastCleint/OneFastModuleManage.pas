@@ -161,6 +161,8 @@ type
     FUIGridCanEdit_: boolean;
     FUIGridCanAdd_: boolean;
     FUIGridCanDel_: boolean;
+    FTreeKeyID_: string;
+    FTreePKeyID_: string;
     //
     FChildControls_: TList<TFastModuleControl>;
     FChildFilters_: TList<TFastModuleFilter>;
@@ -183,6 +185,8 @@ type
     property FUIGridCanEdit: boolean read FUIGridCanEdit_ write FUIGridCanEdit_;
     property FUIGridCanAdd: boolean read FUIGridCanAdd_ write FUIGridCanAdd_;
     property FUIGridCanDel: boolean read FUIGridCanDel_ write FUIGridCanDel_;
+    property FTreeKeyID: string read FTreeKeyID_ write FTreeKeyID_;
+    property FTreePKeyID: string read FTreePKeyID_ write FTreePKeyID_;
     //
     property ChildControls: TList<TFastModuleControl> read FChildControls_ write FChildControls_;
     property ChildFilters: TList<TFastModuleFilter> read FChildFilters_ write FChildFilters_;

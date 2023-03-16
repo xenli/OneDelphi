@@ -20,7 +20,7 @@ implementation
 
 uses OneGlobal, OneZTManage;
 
-function CreateNewFastModuleController(QRouterItem: TOneRouterItem): Tobject;
+function CreateNewFastModuleController(QRouterItem: TOneRouterWorkItem): Tobject;
 var
   lController: TFastModuleController;
 begin

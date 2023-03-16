@@ -74,7 +74,8 @@ uses
   UniSendReceivController in 'OneUniDemo\UniSendReceivController.pas',
   OneFastModuleManage in 'OneFastCleint\OneFastModuleManage.pas',
   OneFastModuleController in 'OneFastCleint\OneFastModuleController.pas',
-  ZTManageController in 'httpServer\Controller\ZTManageController.pas';
+  ZTManageController in 'httpServer\Controller\ZTManageController.pas',
+  DemoUrlPathController in 'httpServer\Controller\Demo\DemoUrlPathController.pas';
 
 var
   lpStartupInfo: TStartupInfo;

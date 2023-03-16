@@ -13,13 +13,13 @@ type
     function TestWrite(): boolean;
   end;
 
-function CreateNewDemoLogController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoLogController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage;
 
-function CreateNewDemoLogController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoLogController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TDemoLogController;
 begin
@@ -49,6 +49,7 @@ initialization
 // 多例模式注册
 OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoLog',
   TDemoLogController, 0, CreateNewDemoLogController);
+
 finalization
 
 end.

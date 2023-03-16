@@ -17,13 +17,13 @@ type
     function SaveSendReceiv(QCustomer: TSendReceivDemo): TActionResult<string>;
   end;
 
-function CreateNewSendReceivController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewSendReceivController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage;
 
-function CreateNewSendReceivController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewSendReceivController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TUniSendReceivController;
 begin

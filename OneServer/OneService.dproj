@@ -199,6 +199,7 @@
         <DCCReference Include="OneFastCleint\OneFastModuleManage.pas"/>
         <DCCReference Include="OneFastCleint\OneFastModuleController.pas"/>
         <DCCReference Include="httpServer\Controller\ZTManageController.pas"/>
+        <DCCReference Include="httpServer\Controller\Demo\DemoUrlPathController.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -46,13 +46,13 @@ type
     function OrmDeleteList(QList: TList<TTestOrm>): TActionResult<string>;
   end;
 
-function CreateNewDemoOrmController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoOrmController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, oneOrm;
 
-function CreateNewDemoOrmController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewDemoOrmController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TDemoOrmController;
 begin

@@ -18,13 +18,13 @@ type
     function BillSendCmd(QBillID: string; QCmd: string): TActionResult<string>;
   end;
 
-function CreateNewBillSendController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewBillSendController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage;
 
-function CreateNewBillSendController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewBillSendController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TUniBillSendController;
 begin

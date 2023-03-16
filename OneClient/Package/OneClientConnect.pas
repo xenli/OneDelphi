@@ -512,7 +512,7 @@ var
   LNetHttp: TNetHTTPClient;
   LRequestStream, LResponseStream: TMemoryStream;
   LResponse: IHTTPResponse;
-  lBytes: TBytes;
+  lZlibBytes, lBytes: TBytes;
   tempA: TArray<string>;
   lErrMsg: string;
   lContentType: string;
@@ -538,7 +538,17 @@ begin
 {$ENDIF}
       // LNetHttp.ContentType := 'text/plain; charset=utf-8';
       LNetHttp.AcceptCharSet := 'utf-8';
-      LRequestStream.Write(QPostDataBtye, length(QPostDataBtye));
+      LNetHttp.AcceptEncoding := 'zlib'; // ½ÓÊÜzlibÑ¹
+      if length(QPostDataBtye) > 1024 then
+      begin
+        LNetHttp.CustomHeaders['Content-Encoding'] := 'zlib';
+        ZCompress(QPostDataBtye, lZlibBytes);
+        LRequestStream.Write(lZlibBytes, length(lZlibBytes));
+      end
+      else
+      begin
+        LRequestStream.Write(QPostDataBtye, length(QPostDataBtye));
+      end;
       LRequestStream.Position := 0;
       LResponse := LNetHttp.Post(lUrl, LRequestStream, LResponseStream);
       if LResponse = nil then
@@ -571,7 +581,16 @@ begin
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        Result.Bytes := lBytes;
+        if LResponse.ContentEncoding = 'zlib' then
+        begin
+          setLength(lZlibBytes, 0);
+          ZDecompress(lBytes, lZlibBytes);
+          Result.Bytes := lZlibBytes;
+        end
+        else
+        begin
+          Result.Bytes := lBytes;
+        end;
         Result.IsOK := true;
       end
       else if LResponse.StatusCode = HTTP_Status_TokenFail then

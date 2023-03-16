@@ -8,7 +8,7 @@ Rem ****************************
 ::@for /r . %%a in (.) do @if exist "%%a\*.db" del "%%a\*.db"
 ::@for /r . %%a in (.) do @if exist "%%a\*.mb" del "%%a\*.mb"
 @for /r . %%a in (.) do @if exist "%%a\*.dcu" del "%%a\*.dcu"
-@echo 删除成功!
+@echo 删除成功!  
 ::删除D10中临时文件
 del __recovery /s
 del __history /s

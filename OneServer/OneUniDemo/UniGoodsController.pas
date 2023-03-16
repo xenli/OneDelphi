@@ -32,13 +32,13 @@ type
     function OneGetGoodsImg(imgid: string): TActionResult<string>;
   end;
 
-function CreateNewGoodsController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewGoodsController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage, OneFileHelper;
 
-function CreateNewGoodsController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewGoodsController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TUniGoodsController;
 begin
@@ -147,7 +147,8 @@ begin
       else
       begin
         // 相拟查询
-        lFDQuery.SQL.Text := 'select FGoodsID,FGoodsCode,FGoodsName,FGoodsPrice,FGoodsRemark,FGoodsImgUrl from demo_goods ' + ' where FGoodsCode like :goodInfo or FGoodsName like :goodInfo order by FGoodsCode ';
+        lFDQuery.SQL.Text := 'select FGoodsID,FGoodsCode,FGoodsName,FGoodsPrice,FGoodsRemark,FGoodsImgUrl from demo_goods ' +
+          ' where FGoodsCode like :goodInfo or FGoodsName like :goodInfo order by FGoodsCode ';
         lFDQuery.Params[0].AsString := '%' + goodInfo + '%';
       end;
       // 分页设置
@@ -227,7 +228,8 @@ begin
       else
       begin
         // 相拟查询
-        lFDQuery.SQL.Text := 'select  FGoodsID,FGoodsCode,FGoodsName,FGoodsPrice,FGoodsRemark,FGoodsImgUrl  from demo_goods ' + ' where FGoodsCode like :goodInfo or FGoodsName like :goodInfo order by FGoodsCode ';
+        lFDQuery.SQL.Text := 'select  FGoodsID,FGoodsCode,FGoodsName,FGoodsPrice,FGoodsRemark,FGoodsImgUrl  from demo_goods ' +
+          ' where FGoodsCode like :goodInfo or FGoodsName like :goodInfo order by FGoodsCode ';
         lFDQuery.Params[0].AsString := '%' + goodInfo + '%';
       end;
       // 分页设置

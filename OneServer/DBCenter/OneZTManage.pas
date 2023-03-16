@@ -271,6 +271,7 @@ begin
 end;
 {$REGION 'TOneZTItem'}
 
+
 constructor TOneZTItem.Create(AOwner: TOneZTPool; QPhyDriver: string; QConnectionString: string);
 begin
   inherited Create;
@@ -516,6 +517,7 @@ end;
 // 一个账磁连接池
 {$REGION 'TOneZTPool'}
 
+
 constructor TOneZTPool.Create(QZTCode: string; QPhyDriver: string; QConnectionStr: string; QInitCount: integer; QMaxInitCount: integer);
 var
   i: integer;
@@ -623,6 +625,7 @@ begin
 end;
 {$ENDREGION}
 {$REGION 'TOneZTManage'}
+
 
 constructor TOneZTManage.Create(QOneLog: IOneLog);
 begin
@@ -984,6 +987,7 @@ begin
   Result := FZTPools.ContainsKey(QZTCode);
 end;
 {$ENDREGION}
+
 
 function TOneZTManage.StarWork(QZTSetList: TList<TOneZTSet>; var QErrMsg: string): Boolean;
 var

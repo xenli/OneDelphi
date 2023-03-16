@@ -36,13 +36,13 @@ type
     function LoginOut(QLogin: TLoginInfo): TActionResult<string>;
   end;
 
-function CreateNewUniDemoController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewUniDemoController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal, OneZTManage;
 
-function CreateNewUniDemoController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewUniDemoController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TUniLoginController;
 begin

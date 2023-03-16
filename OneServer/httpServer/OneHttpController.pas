@@ -19,7 +19,7 @@ type
     { 是否支持跨域访问 }
     FbAllowOrigin: Boolean;
     { 当前调用的路由信息 }
-    FRouterItem: TOneRouterItem;
+    FRouterItem: TOneRouterWorkItem;
     // 验证模式
     FAutoCheckHeadAuthor: Boolean;
     // 是否自动校验 Token参数
@@ -64,11 +64,11 @@ type
     destructor Destroy; override;
     { 工作 }
     // function DoWork(Ctxt:THttpServerRequest;QWorkInfo:THTTPWorkInfo):cardinal;virtual;overload;
-    function DoWork(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QRouterItem: TOneRouterItem): cardinal; virtual;
+    function DoWork(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QRouterItem: TOneRouterWorkItem): cardinal; virtual;
   published
     // property AutoJsonResult:Boolean read FAutoJsonResult write FAutoJsonResult;
     property bAllowOrigin: Boolean read FbAllowOrigin write FbAllowOrigin;
-    property RouterItem: TOneRouterItem read FRouterItem write FRouterItem;
+    property RouterItem: TOneRouterWorkItem read FRouterItem write FRouterItem;
     property HTTPCtxt: THTTPCtxt read FHTTPCtxt write FHTTPCtxt;
     property HTTPResult: THTTPResult read FHTTPResult write FHTTPResult;
   end;
@@ -346,7 +346,7 @@ begin
   end;
 end;
 
-function TOneControllerBase.DoWork(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QRouterItem: TOneRouterItem): cardinal;
+function TOneControllerBase.DoWork(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QRouterItem: TOneRouterWorkItem): cardinal;
 var
   i: Integer;
   LParamNewObjList: TList<TObject>;
@@ -471,6 +471,7 @@ var
   tempInt64: Int64;
   tempFloat: double;
   tempStr: string;
+  tempStrArr: TArray<string>;
   tempObj: TObject;
   tempTValue: TValue;
   lFormList: TStringList;
@@ -495,10 +496,11 @@ begin
     exit;
   setLength(lArgs, iParamLen);
   try
+
     //
     case QOneMethodRtti.HttpMethodType of
 
-      emOneHttpMethodMode.OneGet, emOneHttpMethodMode.OneUpload, emOneHttpMethodMode.OneDownload:
+      emOneHttpMethodMode.OneGet, emOneHttpMethodMode.OneDownload:
         begin
 {$REGION}
           // url获取参数,不能有类
@@ -821,6 +823,69 @@ begin
           end;
 {$ENDREGION}
         end;
+      emOneHttpMethodMode.OnePath:
+        begin
+          // 分析Url获取参数
+          tempStr := QHTTPCtxt.URLPath.Substring(length(QOneMethodRtti.UrlMethod) + 1);
+          tempStrArr := SplitString(tempStr, '/');
+          if length(tempStrArr) <> QOneMethodRtti.paramCount then
+          begin
+            QErrMsg := 'Url路径参数与所需的函数参数个数不一至';
+            exit;
+          end;
+          for iParam := Low(lParameters) to High(lParameters) do
+          begin
+            lParam := lParameters[iParam];
+            // 获取参数值
+            tempStr := tempStrArr[iParam];
+            case lParam.ParamType.TypeKind of
+              tkInteger, tkInt64, tkFloat:
+                begin
+                  if lParam.ParamType.TypeKind = tkInteger then
+                  begin
+                    if tryStrToInt(tempStr, tempInt) then
+                    begin
+                      lArgs[iParam] := tempInt;
+                    end
+                    else
+                    begin
+                      QErrMsg := 'URL参数' + lParam.Name + '转化成整型出错';
+                      exit;
+                    end;
+                  end
+                  else if lParam.ParamType.TypeKind = tkInt64 then
+                  begin
+                    if tryStrToInt64(tempStr, tempInt64) then
+                    begin
+                      lArgs[iParam] := tempInt64;
+                    end
+                    else
+                    begin
+                      QErrMsg := 'URL参数' + lParam.Name + '转化成整型64出错';
+                      exit;
+                    end;
+                  end
+                  else if lParam.ParamType.TypeKind = tkFloat then
+                  begin
+                    if TryStrToFloat(tempStr, tempFloat) then
+                    begin
+                      lArgs[iParam] := tempFloat;
+                    end
+                    else
+                    begin
+                      QErrMsg := 'URL参数' + lParam.Name + '转化成小数出错';
+                      exit;
+                    end;
+                  end;
+                end;
+              tkString, tkUString, tkWChar, tkLString, tkWString, tkChar:
+                begin
+                  // 不存在这个参数会默认''
+                  lArgs[iParam] := tempStr;
+                end;
+            end;
+          end;
+        end;
       emOneHttpMethodMode.OneForm:
         begin
 {$REGION}
@@ -923,6 +988,7 @@ begin
     begin
       lJSonValue.Free;
     end;
+    tempStrArr := nil;
   end;
   Result := lArgs;
 end;
@@ -1070,7 +1136,7 @@ begin
             exit;
           end;
         end;
-      emOneHttpMethodMode.OnePost, emOneHttpMethodMode.OneForm, emOneHttpMethodMode.OneUpload:
+      emOneHttpMethodMode.OnePost, emOneHttpMethodMode.OneForm:
         begin
           if QHTTPCtxt.Method.ToUpper() <> 'POST' then
           begin

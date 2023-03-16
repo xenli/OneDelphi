@@ -30,13 +30,13 @@ type
     function ClientConnectPing(QCleintConnect: TClientConnect): TActionResult<string>;
   end;
 
-function CreateNewOneTokenController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewOneTokenController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
 uses OneGlobal;
 
-function CreateNewOneTokenController(QRouterItem: TOneRouterItem): TObject;
+function CreateNewOneTokenController(QRouterItem: TOneRouterWorkItem): TObject;
 var
   lController: TOneTokenController;
 begin

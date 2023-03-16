@@ -22,14 +22,14 @@ type
     function GetResultData(): TActionResult<TDataSet>;
   end;
 
-function CreateNewDemoCustResultController(QRouterItem: TOneRouterItem)
+function CreateNewDemoCustResultController(QRouterItem: TOneRouterWorkItem)
   : TObject;
 
 implementation
 
 uses OneGlobal;
 
-function CreateNewDemoCustResultController(QRouterItem: TOneRouterItem)
+function CreateNewDemoCustResultController(QRouterItem: TOneRouterWorkItem)
   : TObject;
 var
   lController: TDemoCustResultController;
