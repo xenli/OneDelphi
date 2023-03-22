@@ -65,6 +65,7 @@
 客户端:  
 	1.OneFastClient增加FastApi设置界面  
 
+************2023-03-16***********
 服务端:  
 	1.增加UrlPath风格的请求,单元示例 DemoUrlPathController  
     		// 请求 url xxxx/DemoUrlPath/OnePathTest/flm123  
