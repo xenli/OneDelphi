@@ -417,6 +417,8 @@ begin
     except
       on e: Exception do
       begin
+        // 写入错误日志
+        TOneGlobal.GetInstance().Log.WriteLog('OneExcept', e.Message);
         QHTTPResult.ResultException := e.Message;
         QHTTPResult.ResultStatus := 500;
       end;

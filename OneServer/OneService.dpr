@@ -75,7 +75,10 @@ uses
   OneFastModuleManage in 'OneFastCleint\OneFastModuleManage.pas',
   OneFastModuleController in 'OneFastCleint\OneFastModuleController.pas',
   ZTManageController in 'httpServer\Controller\ZTManageController.pas',
-  DemoUrlPathController in 'httpServer\Controller\Demo\DemoUrlPathController.pas';
+  DemoUrlPathController in 'httpServer\Controller\Demo\DemoUrlPathController.pas',
+  OneFastApiManage in 'OneFastApi\OneFastApiManage.pas',
+  OneFastApiController in 'OneFastApi\OneFastApiController.pas',
+  OneFastApiDo in 'OneFastApi\OneFastApiDo.pas';
 
 var
   lpStartupInfo: TStartupInfo;

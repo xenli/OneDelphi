@@ -124,7 +124,7 @@ type
     constructor Create(AOwner: TOneZTPool; QPhyDriver: string; QConnectionString: string); overload;
     destructor Destroy; override;
     procedure UnLockWork();
-    function CreateNewQuery(): TFDQuery;
+    function CreateNewQuery(QIsOpenData: Boolean = false): TFDQuery;
   Public
     property ADConnection: TFDConnection read FDConnection;
     property ADTransaction: TFDTransaction read GetADTransaction;
@@ -133,6 +133,7 @@ type
     Property ADStoredProc: TFDStoredProc read GetStoredProc;
     Property IsWorking: Boolean read FIsWorking write FIsWorking;
     property DataStream: TMemoryStream read GetTempStream;
+    property FDException: TOneFDException read FException;
   end;
 
   { 一个账套池 }
@@ -383,7 +384,7 @@ begin
   FDQuery.Connection := FDConnection;
 end;
 
-function TOneZTItem.CreateNewQuery(): TFDQuery;
+function TOneZTItem.CreateNewQuery(QIsOpenData: Boolean = false): TFDQuery;
 begin
   Result := TFDQuery.Create(nil);
   Result.CachedUpdates := true;
@@ -396,6 +397,12 @@ begin
   Result.ResourceOptions.MacroCreate := false;
   Result.ResourceOptions.MacroExpand := false;
   Result.FormatOptions.StrsTrim2Len := true;
+  if QIsOpenData then
+  begin
+    Result.UpdateOptions.EnableDelete := false;
+    Result.UpdateOptions.EnableInsert := false;
+    Result.UpdateOptions.EnableUpdate := false;
+  end;
   Result.Connection := FDConnection;
 end;
 

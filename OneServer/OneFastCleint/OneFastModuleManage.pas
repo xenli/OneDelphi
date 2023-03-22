@@ -10,6 +10,7 @@ type
   TFastModuleDataParam = class;
   TFastModuleField = class;
   TFastModuleUI = class;
+  TFastModuleBand = class;
   TFastModuleControl = class;
   TFastModuleFilter = class;
   TFastModuleButton = class;
@@ -164,10 +165,12 @@ type
     FTreeKeyID_: string;
     FTreePKeyID_: string;
     //
+    FChildBands_: TList<TFastModuleBand>;
     FChildControls_: TList<TFastModuleControl>;
     FChildFilters_: TList<TFastModuleFilter>;
     FChildButtons_: TList<TFastModuleButton>;
     FChildButtonpops_: TList<TFastModuleButtonpop>;
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -188,10 +191,37 @@ type
     property FTreeKeyID: string read FTreeKeyID_ write FTreeKeyID_;
     property FTreePKeyID: string read FTreePKeyID_ write FTreePKeyID_;
     //
+    property ChildBands: TList<TFastModuleBand> read FChildBands_ write FChildBands_;
     property ChildControls: TList<TFastModuleControl> read FChildControls_ write FChildControls_;
     property ChildFilters: TList<TFastModuleFilter> read FChildFilters_ write FChildFilters_;
     property ChildButtons: TList<TFastModuleButton> read FChildButtons_ write FChildButtons_;
     property ChildButtonpops: TList<TFastModuleButtonpop> read FChildButtonpops_ write FChildButtonpops_;
+  end;
+
+  TFastModuleBand = class
+  private
+    FBandID_: string;
+    FPBandID_: string;
+    FUIID_: string;
+    FModuleID_: string;
+    FCaption_: string;
+    FBandIndex_: integer;
+    FFixedKind_: integer;
+    FTreeCode_: string;
+    FChildBands_: TList<TFastModuleBand>;
+  public
+    constructor Create;
+    destructor Destroy; override;
+  published
+    property FBandID: string read FBandID_ write FBandID_;
+    property FPBandID: string read FPBandID_ write FPBandID_;
+    property FUIID: string read FUIID_ write FUIID_;
+    property FModuleID: string read FModuleID_ write FModuleID_;
+    property FBandIndex: integer read FBandIndex_ write FBandIndex_;
+    property FCaption: string read FCaption_ write FCaption_;
+    property FFixedKind: integer read FFixedKind_ write FFixedKind_;
+    property FTreeCode: string read FTreeCode_ write FTreeCode_;
+    property ChildBands: TList<TFastModuleBand> read FChildBands_ write FChildBands_;
   end;
 
   TFastModuleControl = class
@@ -202,6 +232,7 @@ type
     FOrderNumber_: integer;
     FControlType_: string;
     FControlCaption_: string;
+    FGridBandID_: string;
     FControlWidth_: integer;
     FControlField_: string;
     FControlTag_: integer;
@@ -219,6 +250,7 @@ type
     property FOrderNumber: integer read FOrderNumber_ write FOrderNumber_;
     property FControlType: string read FControlType_ write FControlType_;
     property FControlCaption: string read FControlCaption_ write FControlCaption_;
+    property FGridBandID: string read FGridBandID_ write FGridBandID_;
     property FControlWidth: integer read FControlWidth_ write FControlWidth_;
     property FControlField: string read FControlField_ write FControlField_;
     property FControlTag: integer read FControlTag_ write FControlTag_;
@@ -438,6 +470,7 @@ end;
 constructor TFastModuleUI.Create;
 begin
   inherited Create;
+  self.FChildBands_ := TList<TFastModuleBand>.Create;
   self.FChildControls_ := TList<TFastModuleControl>.Create;
   self.FChildFilters_ := TList<TFastModuleFilter>.Create;
   self.FChildButtons_ := TList<TFastModuleButton>.Create;
@@ -448,6 +481,13 @@ destructor TFastModuleUI.Destroy;
 var
   i: integer;
 begin
+  for i := 0 to self.FChildBands_.Count - 1 do
+  begin
+    self.FChildBands_[i].Free;
+  end;
+  self.FChildBands_.clear;
+  self.FChildBands_.Free;
+  //
   for i := 0 to self.FChildControls_.Count - 1 do
   begin
     self.FChildControls_[i].Free;
@@ -473,6 +513,23 @@ begin
   self.FChildButtonpops_.clear;
   self.FChildButtonpops_.Free;
   inherited Destroy;
+end;
+
+constructor TFastModuleBand.Create;
+begin
+  self.FChildBands_ := TList<TFastModuleBand>.Create;
+end;
+
+destructor TFastModuleBand.Destroy;
+var
+  i: integer;
+begin
+  for i := 0 to self.FChildBands_.Count - 1 do
+  begin
+    self.FChildBands_[i].Free;
+  end;
+  self.FChildBands_.clear;
+  self.FChildBands_.Free;
 end;
 
 constructor TFastModuleButton.Create;
@@ -559,6 +616,7 @@ var
   lParam: TFastModuleDataParam;
   lField: TFastModuleField;
   lUI: TFastModuleUI;
+  lBand, lPBand: TFastModuleBand;
   lControl: TFastModuleControl;
   lFilter: TFastModuleFilter;
   lButton, lPButton: TFastModuleButton;
@@ -568,6 +626,7 @@ var
   lOrmDataParam: IOneOrm<TFastModuleDataParam>;
   lOrmField: IOneOrm<TFastModuleField>;
   lOrmUI: IOneOrm<TFastModuleUI>;
+  lOrmBand: IOneOrm<TFastModuleBand>;
   lOrmControl: IOneOrm<TFastModuleControl>;
   lOrmFilter: IOneOrm<TFastModuleFilter>;
   lOrmButton: IOneOrm<TFastModuleButton>;
@@ -577,14 +636,18 @@ var
   lModuleDataParams: TList<TFastModuleDataParam>;
   lModuleFields: TList<TFastModuleField>;
   lModuleUIs: TList<TFastModuleUI>;
+  lModuleBands: TList<TFastModuleBand>;
   lModuleControls: TList<TFastModuleControl>;
   lModuleFilters: TList<TFastModuleFilter>;
   lModuleButtons: TList<TFastModuleButton>;
   lModuleButtonpops: TList<TFastModuleButtonpop>;
   lModuleLayouts: TList<TFastModuleLayout>;
   isErr, isRepate: boolean;
-  i, iData, iParam, iField, iUI, iControl, iFilter, iButton: integer;
+  i, iData, iParam, iField, iUI, iBand, iControl, iFilter, iButton: integer;
+  lDictBands: TDictionary<string, TFastModuleBand>;
   lDictButtons: TDictionary<string, TFastModuleButton>;
+  lObjList: TList<TObject>;
+  lIntList: TList<integer>;
 begin
   Result := nil;
   QErrMsg := '';
@@ -611,13 +674,17 @@ begin
   lModuleDataParams := nil;
   lModuleFields := nil;
   lModuleUIs := nil;
+  lModuleBands := nil;
   lModuleControls := nil;
   lModuleFilters := nil;
   lModuleButtons := nil;
   lModuleButtonpops := nil;
   lModuleLayouts := nil;
   lModule := nil;
+  lDictBands := nil;
   lDictButtons := nil;
+  lObjList := TList<TObject>.Create;
+  lIntList := TList<integer>.Create;
   try
     // 查询模块信息
     lOrmModule := TOneOrm<TFastModule>.Start();
@@ -637,13 +704,20 @@ begin
       QErrMsg := '不存在此模板代码配置';
       exit;
     end;
+    lModule := lModuleList[0];
+    for i := lModuleList.Count - 1 downto 0 do
+    begin
+      lObjList.Add(lModuleList[i]);
+      lModuleList.Delete(i);
+    end;
+
     if lModuleList.Count > 1 then
     begin
       isErr := true;
       QErrMsg := '此模板代码配置[' + QModuleCode + ']重复,请联系管理员修正';
       exit;
     end;
-    lModule := lModuleList[0];
+
     if not lModule.FIsStart then
     begin
       isErr := true;
@@ -656,21 +730,24 @@ begin
     lOrmDataParam := TOneOrm<TFastModuleDataParam>.Start();
     lOrmField := TOneOrm<TFastModuleField>.Start();
     lOrmUI := TOneOrm<TFastModuleUI>.Start();
+    lOrmBand := TOneOrm<TFastModuleBand>.Start();
     lOrmControl := TOneOrm<TFastModuleControl>.Start();
     lOrmFilter := TOneOrm<TFastModuleFilter>.Start();
     lOrmButton := TOneOrm<TFastModuleButton>.Start();
     lOrmButtonpop := TOneOrm<TFastModuleButtonpop>.Start();
     lOrmLayout := TOneOrm<TFastModuleLayout>.Start();
+    lDictBands := TDictionary<string, TFastModuleBand>.Create;
     lDictButtons := TDictionary<string, TFastModuleButton>.Create;
     try
-      lModuleDatas := lOrmData.ZTCode(self.FZTCode).Query('select * from onefast_module_data where FModuleID=:FModuleID order by FOrderNumber asc ', [lModule.FModuleID]).ToList();
-      lModuleDataParams := lOrmDataParam.ZTCode(self.FZTCode).Query('select * from onefast_module_dataparam where FModuleID=:FModuleID order by FOrderNumber asc ', [lModule.FModuleID]).ToList();
-      lModuleFields := lOrmField.ZTCode(self.FZTCode).Query('select * from onefast_module_field where FModuleID=:FModuleID order by FOrderNumber asc ', [lModule.FModuleID]).ToList();
-      lModuleUIs := lOrmUI.ZTCode(self.FZTCode).Query('select * from onefast_module_ui where FModuleID=:FModuleID order by FOrderNumber asc ', [lModule.FModuleID]).ToList();
-      lModuleControls := lOrmControl.ZTCode(self.FZTCode).Query('select * from onefast_module_uicontrol where FModuleID=:FModuleID order by FOrderNumber asc ', [lModule.FModuleID]).ToList();
-      lModuleFilters := lOrmFilter.ZTCode(self.FZTCode).Query('select * from onefast_module_uifilter where FModuleID=:FModuleID order by FOrderNumber asc ', [lModule.FModuleID]).ToList();
+      lModuleDatas := lOrmData.ZTCode(self.FZTCode).Query('select * from onefast_module_data where FModuleID=:FModuleID order by FOrderNumber desc ', [lModule.FModuleID]).ToList();
+      lModuleDataParams := lOrmDataParam.ZTCode(self.FZTCode).Query('select * from onefast_module_dataparam where FModuleID=:FModuleID order by FOrderNumber desc ', [lModule.FModuleID]).ToList();
+      lModuleFields := lOrmField.ZTCode(self.FZTCode).Query('select * from onefast_module_field where FModuleID=:FModuleID order by FOrderNumber desc ', [lModule.FModuleID]).ToList();
+      lModuleUIs := lOrmUI.ZTCode(self.FZTCode).Query('select * from onefast_module_ui where FModuleID=:FModuleID order by FOrderNumber desc ', [lModule.FModuleID]).ToList();
+      lModuleBands := lOrmBand.ZTCode(self.FZTCode).Query('select * from onefast_module_uiband where FModuleID=:FModuleID order by FTreeCode desc ', [lModule.FModuleID]).ToList();
+      lModuleControls := lOrmControl.ZTCode(self.FZTCode).Query('select * from onefast_module_uicontrol where FModuleID=:FModuleID order by FOrderNumber desc ', [lModule.FModuleID]).ToList();
+      lModuleFilters := lOrmFilter.ZTCode(self.FZTCode).Query('select * from onefast_module_uifilter where FModuleID=:FModuleID order by FOrderNumber desc ', [lModule.FModuleID]).ToList();
       lModuleButtons := lOrmButton.ZTCode(self.FZTCode).Query('select * from onefast_module_uibutton where FModuleID=:FModuleID order by FButtonTreeCode asc ', [lModule.FModuleID]).ToList();
-      lModuleButtonpops := lOrmButtonpop.ZTCode(self.FZTCode).Query('select * from onefast_module_uibuttonpop where FModuleID=:FModuleID order by FButtonTreeCode asc ', [lModule.FModuleID]).ToList();
+      lModuleButtonpops := lOrmButtonpop.ZTCode(self.FZTCode).Query('select * from onefast_module_uibuttonpop where FModuleID=:FModuleID order by FButtonTreeCode desc ', [lModule.FModuleID]).ToList();
       lModuleLayouts := lOrmLayout.ZTCode(self.FZTCode).Query('select * from onefast_module_layout where FModuleID=:FModuleID', [lModule.FModuleID]).ToList();
     except
       on e: Exception do
@@ -683,67 +760,95 @@ begin
     // 数据集组装
     Result := TModuleInfo.Create;
     Result.module := lModule;
-    for iData := 0 to lModuleDatas.Count - 1 do
+    for iData := lModuleDatas.Count - 1 downto 0 do
     begin
       lData := lModuleDatas[iData];
       Result.moduleDatas.Add(lData);
+      lObjList.Add(lData);
+      lModuleDatas.Delete(iData);
       if lData.ChildFields = nil then
         lData.ChildFields := TList<TFastModuleField>.Create;
-      for iField := 0 to lModuleFields.Count - 1 do
+      for iField := lModuleFields.Count - 1 downto 0 do
       begin
         lField := lModuleFields[iField];
         if lField.FDataID = lData.FDataID then
+        begin
           lData.ChildFields.Add(lField);
+          lObjList.Add(lField);
+          lModuleFields.Delete(iField);
+        end;
       end;
-      for iParam := 0 to lModuleDataParams.Count - 1 do
+      for iParam := lModuleDataParams.Count - 1 downto 0 do
       begin
         lParam := lModuleDataParams[iParam];
         if lParam.FDataID = lData.FDataID then
+        begin
           lData.ChildParams.Add(lParam);
+          lObjList.Add(lParam);
+          lModuleDataParams.Delete(iParam);
+        end;
       end;
     end;
     // UI组装
-    for iUI := 0 to lModuleUIs.Count - 1 do
+    for iUI := lModuleUIs.Count - 1 downto 0 do
     begin
       lUI := lModuleUIs[iUI];
       Result.moduleUIs.Add(lUI);
-      if lUI.ChildControls = nil then
-      begin
-        lUI.ChildControls := TList<TFastModuleControl>.Create;
-      end;
-      if lUI.ChildFilters = nil then
-      begin
-        lUI.ChildFilters := TList<TFastModuleFilter>.Create;
-      end;
-      if lUI.ChildButtons = nil then
-      begin
-        lUI.ChildButtons := TList<TFastModuleButton>.Create;
-      end;
-      if lUI.ChildButtonpops = nil then
-      begin
-        lUI.ChildButtonpops := TList<TFastModuleButtonpop>.Create;
-      end;
+      lObjList.Add(lUI);
+      lModuleUIs.Delete(iUI);
 
-      for iControl := 0 to lModuleControls.Count - 1 do
+      for iControl := lModuleControls.Count - 1 downto 0 do
       begin
         lControl := lModuleControls[iControl];
         if lControl.FUIID = lUI.FUIID then
+        begin
           lUI.ChildControls.Add(lControl);
+          lObjList.Add(lControl);
+          lModuleControls.Delete(iControl);
+        end;
       end;
 
-      for iFilter := 0 to lModuleFilters.Count - 1 do
+      for iFilter := lModuleFilters.Count - 1 downto 0 do
       begin
         lFilter := lModuleFilters[iFilter];
         if lFilter.FUIID = lUI.FUIID then
+        begin
           lUI.ChildFilters.Add(lFilter);
+          lObjList.Add(lFilter);
+          lModuleFilters.Delete(iFilter);
+        end;
       end;
 
+      for iBand := lModuleBands.Count - 1 downto 0 do
+      begin
+        lBand := lModuleBands[iBand];
+        if lBand.FUIID = lUI.FUIID then
+        begin
+          lDictBands.Add(lBand.FBandID, lBand);
+          lObjList.Add(lBand);
+          lModuleBands.Delete(iBand);
+          if lBand.FPBandID <> '' then
+          begin
+            if lDictBands.TryGetValue(lBand.FPBandID, lPBand) then
+            begin
+              lPBand.ChildBands.Add(lBand);
+              continue;
+            end;
+          end;
+          lUI.ChildBands.Add(lBand);
+        end;
+      end;
+
+      //
+      lIntList.clear;
       for iButton := 0 to lModuleButtons.Count - 1 do
       begin
         lButton := lModuleButtons[iButton];
         if lButton.FUIID = lUI.FUIID then
         begin
           lDictButtons.Add(lButton.FButtonID, lButton);
+          lObjList.Add(lButton);
+          lIntList.Add(iButton);
           if lButton.FPButtonID <> '' then
           begin
             if lDictButtons.TryGetValue(lButton.FPButtonID, lPButton) then
@@ -754,14 +859,21 @@ begin
           end;
           lUI.ChildButtons.Add(lButton);
         end;
-
+      end;
+      for iButton := lIntList.Count - 1 downto 0 do
+      begin
+        lModuleButtons.Delete(lIntList[iButton]);
       end;
 
-      for iButton := 0 to lModuleButtonpops.Count - 1 do
+      for iButton := lModuleButtonpops.Count - 1 downto 0 do
       begin
         lButtonpop := lModuleButtonpops[iButton];
         if lButtonpop.FUIID = lUI.FUIID then
+        begin
           lUI.ChildButtonpops.Add(lButtonpop);
+          lObjList.Add(lButtonpop);
+          lModuleButtonpops.Delete(iButton);
+        end;
       end;
     end;
     // 布局
@@ -772,6 +884,12 @@ begin
     else
     begin
       Result.moduleLayout_ := lModuleLayouts[0];
+    end;
+
+    for i := lModuleLayouts.Count - 1 downto 0 do
+    begin
+      lObjList.Add(lModuleLayouts[i]);
+      lModuleLayouts.Delete(i);
     end;
 
     TMonitor.Enter(self.FLockObj);
@@ -791,162 +909,128 @@ begin
       TMonitor.exit(self.FLockObj);
     end;
   finally
+    if lDictBands <> nil then
+    begin
+      lDictBands.clear;
+      lDictBands.Free;
+    end;
+
     if lDictButtons <> nil then
     begin
       lDictButtons.clear;
       lDictButtons.Free;
     end;
-
+    if lModuleList <> nil then
+    begin
+      for i := 0 to lModuleList.Count - 1 do
+      begin
+        lModuleList[i].Free;
+      end;
+      lModuleList.clear;
+      lModuleList.Free;
+    end;
+    if lModuleDatas <> nil then
+    begin
+      for i := 0 to lModuleDatas.Count - 1 do
+      begin
+        lModuleDatas[i].Free;
+      end;
+      lModuleDatas.clear;
+      lModuleDatas.Free;
+    end;
+    if lModuleBands <> nil then
+    begin
+      for i := 0 to lModuleBands.Count - 1 do
+      begin
+        lModuleBands[i].Free;
+      end;
+      lModuleBands.clear;
+      lModuleBands.Free;
+    end;
+    if lModuleDataParams <> nil then
+    begin
+      for i := 0 to lModuleDataParams.Count - 1 do
+      begin
+        lModuleDataParams[i].Free;
+      end;
+      lModuleDataParams.clear;
+      lModuleDataParams.Free;
+    end;
+    if lModuleFields <> nil then
+    begin
+      for i := 0 to lModuleFields.Count - 1 do
+      begin
+        lModuleFields[i].Free;
+      end;
+      lModuleFields.clear;
+      lModuleFields.Free;
+    end;
+    if lModuleUIs <> nil then
+    begin
+      for i := 0 to lModuleUIs.Count - 1 do
+      begin
+        lModuleUIs[i].Free;
+      end;
+      lModuleUIs.clear;
+      lModuleUIs.Free;
+    end;
+    if lModuleControls <> nil then
+    begin
+      for i := 0 to lModuleControls.Count - 1 do
+      begin
+        lModuleControls[i].Free;
+      end;
+      lModuleControls.clear;
+      lModuleControls.Free;
+    end;
+    if lModuleFilters <> nil then
+    begin
+      for i := 0 to lModuleFilters.Count - 1 do
+      begin
+        lModuleFilters[i].Free;
+      end;
+      lModuleFilters.clear;
+      lModuleFilters.Free;
+    end;
+    if lModuleButtons <> nil then
+    begin
+      for i := 0 to lModuleButtons.Count - 1 do
+      begin
+        lModuleButtons[i].Free;
+      end;
+      lModuleButtons.clear;
+      lModuleButtons.Free;
+    end;
+    if lModuleButtonpops <> nil then
+    begin
+      for i := 0 to lModuleButtonpops.Count - 1 do
+      begin
+        lModuleButtonpops[i].Free;
+      end;
+      lModuleButtonpops.clear;
+      lModuleButtonpops.Free;
+    end;
+    if lModuleLayouts <> nil then
+    begin
+      for i := 0 to lModuleLayouts.Count - 1 do
+      begin
+        lModuleLayouts[i].Free;
+      end;
+      lModuleLayouts.clear;
+      lModuleLayouts.Free;
+    end;
     if (isErr) or (isRepate) then
     begin
-      if lModuleList <> nil then
-      begin
-        for i := 0 to lModuleList.Count - 1 do
-        begin
-          lModuleList[i].Free;
-        end;
-        lModuleList.clear;
-        lModuleList.Free;
-      end;
-      if lModuleDatas <> nil then
-      begin
-        for i := 0 to lModuleDatas.Count - 1 do
-        begin
-          lModuleDatas[i].Free;
-        end;
-        lModuleDatas.clear;
-        lModuleDatas.Free;
-      end;
-      if lModuleDataParams <> nil then
-      begin
-        for i := 0 to lModuleDataParams.Count - 1 do
-        begin
-          lModuleDataParams[i].Free;
-        end;
-        lModuleDataParams.clear;
-        lModuleDataParams.Free;
-      end;
-      if lModuleFields <> nil then
-      begin
-        for i := 0 to lModuleFields.Count - 1 do
-        begin
-          lModuleFields[i].Free;
-        end;
-        lModuleFields.clear;
-        lModuleFields.Free;
-      end;
-      if lModuleUIs <> nil then
-      begin
-        for i := 0 to lModuleUIs.Count - 1 do
-        begin
-          lModuleUIs[i].Free;
-        end;
-        lModuleUIs.clear;
-        lModuleUIs.Free;
-      end;
-      if lModuleControls <> nil then
-      begin
-        for i := 0 to lModuleControls.Count - 1 do
-        begin
-          lModuleControls[i].Free;
-        end;
-        lModuleControls.clear;
-        lModuleControls.Free;
-      end;
-      if lModuleFilters <> nil then
-      begin
-        for i := 0 to lModuleFilters.Count - 1 do
-        begin
-          lModuleFilters[i].Free;
-        end;
-        lModuleFilters.clear;
-        lModuleFilters.Free;
-      end;
-      if lModuleButtons <> nil then
-      begin
-        for i := 0 to lModuleButtons.Count - 1 do
-        begin
-          lModuleButtons[i].Free;
-        end;
-        lModuleButtons.clear;
-        lModuleButtons.Free;
-      end;
-      if lModuleButtonpops <> nil then
-      begin
-        for i := 0 to lModuleButtonpops.Count - 1 do
-        begin
-          lModuleButtonpops[i].Free;
-        end;
-        lModuleButtonpops.clear;
-        lModuleButtonpops.Free;
-      end;
-      if lModuleLayouts <> nil then
-      begin
-        for i := 0 to lModuleLayouts.Count - 1 do
-        begin
-          lModuleLayouts[i].Free;
-        end;
-        lModuleLayouts.clear;
-        lModuleLayouts.Free;
-      end;
 
-    end
-    else
-    begin
-      if lModuleList <> nil then
+      for i := 0 to lObjList.Count - 1 do
       begin
-        lModuleList.clear;
-        lModuleList.Free;
-      end;
-      if lModuleDatas <> nil then
-      begin
-        lModuleDatas.clear;
-        lModuleDatas.Free;
-      end;
-      if lModuleDataParams <> nil then
-      begin
-        lModuleDataParams.clear;
-        lModuleDataParams.Free;
-      end;
-      if lModuleFields <> nil then
-      begin
-
-        lModuleFields.clear;
-        lModuleFields.Free;
-      end;
-      if lModuleUIs <> nil then
-      begin
-
-        lModuleUIs.clear;
-        lModuleUIs.Free;
-      end;
-      if lModuleControls <> nil then
-      begin
-        lModuleControls.clear;
-        lModuleControls.Free;
-      end;
-      if lModuleFilters <> nil then
-      begin
-        lModuleFilters.clear;
-        lModuleFilters.Free;
-      end;
-      if lModuleButtons <> nil then
-      begin
-        lModuleButtons.clear;
-        lModuleButtons.Free;
-      end;
-      if lModuleButtonpops <> nil then
-      begin
-        lModuleButtonpops.clear;
-        lModuleButtonpops.Free;
-      end;
-      if lModuleLayouts <> nil then
-      begin
-        lModuleLayouts.clear;
-        lModuleLayouts.Free;
+        lObjList[i].Free;
       end;
     end;
-
+    lObjList.clear;
+    lObjList.Free;
+    lIntList.clear;
+    lIntList.Free;
   end;
 
 end;
@@ -971,6 +1055,7 @@ var
   lParam: TFastModuleDataParam;
   lField: TFastModuleField;
   lUI: TFastModuleUI;
+  lBand, lPBand: TFastModuleBand;
   lControl: TFastModuleControl;
   lFilter: TFastModuleFilter;
   lButton, lPButton: TFastModuleButton;
@@ -981,6 +1066,7 @@ var
   lOrmDataParam: IOneOrm<TFastModuleDataParam>;
   lOrmField: IOneOrm<TFastModuleField>;
   lOrmUI: IOneOrm<TFastModuleUI>;
+  lOrmBand: IOneOrm<TFastModuleBand>;
   lOrmControl: IOneOrm<TFastModuleControl>;
   lOrmFilter: IOneOrm<TFastModuleFilter>;
   lOrmButton: IOneOrm<TFastModuleButton>;
@@ -990,17 +1076,22 @@ var
   lModuleDataParams: TList<TFastModuleDataParam>;
   lModuleFields: TList<TFastModuleField>;
   lModuleUIs: TList<TFastModuleUI>;
+  lModuleBands: TList<TFastModuleBand>;
   lModuleControls: TList<TFastModuleControl>;
   lModuleFilters: TList<TFastModuleFilter>;
   lModuleButtons: TList<TFastModuleButton>;
   lModuleButtonpops: TList<TFastModuleButtonpop>;
   lModuleLayouts: TList<TFastModuleLayout>;
   isErr, isRepate: boolean;
-  i, iModule, iData, iParam, iField, iUI, iControl, iFilter, iButton, iLayout: integer;
+  i, iModule, iData, iParam, iField, iUI, iBand, iControl, iFilter, iButton, iLayout: integer;
+  iDataStep, iUIStep, iChildStep: integer;
   //
   lDictModuleCodes: TDictionary<string, boolean>;
-  lDictModuleIDs: TDictionary<string, TFastModule>;
+  lDictBands: TDictionary<string, TFastModuleBand>;
   lDictButtons: TDictionary<string, TFastModuleButton>;
+
+  lObjList: TList<TObject>;
+  lIntList: TList<integer>;
 begin
   Result := false;
 
@@ -1009,6 +1100,7 @@ begin
   lModuleDataParams := nil;
   lModuleFields := nil;
   lModuleUIs := nil;
+  lModuleBands := nil;
   lModuleControls := nil;
   lModuleFilters := nil;
   lModuleButtons := nil;
@@ -1016,9 +1108,10 @@ begin
   lModuleLayouts := nil;
   lModule := nil;
   lDictModuleCodes := nil;
-  lDictModuleIDs := nil;
+  lDictBands := nil;
   lDictButtons := nil;
-
+  lObjList := TList<TObject>.Create;
+  lIntList := TList<integer>.Create;
   TMonitor.Enter(self.FLockObj);
   try
     for lModuleInfo in self.FModuleInfos.Values do
@@ -1028,11 +1121,10 @@ begin
     self.FModuleInfos.clear;
     //
     lOrmModule := TOneOrm<TFastModule>.Start();
-    lModuleList := lOrmModule.ZTCode(self.FZTCode).Query('select * from onefast_module', []).ToList();
+    lModuleList := lOrmModule.ZTCode(self.FZTCode).Query('select * from onefast_module order by FModuleID asc', []).ToList();
     if lModuleList.Count = 0 then
       exit;
     lDictModuleCodes := TDictionary<string, boolean>.Create;
-    lDictModuleIDs := TDictionary<string, TFastModule>.Create;
     for iModule := lModuleList.Count - 1 downto 0 do
     begin
       lModule := lModuleList[iModule];
@@ -1049,7 +1141,6 @@ begin
         exit;
       end;
       lDictModuleCodes.Add(lModule.FModuleCode, true);
-      lDictModuleIDs.Add(lModule.FModuleID, lModule);
     end;
 
     // 查询模块相关信息
@@ -1057,163 +1148,200 @@ begin
     lOrmDataParam := TOneOrm<TFastModuleDataParam>.Start();
     lOrmField := TOneOrm<TFastModuleField>.Start();
     lOrmUI := TOneOrm<TFastModuleUI>.Start();
+    lOrmBand := TOneOrm<TFastModuleBand>.Start();
     lOrmControl := TOneOrm<TFastModuleControl>.Start();
     lOrmFilter := TOneOrm<TFastModuleFilter>.Start();
     lOrmButton := TOneOrm<TFastModuleButton>.Start();
     lOrmButtonpop := TOneOrm<TFastModuleButtonpop>.Start();
     lOrmLayout := TOneOrm<TFastModuleLayout>.Start();
+    lDictBands := TDictionary<string, TFastModuleBand>.Create;
     lDictButtons := TDictionary<string, TFastModuleButton>.Create;
     try
-      lModuleDatas := lOrmData.ZTCode(self.FZTCode).Query('select * from onefast_module_data order by FModuleID , FOrderNumber asc ', []).ToList();
-      lModuleDataParams := lOrmDataParam.ZTCode(self.FZTCode).Query('select * from onefast_module_dataparam order by FModuleID , FOrderNumber asc ', []).ToList();
-      lModuleFields := lOrmField.ZTCode(self.FZTCode).Query('select * from onefast_module_field order by FDataID, FOrderNumber asc ', []).ToList();
-      lModuleUIs := lOrmUI.ZTCode(self.FZTCode).Query('select * from onefast_module_ui order by FModuleID, FOrderNumber asc ', []).ToList();
-      lModuleControls := lOrmControl.ZTCode(self.FZTCode).Query('select * from onefast_module_uicontrol order by FUIID, FOrderNumber asc ', []).ToList();
-      lModuleFilters := lOrmFilter.ZTCode(self.FZTCode).Query('select * from onefast_module_uifilter order by FUIID,FOrderNumber asc ', []).ToList();
-      lModuleButtons := lOrmButton.ZTCode(self.FZTCode).Query('select * from onefast_module_uibutton order by FUIID,FButtonTreeCode asc ', []).ToList();
-      lModuleButtonpops := lOrmButtonpop.ZTCode(self.FZTCode).Query('select * from onefast_module_uibuttonpop  order by FUIID,FButtonTreeCode asc ', []).ToList();
-      lModuleLayouts := lOrmLayout.ZTCode(self.FZTCode).Query('select * from onefast_module_layout', []).ToList();
-      // 去掉无关联的数据
-      for iData := lModuleDatas.Count - 1 downto 0 do
-      begin
-        lData := lModuleDatas[iData];
-        if not lDictModuleIDs.ContainsKey(lData.FModuleID) then
-        begin
-          lData.Free;
-          lModuleDatas.Delete(iData);
-        end;
-      end;
-
-      for iField := lModuleFields.Count - 1 downto 0 do
-      begin
-        lField := lModuleFields[iField];
-        if not lDictModuleIDs.ContainsKey(lField.FModuleID) then
-        begin
-          lField.Free;
-          lModuleFields.Delete(iField);
-        end;
-      end;
-
-      for iParam := lModuleDataParams.Count - 1 downto 0 do
-      begin
-        lParam := lModuleDataParams[iParam];
-        if not lDictModuleIDs.ContainsKey(lParam.FModuleID) then
-        begin
-          lParam.Free;
-          lModuleDataParams.Delete(iParam);
-        end;
-      end;
-
-      for iUI := lModuleUIs.Count - 1 downto 0 do
-      begin
-        lUI := lModuleUIs[iUI];
-        if not lDictModuleIDs.ContainsKey(lUI.FModuleID) then
-        begin
-          lUI.Free;
-          lModuleUIs.Delete(iUI);
-        end;
-      end;
-
-      for iControl := lModuleControls.Count - 1 downto 0 do
-      begin
-        lControl := lModuleControls[iControl];
-        if not lDictModuleIDs.ContainsKey(lControl.FModuleID) then
-        begin
-          lControl.Free;
-          lModuleControls.Delete(iControl);
-        end;
-      end;
-
-      for iButton := lModuleButtons.Count - 1 downto 0 do
-      begin
-        lButton := lModuleButtons[iButton];
-        if not lDictModuleIDs.ContainsKey(lButton.FModuleID) then
-        begin
-          lButton.Free;
-          lModuleButtons.Delete(iButton);
-        end;
-      end;
-
-      for iButton := lModuleButtonpops.Count - 1 downto 0 do
-      begin
-        lButtonpop := lModuleButtonpops[iButton];
-        if not lDictModuleIDs.ContainsKey(lButtonpop.FModuleID) then
-        begin
-          lButtonpop.Free;
-          lModuleButtonpops.Delete(iButton);
-        end;
-      end;
-
-      for iLayout := lModuleLayouts.Count - 1 downto 0 do
-      begin
-        lLayout := lModuleLayouts[iLayout];
-        if not lDictModuleIDs.ContainsKey(lLayout.FModuleID) then
-        begin
-          lLayout.Free;
-          lModuleLayouts.Delete(iLayout);
-        end;
-      end;
-
+      lModuleDatas := lOrmData.ZTCode(self.FZTCode).Query('select * from onefast_module_data order by FModuleID asc, FOrderNumber desc ', []).ToList();
+      lModuleDataParams := lOrmDataParam.ZTCode(self.FZTCode).Query('select * from onefast_module_dataparam order by FModuleID asc,FDataID asc, FOrderNumber desc ', []).ToList();
+      lModuleFields := lOrmField.ZTCode(self.FZTCode).Query('select * from onefast_module_field order by FModuleID asc, FDataID asc, FOrderNumber desc ', []).ToList();
+      lModuleUIs := lOrmUI.ZTCode(self.FZTCode).Query('select * from onefast_module_ui order by FModuleID asc, FOrderNumber desc ', []).ToList();
+      lModuleBands := lOrmBand.ZTCode(self.FZTCode).Query('select * from onefast_module_uiband order by FModuleID asc, FUIID asc , FTreeCode desc ', []).ToList();
+      lModuleControls := lOrmControl.ZTCode(self.FZTCode).Query('select * from onefast_module_uicontrol order by FModuleID asc, FUIID asc, FOrderNumber desc ', []).ToList();
+      lModuleFilters := lOrmFilter.ZTCode(self.FZTCode).Query('select * from onefast_module_uifilter order by FModuleID asc, FUIID asc, FOrderNumber desc ', []).ToList();
+      lModuleButtons := lOrmButton.ZTCode(self.FZTCode).Query('select * from onefast_module_uibutton order by FModuleID asc, FUIID asc,FButtonTreeCode asc ', []).ToList();
+      lModuleButtonpops := lOrmButtonpop.ZTCode(self.FZTCode).Query('select * from onefast_module_uibuttonpop  order by FModuleID asc, FUIID asc,FButtonTreeCode desc ', []).ToList();
+      lModuleLayouts := lOrmLayout.ZTCode(self.FZTCode).Query('select * from onefast_module_layout  order by FModuleID asc', []).ToList();
       // 处理数据关联
-      for lModule in lDictModuleIDs.Values do
+      for iModule := lModuleList.Count - 1 downto 0 do
       begin
+        lModule := lModuleList[iModule];
         lModuleInfo := TModuleInfo.Create;
         self.FModuleInfos.Add(lModule.FModuleCode, lModuleInfo);
         lModuleInfo.module := lModule;
+        lObjList.Add(lModule);
+        lModuleList.Delete(iModule);
+        iDataStep := 0;
+        iUIStep := 0;
         // 数据集
-        for iData := 0 to lModuleDatas.Count - 1 do
+        for iData := lModuleDatas.Count - 1 downto 0 do
         begin
           lData := lModuleDatas[iData];
           if lData.FModuleID <> lModule.FModuleID then
           begin
-            continue;
+            if iDataStep = 1 then
+            begin
+              // 减少不必要的循环,因为是按FModuleID排序,，一样后有不一样,说明已经完成了本模块的循环
+              break;
+            end
+            else
+            begin
+              continue;
+            end;
           end;
+          iDataStep := 1;
           lModuleInfo.moduleDatas.Add(lData);
-          for iField := 0 to lModuleFields.Count - 1 do
+          lObjList.Add(lData);
+          lModuleDatas.Delete(iData);
+          iChildStep := 0;
+          for iField := lModuleFields.Count - 1 downto 0 do
           begin
             lField := lModuleFields[iField];
             if lField.FDataID = lData.FDataID then
+            begin
+              iChildStep := 1;
               lData.ChildFields.Add(lField);
+              lObjList.Add(lField);
+              lModuleFields.Delete(iField);
+            end
+            else
+            begin
+              if iChildStep = 1 then
+              begin
+                break;
+              end;
+            end;
           end;
 
-          for iParam := 0 to lModuleDataParams.Count - 1 do
+          iChildStep := 0;
+          for iParam := lModuleDataParams.Count - 1 downto 0 do
           begin
             lParam := lModuleDataParams[iParam];
             if lParam.FDataID = lData.FDataID then
+            begin
+              iChildStep := 1;
               lData.ChildParams.Add(lParam);
+              lObjList.Add(lParam);
+              lModuleDataParams.Delete(iParam);
+            end
+            else
+            begin
+              if iChildStep = 1 then
+              begin
+                break;
+              end;
+            end;
           end;
         end;
         // UI
-        for iUI := 0 to lModuleUIs.Count - 1 do
+        for iUI := lModuleUIs.Count - 1 downto 0 do
         begin
           lUI := lModuleUIs[iUI];
           if lUI.FModuleID <> lModule.FModuleID then
           begin
-            continue;
+            if iUIStep = 1 then
+            begin
+              // 减少不必要的循环,因为是按FModuleID排序,，一样后有不一样,说明已经完成了本模块的循环
+              break;
+            end
+            else
+            begin
+              continue;
+            end;
           end;
+          iUIStep := 1;
           lModuleInfo.moduleUIs.Add(lUI);
+          lObjList.Add(lUI);
+          lModuleUIs.Delete(iUI);
           // 控件
-          for iControl := 0 to lModuleControls.Count - 1 do
+          iChildStep := 0;
+          for iControl := lModuleControls.Count - 1 downto 0 do
           begin
             lControl := lModuleControls[iControl];
             if lControl.FUIID = lUI.FUIID then
+            begin
+              iChildStep := 1;
               lUI.ChildControls.Add(lControl);
-
+              lObjList.Add(lControl);
+              lModuleControls.Delete(iControl);
+            end
+            else
+            begin
+              if iChildStep = 1 then
+              begin
+                // 减少不必要的循环,因为是按FUIID排序,，一样后有不一样,说明已经完成了本UI的循环
+                break;
+              end;
+            end;
           end;
 
-          for iFilter := 0 to lModuleFilters.Count - 1 do
+          iChildStep := 0;
+          for iFilter := lModuleFilters.Count - 1 downto 0 do
           begin
             lFilter := lModuleFilters[iFilter];
             if lFilter.FUIID = lUI.FUIID then
+            begin
+              iChildStep := 1;
               lUI.ChildFilters.Add(lFilter);
+              lObjList.Add(lFilter);
+              lModuleFilters.Delete(iFilter);
+            end
+            else
+            begin
+              if iChildStep = 1 then
+              begin
+                // 减少不必要的循环,因为是按FUIID排序,，一样后有不一样,说明已经完成了本UI的循环
+                break;
+              end;
+            end;
           end;
 
+          iChildStep := 0;
+          for iBand := lModuleBands.Count - 1 downto 0 do
+          begin
+            lBand := lModuleBands[iBand];
+            if lBand.FUIID = lUI.FUIID then
+            begin
+              iChildStep := 1;
+              lDictBands.Add(lBand.FBandID, lBand);
+              lObjList.Add(lBand);
+              lModuleBands.Delete(iBand);
+              if lBand.FPBandID <> '' then
+              begin
+                if lDictBands.TryGetValue(lBand.FPBandID, lPBand) then
+                begin
+                  lPBand.ChildBands.Add(lBand);
+                  continue;
+                end;
+              end;
+              lUI.ChildBands.Add(lBand);
+            end
+            else
+            begin
+              if iChildStep = 1 then
+              begin
+                // 减少不必要的循环,因为是按FUIID排序,，一样后有不一样,说明已经完成了本UI的循环
+                break;
+              end;
+            end;
+          end;
+
+          lIntList.clear;
+          iChildStep := 0;
           for iButton := 0 to lModuleButtons.Count - 1 do
           begin
             lButton := lModuleButtons[iButton];
             if lButton.FUIID = lUI.FUIID then
             begin
+              iChildStep := 1;
               lDictButtons.Add(lButton.FButtonID, lButton);
+              lObjList.Add(lButton);
+              lIntList.Add(iButton);
               if lButton.FPButtonID <> '' then
               begin
                 if lDictButtons.TryGetValue(lButton.FPButtonID, lPButton) then
@@ -1223,23 +1351,51 @@ begin
                 end;
               end;
               lUI.ChildButtons.Add(lButton);
+            end
+            else
+            begin
+              if iChildStep = 1 then
+              begin
+                // 减少不必要的循环,因为是按FUIID排序,，一样后有不一样,说明已经完成了本UI的循环
+                break;
+              end;
             end;
           end;
+          for iButton := lIntList.Count - 1 downto 0 do
+          begin
+            lModuleButtons.Delete(lIntList[iButton]);
+          end;
 
-          for iButton := 0 to lModuleButtonpops.Count - 1 do
+          iChildStep := 0;
+          for iButton := lModuleButtonpops.Count - 1 downto 0 do
           begin
             lButtonpop := lModuleButtonpops[iButton];
             if lButtonpop.FUIID = lUI.FUIID then
+            begin
+              iChildStep := 1;
               lUI.ChildButtonpops.Add(lButtonpop);
+              lObjList.Add(lButtonpop);
+              lModuleButtonpops.Delete(iButton);
+            end
+            else
+            begin
+              if iChildStep = 1 then
+              begin
+                // 减少不必要的循环,因为是按FUIID排序,，一样后有不一样,说明已经完成了本UI的循环
+                break;
+              end;
+            end;
           end;
         end;
 
-        for iLayout := 0 to lModuleLayouts.Count - 1 do
+        for iLayout := lModuleLayouts.Count - 1 downto 0 do
         begin
           lLayout := lModuleLayouts[iLayout];
           if lLayout.FModuleID = lModule.FModuleID then
           begin
             lModuleInfo.moduleLayout := lLayout;
+            lObjList.Add(lLayout);
+            lModuleLayouts.Delete(iLayout);
             break;
           end;
         end;
@@ -1255,15 +1411,15 @@ begin
     end;
   finally
     TMonitor.exit(self.FLockObj);
-    if lDictModuleIDs <> nil then
-    begin
-      lDictModuleIDs.clear;
-      lDictModuleIDs.Free;
-    end;
     if lDictModuleCodes <> nil then
     begin
       lDictModuleCodes.clear;
       lDictModuleCodes.Free;
+    end;
+    if lDictBands <> nil then
+    begin
+      lDictBands.clear;
+      lDictBands.Free;
     end;
     if lDictButtons <> nil then
     begin
@@ -1271,155 +1427,117 @@ begin
       lDictButtons.Free;
     end;
 
+    if lModuleList <> nil then
+    begin
+      for i := 0 to lModuleList.Count - 1 do
+      begin
+        lModuleList[i].Free;
+      end;
+      lModuleList.clear;
+      lModuleList.Free;
+    end;
+    if lModuleDatas <> nil then
+    begin
+      for i := 0 to lModuleDatas.Count - 1 do
+      begin
+        lModuleDatas[i].Free;
+      end;
+      lModuleDatas.clear;
+      lModuleDatas.Free;
+    end;
+    if lModuleDataParams <> nil then
+    begin
+      for i := 0 to lModuleDataParams.Count - 1 do
+      begin
+        lModuleDataParams[i].Free;
+      end;
+      lModuleDataParams.clear;
+      lModuleDataParams.Free;
+    end;
+    if lModuleFields <> nil then
+    begin
+      for i := 0 to lModuleFields.Count - 1 do
+      begin
+        lModuleFields[i].Free;
+      end;
+      lModuleFields.clear;
+      lModuleFields.Free;
+    end;
+    if lModuleUIs <> nil then
+    begin
+      for i := 0 to lModuleUIs.Count - 1 do
+      begin
+        lModuleUIs[i].Free;
+      end;
+      lModuleUIs.clear;
+      lModuleUIs.Free;
+    end;
+    if lModuleBands <> nil then
+    begin
+      for i := 0 to lModuleBands.Count - 1 do
+      begin
+        lModuleBands[i].Free;
+      end;
+      lModuleBands.clear;
+      lModuleBands.Free;
+    end;
+    if lModuleControls <> nil then
+    begin
+      for i := 0 to lModuleControls.Count - 1 do
+      begin
+        lModuleControls[i].Free;
+      end;
+      lModuleControls.clear;
+      lModuleControls.Free;
+    end;
+    if lModuleFilters <> nil then
+    begin
+      for i := 0 to lModuleFilters.Count - 1 do
+      begin
+        lModuleFilters[i].Free;
+      end;
+      lModuleFilters.clear;
+      lModuleFilters.Free;
+    end;
+    if lModuleButtons <> nil then
+    begin
+      for i := 0 to lModuleButtons.Count - 1 do
+      begin
+        lModuleButtons[i].Free;
+      end;
+      lModuleButtons.clear;
+      lModuleButtons.Free;
+    end;
+    if lModuleButtonpops <> nil then
+    begin
+      for i := 0 to lModuleButtonpops.Count - 1 do
+      begin
+        lModuleButtonpops[i].Free;
+      end;
+      lModuleButtonpops.clear;
+      lModuleButtonpops.Free;
+    end;
+    if lModuleLayouts <> nil then
+    begin
+      for i := 0 to lModuleLayouts.Count - 1 do
+      begin
+        lModuleLayouts[i].Free;
+      end;
+      lModuleLayouts.clear;
+      lModuleLayouts.Free;
+    end;
+
     if (isErr) or (isRepate) then
     begin
-      if lModuleList <> nil then
+      for i := 0 to lObjList.Count - 1 do
       begin
-        for i := 0 to lModuleList.Count - 1 do
-        begin
-          lModuleList[i].Free;
-        end;
-        lModuleList.clear;
-        lModuleList.Free;
-      end;
-      if lModuleDatas <> nil then
-      begin
-        for i := 0 to lModuleDatas.Count - 1 do
-        begin
-          lModuleDatas[i].Free;
-        end;
-        lModuleDatas.clear;
-        lModuleDatas.Free;
-      end;
-      if lModuleDataParams <> nil then
-      begin
-        for i := 0 to lModuleDataParams.Count - 1 do
-        begin
-          lModuleDataParams[i].Free;
-        end;
-        lModuleDataParams.clear;
-        lModuleDataParams.Free;
-      end;
-      if lModuleFields <> nil then
-      begin
-        for i := 0 to lModuleFields.Count - 1 do
-        begin
-          lModuleFields[i].Free;
-        end;
-        lModuleFields.clear;
-        lModuleFields.Free;
-      end;
-      if lModuleUIs <> nil then
-      begin
-        for i := 0 to lModuleUIs.Count - 1 do
-        begin
-          lModuleUIs[i].Free;
-        end;
-        lModuleUIs.clear;
-        lModuleUIs.Free;
-      end;
-      if lModuleControls <> nil then
-      begin
-        for i := 0 to lModuleControls.Count - 1 do
-        begin
-          lModuleControls[i].Free;
-        end;
-        lModuleControls.clear;
-        lModuleControls.Free;
-      end;
-      if lModuleFilters <> nil then
-      begin
-        for i := 0 to lModuleFilters.Count - 1 do
-        begin
-          lModuleFilters[i].Free;
-        end;
-        lModuleFilters.clear;
-        lModuleFilters.Free;
-      end;
-      if lModuleButtons <> nil then
-      begin
-        for i := 0 to lModuleButtons.Count - 1 do
-        begin
-          lModuleButtons[i].Free;
-        end;
-        lModuleButtons.clear;
-        lModuleButtons.Free;
-      end;
-      if lModuleButtonpops <> nil then
-      begin
-        for i := 0 to lModuleButtonpops.Count - 1 do
-        begin
-          lModuleButtonpops[i].Free;
-        end;
-        lModuleButtonpops.clear;
-        lModuleButtonpops.Free;
-      end;
-      if lModuleLayouts <> nil then
-      begin
-        for i := 0 to lModuleLayouts.Count - 1 do
-        begin
-          lModuleLayouts[i].Free;
-        end;
-        lModuleLayouts.clear;
-        lModuleLayouts.Free;
-      end;
-
-    end
-    else
-    begin
-      if lModuleList <> nil then
-      begin
-        lModuleList.clear;
-        lModuleList.Free;
-      end;
-      if lModuleDatas <> nil then
-      begin
-        lModuleDatas.clear;
-        lModuleDatas.Free;
-      end;
-      if lModuleDataParams <> nil then
-      begin
-        lModuleDataParams.clear;
-        lModuleDataParams.Free;
-      end;
-      if lModuleFields <> nil then
-      begin
-
-        lModuleFields.clear;
-        lModuleFields.Free;
-      end;
-      if lModuleUIs <> nil then
-      begin
-
-        lModuleUIs.clear;
-        lModuleUIs.Free;
-      end;
-      if lModuleControls <> nil then
-      begin
-        lModuleControls.clear;
-        lModuleControls.Free;
-      end;
-      if lModuleFilters <> nil then
-      begin
-        lModuleFilters.clear;
-        lModuleFilters.Free;
-      end;
-      if lModuleButtons <> nil then
-      begin
-        lModuleButtons.clear;
-        lModuleButtons.Free;
-      end;
-      if lModuleButtonpops <> nil then
-      begin
-        lModuleButtonpops.clear;
-        lModuleButtonpops.Free;
-      end;
-      if lModuleLayouts <> nil then
-      begin
-        lModuleLayouts.clear;
-        lModuleLayouts.Free;
+        lObjList[i].Free;
       end;
     end;
+    lObjList.clear;
+    lObjList.Free;
+    lIntList.clear;
+    lIntList.Free;
   end;
 end;
 

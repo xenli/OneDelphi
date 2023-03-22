@@ -303,7 +303,7 @@ begin
       self.FLog.WriteHTTPLog('请求URL:[' + Ctxt.Host + Ctxt.Url + ']');
       if not IsMultipartForm(Ctxt.InContentType) then
       begin
-        self.FLog.WriteHTTPLog('请求内容:' + Ctxt.InContent);
+        self.FLog.WriteHTTPLog('请求内容:' + UTF8Decode(Ctxt.InContent));
         // self.FLog.WriteHTTPLog('输出内容:' + Ctxt.OutContent);
       end;
     end;
