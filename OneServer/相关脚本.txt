@@ -1,0 +1,20 @@
+---微信账号管理表----
+create table onefast_weixin
+(
+                [FAccountID] [varchar] primary key,
+	[FSourceID] [varchar](50) NULL,
+	[FAppID] [varchar](100) NULL,
+	[FAppSecret] [varchar](255) NULL,
+	[FMessageToken] [varchar](30) NULL,
+	[FMessageEncodingAESKey] [varchar](255) NULL,
+	[FAccessTokenExpireIn] [int] NULL,
+	[FAccessToken] [varchar](250) NULL,
+	[FAccessTokenLastTime] [datetime] NULL,
+	[FGetAuthorCodeUrl] [varchar](200) NULL,
+	[FErrWebUrl] [varchar](200) NULL,
+	[FAccessTokenErrMsg] [varchar](1000) NULL,
+	[FCreateTime] [datetime] NULL,
+	[FJsApiTicket] [varchar](250) NULL,
+	[FJsApiLastTime] [datetime] NULL,
+	[FGetAuthorCodeAPI] [varchar](200) NULL,
+	)

@@ -125,10 +125,10 @@ var
   lOneTokenManage: TOneTokenManage;
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem: TOneTokenItem;
   lErrMsg: string;
   lNow: TDateTime;
-  LTokenItem: IOneTokenItem;
+  LTokenItem: TOneTokenItem;
   lDictMenus: TDictionary<string, TFastMenu>;
   //
   lTempMenu, lPMenu: TFastMenu;
@@ -194,7 +194,7 @@ begin
       lFDQuery.Next;
     end;
     // 非超级管理员还得处理个人角色或个人菜单权限
-    if LTokenItem.SysUserType() <> '超级管理员' then
+    if LTokenItem.SysUserType <> '超级管理员' then
     begin
       // 角色启用禁用
       lFDQuery := lZTItem.ADQuery;

@@ -29,6 +29,7 @@ type
     FResultJsonObj: TJsonObject;
     FResultDataJsonArr: TJsonArray;
     FResultDataJsonArrIsFree: boolean;
+    FResultAffected: integer;
     FBuildParams: TParams;
     FBuildFilterSQL: string;
     FApiData: TFastApiData;
@@ -42,7 +43,7 @@ type
   private
     UnionID: string;
     // 传进来的参数
-    token: IOneTokenItem;
+    token: TOneTokenItem;
     postDataJson: TJsonObject;
     paramJson: TJsonObject;
     pageJson: TJsonObject;
@@ -61,12 +62,13 @@ type
     function GetZTItem(QZTCode: string): TOneZTItem;
   end;
 
-function DoFastApi(QToken: IOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
+function DoFastApi(QToken: TOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
 function DoFastApiStep(QApiDatas: TList<TFastApiData>; QApiAll: TApiAll; QPStepResult: TApiStepResult): boolean;
 function DoFastResultJson(QApiInfo: TFastApiInfo; QApiAll: TApiAll): TJsonValue;
 // openData打开数据
 function DoOpenData(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 function DoDataStore(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
+function DoDml(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 
 function BuildDataSQLAndParams(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 function BuildFilterSQLAndParams(QApiData: TFastApiData; QApiFilter: TFastApiFilter; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
@@ -171,7 +173,7 @@ begin
   Result := lZTItem;
 end;
 
-function DoFastApi(QToken: IOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
+function DoFastApi(QToken: TOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
 var
   lFastApiManage: TOneFastApiManage;
   lApiInfo: TFastApiInfo;
@@ -269,7 +271,7 @@ begin
           openData, openDataStore, doStore:
             begin
             end;
-          dmlInsert, dmlUpdate, dmlDel, appendDatas:
+          doDMLSQL, appendDatas:
             begin
               isHaveTran := true;
             end;
@@ -344,8 +346,11 @@ begin
       finally
         if iComitStep = 1 then
         begin
-          lZTItem := lZTItems[iZT];
-          lZTItem.ADTransaction.Rollback;
+          for iZT := 0 to lZTItems.Count - 1 do
+          begin
+            lZTItem := lZTItems[iZT];
+            lZTItem.ADTransaction.Rollback;
+          end;
         end;
         for iZT := 0 to lZTItems.Count - 1 do
         begin
@@ -413,10 +418,10 @@ var
             begin
               for tempIAdd := 0 to tempJsonArr.Count - 1 do
               begin
-                tempStepResult.FResultDataJsonArr.AddElement(tempJsonArr[tempIAdd]);
+                tempStepResult.FResultDataJsonArr.AddElement(tempJsonArr.Items[tempIAdd]);
               end;
             end;
-            TJsonObject(tempPStepResult.FResultDataJsonArr[tempIArr]).AddPair(tempStepResult.FApiData.FDataJsonName, tempJsonArr);
+            TJsonObject(tempPStepResult.FResultDataJsonArr.Items[tempIArr]).AddPair(tempStepResult.FApiData.FDataJsonName, tempJsonArr);
             tempIArr := tempIArr + 1;
             tempPData.Next;
           end;
@@ -430,6 +435,10 @@ var
             tempPStepResult.FResultJsonObj.AddPair(tempStepResult.FApiData.FDataJsonName, tempJsonArr);
           end;
         end;
+      end;
+      if lStepResult.FApiData.DataOpenMode = doDMLSQL then
+      begin
+        lStepJson.AddPair('AffectedCount', TJsonNumber.Create(lStepResult.FResultAffected));
       end;
       DoChildStepResult(tempStepResult.FChilds);
     end;
@@ -465,7 +474,7 @@ begin
           end
           else
           begin
-            lStepJson.AddPair('Data', TJsonValue(lJsonArr[0].clone));
+            lStepJson.AddPair('Data', TJsonValue(lJsonArr.Items[0].clone));
           end;
           lJsonArr.Free;
         end
@@ -491,6 +500,10 @@ begin
         end;
 
         lStepJson.AddPair('DataCount', TJsonNumber.Create(lStepResult.FDataSet.RecordCount));
+      end;
+      if lStepResult.FApiData.DataOpenMode = doDMLSQL then
+      begin
+        lStepJson.AddPair('AffectedCount', TJsonNumber.Create(lStepResult.FResultAffected));
       end;
       DoChildStepResult(lStepResult.FChilds);
     end;
@@ -544,9 +557,10 @@ begin
           if not DoDataStore(lApiData, QApiAll, lStepResult) then
             exit;
         end;
-      dmlInsert, dmlUpdate, dmlDel:
+      doDMLSQL:
         begin
-
+          if not DoDml(lApiData, QApiAll, lStepResult) then
+            exit;
         end;
       appendDatas:
         begin
@@ -797,6 +811,84 @@ begin
     end;
   end;
   Result := true;
+end;
+
+function DoDml(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
+var
+  iData, iParam: integer;
+  lApiData: TFastApiData;
+  tempI: integer;
+  // {"pageIndex":1,"pageSize":20}
+  lStringList: TStringList;
+  lZTItem: TOneZTItem;
+  LZTQuery: TFDQuery;
+  lFDParam: TFDParam;
+  lParam: TParam;
+  iRowsAffected: integer;
+begin
+  Result := false;
+  // 解析参数 以及组装出SQL
+  if not BuildDataSQLAndParams(QApiData, QApiAll, QStepResult) then
+    exit;
+
+  lStringList := TStringList.Create;
+  TRY
+    lStringList.Text := QApiData.FDataSQL;
+    if QApiData.FilterLine >= 0 then
+    begin
+      lStringList[QApiData.FilterLine] := QStepResult.FBuildFilterSQL;
+    end;
+    // 获取账套
+    lZTItem := QApiAll.GetZTItem(QApiData.FDataZTCode);
+    // 打开数据
+    LZTQuery := lZTItem.ADQuery;
+    LZTQuery.SQL.Text := lStringList.Text;
+    // 参数处理
+    for iParam := 0 to LZTQuery.params.Count - 1 do
+    begin
+      lFDParam := LZTQuery.params[iParam];
+      lParam := QStepResult.FBuildParams.FindParam(lFDParam.Name);
+      if lParam = nil then
+      begin
+        QApiAll.errMsg := '参数[' + lFDParam.Name + ']找不到,请开发人员检查组装的参数代码';
+        exit;
+      end;
+      lFDParam.DataType := lParam.DataType;
+      lFDParam.ParamType := lParam.ParamType;
+      lFDParam.Value := lParam.Value;
+    end;
+    //
+    try
+      LZTQuery.ExecSQL;
+      iRowsAffected := LZTQuery.RowsAffected;
+      QStepResult.FResultAffected := iRowsAffected;
+      if QApiData.FMinAffected > 0 then
+      begin
+        if iRowsAffected < QApiData.FMinAffected then
+        begin
+          QApiAll.errMsg := '执行失败:数据集[' + QApiData.FDataName + ']当前影响行数[' + iRowsAffected.ToString + ']小于设置最小影响行数[' + QApiData.FMinAffected.ToString + ']';
+          exit;
+        end;
+      end;
+      if QApiData.FMaxAffected > 0 then
+      begin
+        if iRowsAffected > QApiData.FMaxAffected then
+        begin
+          QApiAll.errMsg := '执行失败:数据集[' + QApiData.FDataName + ']当前影响行数[' + iRowsAffected.ToString + ']大于设置最大影响行数[' + QApiData.FMaxAffected.ToString + ']';
+          exit;
+        end;
+      end;
+    except
+      on e: exception do
+      begin
+        QApiAll.errMsg := '执行DML语句异常,原因:' + e.Message;
+        exit;
+      end;
+    end;
+    Result := true;
+  FINALLY
+    lStringList.Free;
+  END;
 end;
 
 function BuildDataSQLAndParams(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;

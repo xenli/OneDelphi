@@ -54,7 +54,7 @@ type
     procedure EndCodeResultOut(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult); virtual;
     //
     function CheckCureentToken(var QErrMsg: string): Boolean;
-    function GetCureentToken(var QErrMsg: string): IOneTokenItem;
+    function GetCureentToken(var QErrMsg: string): TOneTokenItem;
     function GetCureentHTTPCtxt(var QErrMsg: string): THTTPCtxt;
   protected
     // QCompact JSON是否紧密型的，默认是，减少传输量
@@ -198,7 +198,7 @@ begin
   end;
 end;
 
-function TOneControllerBase.GetCureentToken(var QErrMsg: string): IOneTokenItem;
+function TOneControllerBase.GetCureentToken(var QErrMsg: string): TOneTokenItem;
 var
   lTokenID: string;
   lThreadID: TThreadID;

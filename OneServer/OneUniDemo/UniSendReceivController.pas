@@ -39,7 +39,7 @@ function TUniSendReceivController.GetSendReceivList(pageIndex: integer; pageSize
 var
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem: TOneTokenItem;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
   lGoodDemo: TGoodsDemo;
@@ -115,7 +115,7 @@ function TUniSendReceivController.GetSendReceiv(QCustomerID: string): TActionRes
 var
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem: TOneTokenItem;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
   lSendReceivDemo: TSendReceivDemo;
@@ -186,7 +186,7 @@ function TUniSendReceivController.SaveSendReceiv(QCustomer: TSendReceivDemo): TA
 var
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem: TOneTokenItem;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
   lGoodDemo: TGoodsDemo;
@@ -262,7 +262,7 @@ begin
         // 新增相关东东赋值下
         QCustomer.FCustomerID := OneGuID.GetGUID32;
         QCustomer.FCreateTime := FormatDateTime('yyyy-MM-dd hh:mm:ss', now);
-        QCustomer.FCreateID := lOneTokenItem.SysUserID();
+        QCustomer.FCreateID := lOneTokenItem.SysUserID;
         QCustomer.FCreateName := lOneTokenItem.SysUserName;
         lFDQuery.Append;
         lFDQuery.FieldByName('FCustomerID').AsString := QCustomer.FCustomerID;

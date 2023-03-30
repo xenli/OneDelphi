@@ -61,7 +61,7 @@ var
   lOneTokenManage: TOneTokenManage;
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem: TOneTokenItem;
   lErrMsg: string;
 begin
   result := TActionResult<TLoginInfo>.Create(true, false);
@@ -118,11 +118,11 @@ begin
       exit;
     end;
     // 为Token设置相关信息
-    lOneTokenItem.SetLoginUserCode(QLogin.loginCode);
-    lOneTokenItem.SetZTCode(QLogin.loginZTCode); // 指定账套
-    lOneTokenItem.SetSysUserID(lFDQuery.FieldByName('FUserID').AsString);
-    lOneTokenItem.SetSysUserName(lFDQuery.FieldByName('FUserName').AsString);
-    lOneTokenItem.SetSysUserCode(lFDQuery.FieldByName('FUserCode').AsString);
+    lOneTokenItem.LoginUserCode := QLogin.loginCode;
+    lOneTokenItem.ZTCode := QLogin.loginZTCode; // 指定账套
+    lOneTokenItem.SysUserID := lFDQuery.FieldByName('FUserID').AsString;
+    lOneTokenItem.SysUserName := lFDQuery.FieldByName('FUserName').AsString;
+    lOneTokenItem.SysUserCode := lFDQuery.FieldByName('FUserCode').AsString;
     // 返回信息设置
     result.resultData := TLoginInfo.Create;
     result.resultData.loginCode := QLogin.loginCode;

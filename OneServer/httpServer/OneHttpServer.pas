@@ -334,7 +334,9 @@ end;
 // 启动服务
 function TOneHttpServer.ServerStart(): boolean;
 var
-  CertificateFile, PrivateKeyFile: string;
+  CertificateFile, PrivateKeyFile, CACertificatesFile, PrivateKeyPassword: string;
+  lHttpServerOptions: THttpServerOptions;
+  lServerSet: TOneServerSet;
 begin
   Result := False;
   // 已经启动
@@ -354,20 +356,24 @@ begin
     self.FHttpQueueLength := 1000;
   // 创建HTTP服务
   try
+    lHttpServerOptions := [hsoNoXPoweredHeader];
+    lServerSet := TOneGlobal.GetInstance().ServerSet;
+    if lServerSet.IsHttps then
+      lHttpServerOptions := lHttpServerOptions + [hsoEnableTls];
     // hsoEnableTls开始ssl证书
     self.FHttpServer := THttpAsyncServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi',
-      self.FThreadPoolCount, self.FKeepAliveTimeOut, [hsoNoXPoweredHeader]);
+      self.FThreadPoolCount, self.FKeepAliveTimeOut, lHttpServerOptions);
     self.FHttpServer.HttpQueueLength := self.FHttpQueueLength;
     self.FHttpServer.OnRequest := self.OnRequest;
     self.FHttpServer.RegisterCompress(CompressDeflate);
     self.FHttpServer.RegisterCompress(CompressGZip);
     self.FHttpServer.RegisterCompress(CompressZLib);
     self.FHttpServer.RegisterCompress(CompressSynLZ);
-    // CertificateFile :=
-    // 'D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\callbaba.cn_bundle.crt';
-    // PrivateKeyFile :=
-    // 'D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\callbaba.cn.key';
-    self.FHttpServer.WaitStarted();
+    if lServerSet.IsHttps then
+      self.FHttpServer.WaitStarted(10, lServerSet.CertificateFile, lServerSet.PrivateKeyFile,
+        lServerSet.PrivateKeyPassword, lServerSet.CACertificatesFile)
+    else
+      self.FHttpServer.WaitStarted();
     // raise exception e.g. on binding issue
     self.FStopRequest := False;
     self.FStarted := True;

@@ -112,7 +112,7 @@ function TUniGoodsController.GetGoodsList(pageIndex: integer; pageSize: integer;
 var
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem: TOneTokenItem;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
   lGoodDemo: TGoodsDemo;
@@ -189,7 +189,7 @@ function TUniGoodsController.GetGoodsListByJson(QJson: TJsonObject): TActionResu
 var
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem: TOneTokenItem;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
   lGoodDemo: TGoodsDemo;
@@ -269,7 +269,7 @@ function TUniGoodsController.GetGoods(QGoodsID: string): TActionResult<TGoodsDem
 var
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem:TOneTokenItem;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
   lGoodDemo: TGoodsDemo;
@@ -336,7 +336,7 @@ function TUniGoodsController.SaveGoods(QGoods: TGoodsDemo): TActionResult<string
 var
   lZTItem: TOneZTItem;
   lFDQuery: TFDQuery;
-  lOneTokenItem: IOneTokenItem;
+  lOneTokenItem:TOneTokenItem;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
   lGoodDemo: TGoodsDemo;

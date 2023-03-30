@@ -1059,6 +1059,11 @@ begin
         QErrMsg := '数据集:' + lOneDataSet.Name + 'SQL为空,无法打开数据';
         exit;
       end;
+      if lOneDataSet.DataInfo.OpenMode = TDataOpenMode.localSQL then
+      begin
+        QErrMsg := '[' + lOneDataSet.Name + ']当数据集打开模式为localSQL时,只支持本地查询';
+        exit;
+      end;
     end;
     // 组装参数
     for i := 0 to lOneDataSets.Count - 1 do
@@ -1622,6 +1627,7 @@ begin
           begin
             // 无计算字段的整个加载
             lOneDataSet.LoadFromStream(lTemStream, sfBinary);
+            // lOneDataSet.FieldDefs.Clear;
           end;
         finally
           lTemStream.Clear;

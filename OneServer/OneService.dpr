@@ -78,7 +78,13 @@ uses
   DemoUrlPathController in 'httpServer\Controller\Demo\DemoUrlPathController.pas',
   OneFastApiManage in 'OneFastApi\OneFastApiManage.pas',
   OneFastApiController in 'OneFastApi\OneFastApiController.pas',
-  OneFastApiDo in 'OneFastApi\OneFastApiDo.pas';
+  OneFastApiDo in 'OneFastApi\OneFastApiDo.pas',
+  WeiXinManage in 'OneFastWeiXin\WeiXinManage.pas',
+  WeixinApi in 'OneFastWeiXin\WeixinApi.pas',
+  WeixinAuthController in 'OneFastWeiXin\WeixinAuthController.pas',
+  WeixinAdminController in 'OneFastWeiXin\WeixinAdminController.pas',
+  WeiXinMinApi in 'OneFastWeiXin\WeiXinMinApi.pas',
+  WeixinApiPublic in 'OneFastWeiXin\WeixinApiPublic.pas';
 
 var
   lpStartupInfo: TStartupInfo;

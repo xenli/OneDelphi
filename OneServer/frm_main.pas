@@ -14,7 +14,8 @@ uses
   FireDAC.VCLUI.Login, FireDAC.Comp.UI, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.ConnEdit, OneLog,
   Vcl.Menus, OneFileHelper, Winapi.ShellAPI, OneHttpRouterManage, Vcl.Buttons,
-  FireDAC.DApt;
+  FireDAC.DApt, System.Net.URLClient, System.Net.HttpClient,
+  System.Net.HttpClientComponent;
 
 type
   TfrmMain = class(TForm)
@@ -174,6 +175,16 @@ type
     FDMetaInfoQuery1: TFDMetaInfoQuery;
     Label13: TLabel;
     edSuperAdminPass: TEdit;
+    edHttps: TCheckBox;
+    lbCertificateFile: TLabel;
+    edCertificateFile: TEdit;
+    Label15: TLabel;
+    edPrivateKeyFile: TEdit;
+    Label16: TLabel;
+    edPrivateKeyPassword: TEdit;
+    Label17: TLabel;
+    edCACertificatesFile: TEdit;
+    NetHTTPClient1: TNetHTTPClient;
     procedure FormCreate(Sender: TObject);
     procedure tbStartClick(Sender: TObject);
     procedure tbStopClick(Sender: TObject);
@@ -232,6 +243,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 uses OneGlobal, OneZTManage, OneGUID, OneVirtualFile, OneTokenManage, OneWinReg;
 
@@ -350,6 +362,12 @@ begin
   chWinTaskStart.Checked := lOneGlobal.ServerSet.WinTaskStart;
   chWinRegisterStart.Checked := lOneGlobal.ServerSet.WinRegisterStart;
   edSuperAdminPass.Text := lOneGlobal.ServerSet.SuperAdminPass;
+  // ssl
+  edHttps.Checked := lOneGlobal.ServerSet.IsHttps;
+  edCertificateFile.Text := lOneGlobal.ServerSet.CertificateFile;
+  edPrivateKeyFile.Text := lOneGlobal.ServerSet.PrivateKeyFile;
+  edPrivateKeyPassword.Text := lOneGlobal.ServerSet.PrivateKeyPassword;
+  edCACertificatesFile.Text := lOneGlobal.ServerSet.CACertificatesFile;
   // 账套自动工作
   edZTAutoStart.Checked := lOneGlobal.ZTMangeSet.AutoWork;
   // 日记配置加载
@@ -616,6 +634,12 @@ begin
   //
   lOneGlobal.ServerSet.WinTaskStart := chWinTaskStart.Checked;
   lOneGlobal.ServerSet.WinRegisterStart := chWinRegisterStart.Checked;
+  // ssl
+  lOneGlobal.ServerSet.IsHttps := edHttps.Checked;
+  lOneGlobal.ServerSet.CertificateFile := edCertificateFile.Text;
+  lOneGlobal.ServerSet.PrivateKeyFile := edPrivateKeyFile.Text;
+  lOneGlobal.ServerSet.PrivateKeyPassword := edPrivateKeyPassword.Text;
+  lOneGlobal.ServerSet.CACertificatesFile := edCACertificatesFile.Text;
   //
   tempStr := edTokenOutSec.Text;
   if not tryStrToInt(tempStr, lTokenSec) then
@@ -710,7 +734,7 @@ end;
 procedure TfrmMain.tbTokenSaveClick(Sender: TObject);
 var
   lOneGlobal: TOneGlobal;
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
 begin
   lOneGlobal := TOneGlobal.GetInstance();
   lOneGlobal.TokenManage.SaveToken;
@@ -720,7 +744,7 @@ end;
 procedure TfrmMain.tbTokenSelectClick(Sender: TObject);
 var
   lOneGlobal: TOneGlobal;
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
 begin
   qryToken.DisableControls;
   try

@@ -34,7 +34,7 @@ end;
 
 function TFastApiController.DoFastApi(QPostJson: TJsonObject): string;
 var
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
   lErrMsg: string;
   lJsonValue: TJsonValue;
 begin

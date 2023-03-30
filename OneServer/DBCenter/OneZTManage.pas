@@ -250,6 +250,10 @@ var
   var_ODBCDriverLink: TFDPhysODBCDriverLink = nil;
   var_MSAccDriverLink: TFDPhysMSAccessDriverLink = nil;
 
+var
+  // OneGlobal初始化时赋值,其它单元可以速用
+  Unit_ZTManage: TOneZTManage = nil;
+
 implementation
 
 constructor TOneZTMangeSet.Create();
@@ -291,6 +295,11 @@ begin
   FDConnection.DriverName := QPhyDriver;
   FDConnection.ResourceOptions.AutoReconnect := true;
   FDConnection.ResourceOptions.KeepConnection := true;
+  // 当着特定整型用 number(5,0)--至number(10,0),oracle ，pg多有
+  FDConnection.FormatOptions.MapRules.Add(5, 10, 0, 0, dtBCD, dtInt32);
+  // FDConnection.FormatOptions.MapRules.Add(0, 0, 0, 0, dtDateTime, dtDateTimeStamp);
+  if QPhyDriver.StartsWith('Ora') then
+    FDConnection.FormatOptions.MapRules.Add(1, 1, 0, 0, dtBCD, dtBoolean);
   //
   FDTransaction := TFDTransaction.Create(nil);
 

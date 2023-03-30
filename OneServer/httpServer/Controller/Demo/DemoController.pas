@@ -277,6 +277,7 @@ var
   lList: TObjectList;
   i: integer;
 begin
+  result := nil;
   lList := TObjectList.Create;
   for i := 0 to 9 do
   begin

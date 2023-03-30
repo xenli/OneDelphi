@@ -170,6 +170,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   public
+    function IsEdit: boolean;
     /// <summary>
     /// 打开数据集，返回所有数据，如果Pagesize和PageIndex设置，则返回分页数据
     /// </summary>
@@ -432,6 +433,11 @@ begin
   end;
 end;
 
+function TOneDataSet.IsEdit: boolean;
+begin
+  Result := (Self.State in dsEditModes) or (Self.ChangeCount > 0);
+end;
+
 function TOneDataSet.Open: boolean;
 begin
   Result := Self.OpenData;
@@ -450,6 +456,11 @@ begin
   if Self.SQL.Text = '' then
   begin
     Self.FDataInfo.FErrMsg := '数据集DataInfo.SQL=空';
+    exit;
+  end;
+  if Self.FDataInfo.OpenMode = TDataOpenMode.localSQL then
+  begin
+    Self.FDataInfo.FErrMsg := '当数据集打开模式为localSQL时,只支持本地查询';
     exit;
   end;
   if Self.DataInfo.OpenMode = TDataOpenMode.OpenStored then

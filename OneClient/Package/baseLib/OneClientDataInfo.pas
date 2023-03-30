@@ -19,7 +19,8 @@ const
   const_DataSaveMode_SaveDML = 'saveDML';
 
 type
-  TDataOpenMode = (openData, openStored);
+  // LocalSQL本地查询
+  TDataOpenMode = (openData, openStored, localSQL);
   TDataReturnMode = (dataStream, dataFile, dataJson, dataEmpty);
   TDataSaveMode = (saveData, saveDML);
 

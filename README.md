@@ -47,7 +47,40 @@
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
 ## 更新日志
-************2023-03-16***********  
+
+************2023-03-29***********
+服务端:  
+	1.增加控制台版服务端OneServiceConsole功能  
+	2.增加OneFastWeixin基础功能  
+	3.IOneTokenItem去除Token管理接口全用类属性，不考虑大家Token不一样，后面在个年字典属性保存不一样的属性  
+	4.其它功能和修正  
+客户端:  
+	OneFastCleint  
+	1.增加微信管理界面  
+	
+ 	OneUniapp  
+	1.增加小程序和系统用户绑定登陆的功能  
+	2.增加兼容小程序，web,app三端  
+	
+
+	
+************2023-03-24***********
+服务端:  
+	1.增加FastApi功能DML功能  
+	OneZTManage.TOneZTItem.Create  
+	2.增加Orcal-Number(1,0)-对应成Delphi boolean  
+	3.增加Orcal-Number(5,0)到Number(10,0)-对应成Delphi Integer  
+ 	 FDConnection.FormatOptions.MapRules.Add(5, 10, 0, 0, dtBCD, dtInt32);	    
+   	 FDConnection.FormatOptions.MapRules.Add(1, 1, 0, 0, dtBCD, dtBoolean);  
+客户端:  
+	OneFastCleint  
+	1.增加模板[列表编辑]-frm_LayOut_ListEdit  
+	2.增加导航图功能  
+	3.增加菜单导航图,列表编辑功能  
+	4.增加FastApi DML插入,删除，更新功能  
+	5.以及一些优化，及底程修正  
+	
+************2023-03-22***********  
 服务端:  
 	1.增加FastApi功能，无需写任何一句代码只需写SQL，即可获取相关账套数据  
 	支持SQL查询数据，支持存储过程，格式如下  

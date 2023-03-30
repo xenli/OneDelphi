@@ -12,7 +12,7 @@ type
   // dmlUpdate 执行DMl语句更新
   // dmlDel执行DML语句删除
   // appendDatas 批量执行插入数据
-  emDataOpenMode = (unkown, openData, openDataStore, doStore, dmlInsert, dmlUpdate, dmlDel, appendDatas);
+  emDataOpenMode = (unkown, openData, openDataStore, doStore,doDMLSQL, appendDatas);
 
   TFastApi = class;
   TFastApiData = class;
@@ -62,7 +62,9 @@ type
     FDataPageSize_: integer;
     FDataUpdateMode_: string;
     FDataSQL_: string;
-
+    FMinAffected_: integer; // 执行DML最小影响行数
+    FMaxAffected_: integer; // 执行DML最大影响行数
+    //
     FChildFields_: TList<TFastApiField>;
     FChildFilters_: TList<TFastApiFilter>;
     FChildDatas_: TList<TFastApiData>;
@@ -91,6 +93,8 @@ type
     property FDataPageSize: integer read FDataPageSize_ write FDataPageSize_;
     property FDataUpdateMode: string read FDataUpdateMode_ write FDataUpdateMode_;
     property FDataSQL: string read FDataSQL_ write FDataSQL_;
+    property FMinAffected: integer read FMinAffected_ write FMinAffected_;
+    property FMaxAffected: integer read FMaxAffected_ write FMaxAffected_;
 
     property ChildFields: TList<TFastApiField> read FChildFields_ write FChildFields_;
     property ChildFilters: TList<TFastApiFilter> read FChildFilters_ write FChildFilters_;

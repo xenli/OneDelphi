@@ -10,7 +10,7 @@ uses
   OneILog, system.DateUtils, OneThread;
 
 type
-  IOneTokenItem = interface;
+  // TOneTokenItem = interface;
   TOneTokenItem = class;
   TOneTokenManage = class;
   // 角色权限 noneRegister:无需注册就能访问最低级别
@@ -20,46 +20,48 @@ type
   // sysAdminRole:系统用户且为管理员
   // superRole:超级管理员
   // platformRole:平台管理员
-  TOneAuthorRole = (noneRegister, noneRole, userRole, sysUserRole, sysAdminRole, superRole, platformRole);
+  TOneTokenRole = (noneRegister, noneRole, userRole, sysUserRole, sysAdminRole, superRole, platformRole);
 
-  IOneTokenItem = interface
-    ['{3EF15CD4-0435-42EB-B534-C9B550E82393}']
-    function ConnectionID(): string;
-    procedure SetConnectionID(QValue: string);
-    function TokenID(): string;
-    procedure SetTokenID(QValue: string);
-    function PrivateKey(): string;
-    procedure SetPrivateKey(QValue: string);
-    function LoginIP(): string;
-    procedure SetLoginIP(QValue: string);
-    function LoginMac(): string;
-    procedure SetLoginMac(QValue: string);
-    function LoginTime(): TDateTime;
-    procedure SetLoginTime(QValue: TDateTime);
-    function LoginPlatform(): string;
-    procedure SetLoginPlatform(QValue: string);
-    function LoginUserCode(): string;
-    procedure SetLoginUserCode(QValue: string);
-    function SysUserID(): string;
-    procedure SetSysUserID(QValue: string);
-    function SysUserName(): string;
-    procedure SetSysUserName(QValue: string);
-    function SysUserCode(): string;
-    procedure SetSysUserCode(QValue: string);
-    function SysUserType(): string;
-    procedure SetSysUserType(QValue: string);
-    function SysUserTable(): string;
-    procedure SetSysUserTable(QValue: string);
-    function ZTCode(): string;
-    procedure SetZTCode(QValue: string);
-    function PlatUserID(): string;
-    procedure SetPlatUserID(QValue: string);
-    function LastTime(): TDateTime;
-    procedure SetLastTime(QValue: TDateTime);
-  end;
+  // TOneTokenItem = interface
+  // ['{3EF15CD4-0435-42EB-B534-C9B550E82393}']
+  // function ConnectionID(): string;
+  // procedure SetConnectionID(QValue: string);
+  // function TokenID(): string;
+  // procedure SetTokenID(QValue: string);
+  // function PrivateKey(): string;
+  // procedure SetPrivateKey(QValue: string);
+  // function LoginIP(): string;
+  // procedure SetLoginIP(QValue: string);
+  // function LoginMac(): string;
+  // procedure SetLoginMac(QValue: string);
+  // function LoginTime(): TDateTime;
+  // procedure SetLoginTime(QValue: TDateTime);
+  // function LoginPlatform(): string;
+  // procedure SetLoginPlatform(QValue: string);
+  //
+  //
+  // function LoginUserCode(): string;
+  // procedure SetLoginUserCode(QValue: string);
+  // function SysUserID(): string;
+  // procedure SetSysUserID(QValue: string);
+  // function SysUserName(): string;
+  // procedure SetSysUserName(QValue: string);
+  // function SysUserCode(): string;
+  // procedure SetSysUserCode(QValue: string);
+  // function SysUserType(): string;
+  // procedure SetSysUserType(QValue: string);
+  // function SysUserTable(): string;
+  // procedure SetSysUserTable(QValue: string);
+  // function ZTCode(): string;
+  // procedure SetZTCode(QValue: string);
+  // function PlatUserID(): string;
+  // procedure SetPlatUserID(QValue: string);
+  // function LastTime(): TDateTime;
+  // procedure SetLastTime(QValue: TDateTime);
+  // end;
 
   // 如果此token没办法满足你，你自已继承 IOneTokenItem写个
-  TOneTokenItem = Class(TInterfacedObject, IOneTokenItem)
+  TOneTokenItem = Class(TObject)
   private
     // 连接ID ，长连接才有，否则这个就是假的
     FConnectionID: string;
@@ -77,6 +79,13 @@ type
     FLoginPlatform: string;
     // 登陆代码
     FLoginUserCode: string;
+    // 第三方登陆  appID
+    FThirdAppID: string;
+    // 第三方登陆  用户ID
+    FThirdAppUserID: string;
+    // 第三方登陆  用户关联ID
+    FThirdAppUnionID: string;
+
     // 用户关联的用户代码ID
     FSysUserID: string;
     // 用户名称
@@ -93,48 +102,61 @@ type
     // ***登陆信息end********//
     // 最后交互时间
     FLastTime: TDateTime;
+    //
+    FTokenRole: TOneTokenRole;
+  private
+    procedure SetSysUserType(value: string);
   public
     destructor Destroy; override;
-  public
-    function ConnectionID(): string;
-    procedure SetConnectionID(QValue: string);
-    function TokenID(): string;
-    procedure SetTokenID(QValue: string);
-    function PrivateKey(): string;
-    procedure SetPrivateKey(QValue: string);
-    function LoginIP(): string;
-    procedure SetLoginIP(QValue: string);
-    function LoginMac(): string;
-    procedure SetLoginMac(QValue: string);
-    function LoginTime(): TDateTime;
-    procedure SetLoginTime(QValue: TDateTime);
-    function LoginPlatform(): string;
-    procedure SetLoginPlatform(QValue: string);
-    function LoginUserCode(): string;
-    procedure SetLoginUserCode(QValue: string);
-    function SysUserID(): string;
-    procedure SetSysUserID(QValue: string);
-    function SysUserName(): string;
-    procedure SetSysUserName(QValue: string);
-    function SysUserCode(): string;
-    procedure SetSysUserCode(QValue: string);
-    function SysUserType(): string;
-    procedure SetSysUserType(QValue: string);
-    function SysUserTable(): string;
-    procedure SetSysUserTable(QValue: string);
-    function ZTCode(): string;
-    procedure SetZTCode(QValue: string);
-    function PlatUserID(): string;
-    procedure SetPlatUserID(QValue: string);
-    function LastTime(): TDateTime;
-    procedure SetLastTime(QValue: TDateTime);
+  published
+    // 连接ID ，长连接才有，否则这个就是假的
+    property ConnectionID: string read FConnectionID write FConnectionID;
+    // 生成的TokenID唯一的
+    property TokenID: string read FTokenID write FTokenID;
+    // 每个token多分配一个私钥给它保证安全性
+    property PrivateKey: string read FPrivateKey write FPrivateKey;
+    // ***登陆信息********//
+    // 登陆IP
+    property LoginIP: string read FLoginIP write FLoginIP;
+    property LoginMac: string read FLoginMac write FLoginMac;
+    // 登陆时间
+    property LoginTime: TDateTime read FLoginTime write FLoginTime;
+    // 从哪个平台登陆 exe,web,微信，小程序
+    property LoginPlatform: string read FLoginPlatform write FLoginPlatform;
+    // 登陆代码
+    property LoginUserCode: string read FLoginUserCode write FLoginUserCode;
+    // 第三方登陆  appID
+    property ThirdAppID: string read FThirdAppID write FThirdAppID;
+    // 第三方登陆  用户ID
+    property ThirdAppUserID: string read FThirdAppUserID write FThirdAppUserID;
+    // 第三方登陆  用户关联ID
+    property ThirdAppUnionID: string read FThirdAppUnionID write FThirdAppUnionID;
+
+    // 用户关联的用户代码ID
+    property SysUserID: string read FSysUserID write FSysUserID;
+    // 用户名称
+    property SysUserName: string read FSysUserName write FSysUserName;
+    property SysUserCode: string read FSysUserCode write FSysUserCode;
+    // 用户类型
+    property SysUserType: string read FSysUserType write SetSysUserType;
+    // 用户关联的表
+    property SysUserTable: string read FSysUserTable write FSysUserTable;
+    // 账套代码
+    property ZTCode: string read FZTCode write FZTCode;
+    // 租户ID
+    property PlatUserID: string read FPlatUserID write FPlatUserID;
+    // ***登陆信息end********//
+    // 最后交互时间
+    property LastTime: TDateTime read FLastTime write FLastTime;
+
+    property TokenRole: TOneTokenRole read FTokenRole write FTokenRole;
   end;
 
   TOneTokenManage = class
   private
     FLockObj: TObject;
     // token容器
-    FTokenList: TDictionary<string, IOneTokenItem>;
+    FTokenList: TDictionary<string, TOneTokenItem>;
     FOnLine: Integer;
     // 多交没交互失效
     FTimeOutSec: Integer;
@@ -148,13 +170,13 @@ type
     destructor Destroy; override;
   public
     // 获取一个token，交互用的,不包含任何用户信息
-    function AddNewToken(): IOneTokenItem;
+    function AddNewToken(): TOneTokenItem;
     // 添加自已类型的Token
-    function AddToken(QTokenItem: IOneTokenItem): boolean;
+    function AddToken(QTokenItem: TOneTokenItem): boolean;
     // 获取token
-    function GetToken(QTokenID: string): IOneTokenItem;
+    function GetToken(QTokenID: string): TOneTokenItem;
     // 增加一个token，QLoginPlatform 登陆平台，登陆用户, QIsMultiLogin:多点登陆
-    function AddLoginToken(QLoginPlatform: string; QLoginCode: string; QIsMultiLogin: boolean; Var QErrMsg: string): IOneTokenItem;
+    function AddLoginToken(QLoginPlatform: string; QLoginCode: string; QIsMultiLogin: boolean; Var QErrMsg: string): TOneTokenItem;
     // 移除一个token
     procedure RemoveToken(QTokenID: string);
     //
@@ -164,178 +186,31 @@ type
     procedure SaveToken();
     procedure LoadToken();
   public
-    property TokenList: TDictionary<string, IOneTokenItem> read FTokenList;
+    property TokenList: TDictionary<string, TOneTokenItem> read FTokenList;
     property OnLine: Integer read FOnLine;
     property TokenTimeOutSec: Integer read FTimeOutSec write FTimeOutSec;
   end;
 
 implementation
 
-uses OneCrypto, OneGUID, OneFileHelper;
+uses OneCrypto, OneGUID, OneFileHelper, OneNeonHelper;
+
+procedure TOneTokenItem.SetSysUserType(value: string);
+begin
+  self.FSysUserType := value;
+  // 游客
+  self.FTokenRole := TOneTokenRole.userRole;
+  if self.FSysUserType = '超级管理员' then
+    self.FTokenRole := TOneTokenRole.superRole
+  else if self.FSysUserType = '管理员' then
+    self.FTokenRole := TOneTokenRole.sysAdminRole
+  else if self.FSysUserType = '操作员' then
+    self.FTokenRole := TOneTokenRole.sysUserRole;
+end;
 
 destructor TOneTokenItem.Destroy;
 begin
   inherited Destroy;
-end;
-
-function TOneTokenItem.ConnectionID(): string;
-begin
-  result := self.FConnectionID;
-end;
-
-procedure TOneTokenItem.SetConnectionID(QValue: string);
-begin
-  self.FConnectionID := QValue;
-end;
-
-function TOneTokenItem.TokenID(): string;
-begin
-  result := self.FTokenID;
-end;
-
-procedure TOneTokenItem.SetTokenID(QValue: string);
-begin
-  self.FTokenID := QValue;
-end;
-
-function TOneTokenItem.PrivateKey(): string;
-begin
-  result := self.FPrivateKey;
-end;
-
-procedure TOneTokenItem.SetPrivateKey(QValue: string);
-begin
-  self.FPrivateKey := QValue;
-end;
-
-function TOneTokenItem.LoginIP(): string;
-begin
-  result := self.FLoginIP;
-end;
-
-procedure TOneTokenItem.SetLoginIP(QValue: string);
-begin
-  self.FLoginIP := QValue;
-end;
-
-function TOneTokenItem.LoginMac(): string;
-begin
-  result := self.FLoginMac;
-end;
-
-procedure TOneTokenItem.SetLoginMac(QValue: string);
-begin
-  self.FLoginMac := QValue;
-end;
-
-function TOneTokenItem.LoginTime(): TDateTime;
-begin
-  result := self.FLoginTime;
-end;
-
-procedure TOneTokenItem.SetLoginTime(QValue: TDateTime);
-begin
-  self.FLoginTime := QValue;
-end;
-
-function TOneTokenItem.LoginPlatform(): string;
-begin
-  result := self.FLoginPlatform;
-end;
-
-procedure TOneTokenItem.SetLoginPlatform(QValue: string);
-begin
-  self.FLoginPlatform := QValue;
-end;
-
-function TOneTokenItem.LoginUserCode(): string;
-begin
-  result := self.FLoginUserCode;
-end;
-
-procedure TOneTokenItem.SetLoginUserCode(QValue: string);
-begin
-  self.FLoginUserCode := QValue;
-end;
-
-function TOneTokenItem.SysUserID(): string;
-begin
-  result := self.FSysUserID;
-end;
-
-procedure TOneTokenItem.SetSysUserID(QValue: string);
-begin
-  self.FSysUserID := QValue;
-end;
-
-function TOneTokenItem.SysUserName(): string;
-begin
-  result := self.FSysUserName;
-end;
-
-procedure TOneTokenItem.SetSysUserName(QValue: string);
-begin
-  self.FSysUserName := QValue;
-end;
-
-function TOneTokenItem.SysUserCode(): string;
-begin
-  result := self.FSysUserCode;
-end;
-
-procedure TOneTokenItem.SetSysUserCode(QValue: string);
-begin
-  self.FSysUserCode := QValue;
-end;
-
-function TOneTokenItem.SysUserType(): string;
-begin
-  result := self.FSysUserType;
-end;
-
-procedure TOneTokenItem.SetSysUserType(QValue: string);
-begin
-  self.FSysUserType := QValue;
-end;
-
-function TOneTokenItem.SysUserTable(): string;
-begin
-  result := self.FSysUserTable;
-end;
-
-procedure TOneTokenItem.SetSysUserTable(QValue: string);
-begin
-  self.FSysUserTable := QValue;
-end;
-
-function TOneTokenItem.ZTCode(): string;
-begin
-  result := self.FZTCode;
-end;
-
-procedure TOneTokenItem.SetZTCode(QValue: string);
-begin
-  self.FZTCode := QValue;
-end;
-
-function TOneTokenItem.PlatUserID(): string;
-begin
-  result := self.FPlatUserID;
-end;
-
-procedure TOneTokenItem.SetPlatUserID(QValue: string);
-begin
-  self.FPlatUserID := QValue;
-end;
-
-function TOneTokenItem.LastTime(): TDateTime;
-begin
-  result := self.FLastTime;
-end;
-
-procedure TOneTokenItem.SetLastTime(QValue: TDateTime);
-begin
-  self.FLastTime := QValue;
 end;
 
 // ******* TOneTokenManage **********//
@@ -345,7 +220,7 @@ begin
   FLog := QLog;
   FTimeOutSec := 60 * 30; // 默认30分钟失效无交互
   FLockObj := TObject.Create;
-  FTokenList := TDictionary<string, IOneTokenItem>.Create;
+  FTokenList := TDictionary<string, TOneTokenItem>.Create;
   FTimerThread := TOneTimerThread.Create(self.onTimerWork);
   // 加载内存Token信息
   self.LoadToken;
@@ -357,15 +232,15 @@ end;
 
 destructor TOneTokenManage.Destroy;
 var
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
 begin
   if FTimerThread <> nil then
     FTimerThread.FreeWork;
-  // for lTokenItem in FTokenList.Values do
-  // begin
-  // TInterfacedObject(lTokenItem).Free;
-  // end;
   self.SaveToken;
+  for lTokenItem in FTokenList.Values do
+  begin
+    lTokenItem.Free;
+  end;
   FTokenList.Clear;
   FTokenList.Free;
   FLockObj.Free;
@@ -374,7 +249,7 @@ end;
 
 procedure TOneTokenManage.onTimerWork(Sender: TObject);
 var
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
   lNow: TDateTime;
   lSpanSec: Integer;
 begin
@@ -389,6 +264,7 @@ begin
         if SecondsBetween(lNow, lTokenItem.LastTime) >= self.FTimeOutSec then
         begin
           FTokenList.Remove(lTokenItem.TokenID);
+          lTokenItem.Free;
         end;
       end
       else
@@ -397,6 +273,7 @@ begin
         if HoursBetween(lNow, lTokenItem.LastTime) >= 6 then
         begin
           FTokenList.Remove(lTokenItem.TokenID);
+          lTokenItem.Free;
         end;
       end;
     end;
@@ -407,7 +284,7 @@ begin
   self.SaveToken();
 end;
 
-function TOneTokenManage.AddNewToken(): IOneTokenItem;
+function TOneTokenManage.AddNewToken(): TOneTokenItem;
 var
   lKey: string;
   lTokenItem: TOneTokenItem;
@@ -434,7 +311,7 @@ begin
   end;
 end;
 
-function TOneTokenManage.AddToken(QTokenItem: IOneTokenItem): boolean;
+function TOneTokenManage.AddToken(QTokenItem: TOneTokenItem): boolean;
 begin
   result := false;
   TMonitor.TryEnter(self.FLockObj);
@@ -450,23 +327,23 @@ begin
   end;
 end;
 
-function TOneTokenManage.GetToken(QTokenID: string): IOneTokenItem;
+function TOneTokenManage.GetToken(QTokenID: string): TOneTokenItem;
 var
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
 begin
   result := nil;
   lTokenItem := nil;
   if self.FTokenList.TryGetValue(QTokenID, lTokenItem) then
   begin
-    lTokenItem.SetLastTime(Now);
+    lTokenItem.LastTime := Now;
     result := lTokenItem;
   end;
 end;
 
-function TOneTokenManage.AddLoginToken(QLoginPlatform: string; QLoginCode: string; QIsMultiLogin: boolean; Var QErrMsg: string): IOneTokenItem;
+function TOneTokenManage.AddLoginToken(QLoginPlatform: string; QLoginCode: string; QIsMultiLogin: boolean; Var QErrMsg: string): TOneTokenItem;
 var
   lKey: string;
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
 begin
   result := nil;
   lTokenItem := nil;
@@ -480,28 +357,29 @@ begin
       FTokenList.TryGetValue(lKey, lTokenItem);
       if QIsMultiLogin and (lTokenItem <> nil) then
       begin
-        lTokenItem.SetLastTime(Now);
+        lTokenItem.LastTime := Now;
         result := lTokenItem;
         exit;
       end;
       if lTokenItem <> nil then
       begin
+        lTokenItem.Free;
         lTokenItem := nil;
       end;
       FTokenList.Remove(lKey);
     end;
     lTokenItem := TOneTokenItem.Create;
-    lTokenItem.SetTokenID(lKey);
-    lTokenItem.SetPrivateKey(OneGUID.GetGUID32);
-    lTokenItem.SetLoginIP('');
-    lTokenItem.SetLoginTime(Now);
-    lTokenItem.SetLoginPlatform(QLoginPlatform);
-    lTokenItem.SetLoginUserCode(QLoginCode);
-    lTokenItem.SetSysUserID('');
-    lTokenItem.SetSysUserName('');
-    lTokenItem.SetSysUserType('');
-    lTokenItem.SetSysUserTable('');
-    lTokenItem.SetLastTime(Now);
+    lTokenItem.TokenID := lKey;
+    lTokenItem.PrivateKey := OneGUID.GetGUID32;
+    lTokenItem.LoginIP := '';
+    lTokenItem.LoginTime := Now;
+    lTokenItem.LoginPlatform := QLoginPlatform;
+    lTokenItem.LoginUserCode := QLoginCode;
+    lTokenItem.SysUserID := '';
+    lTokenItem.SysUserName := '';
+    lTokenItem.SysUserType := '';
+    lTokenItem.SysUserTable := '';
+    lTokenItem.LastTime := Now;
     FTokenList.Add(lKey, lTokenItem);
     result := lTokenItem;
   finally
@@ -521,7 +399,7 @@ end;
 
 function TOneTokenManage.CheckToken(QTokenID: String): boolean;
 var
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
   lNow: TDateTime;
   lSub: Double;
 begin
@@ -538,19 +416,20 @@ begin
       if lSub > FTimeOutSec then
       begin
         self.RemoveToken(lTokenItem.TokenID);
+        lTokenItem.Free;
         lTokenItem := nil;
         exit;
       end;
     end;
     // 合法刷新最后交互时间,保证TOKEN有效性
-    lTokenItem.SetLastTime(lNow);
+    lTokenItem.LastTime := lNow;
     result := true;
   end;
 end;
 
 function TOneTokenManage.CheckSign(QTokenID: String; QUTCTime: string; QSign: string): boolean;
 var
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
   lNow: TDateTime;
   tempSign: string;
 begin
@@ -562,109 +441,57 @@ begin
   tempSign := OneCrypto.MD5Endcode(tempSign);
   if tempSign.ToLower = QSign.ToLower then
   begin
-    lTokenItem.SetLastTime(lNow);
+    lTokenItem.LastTime := lNow;
     result := true;
   end;
 end;
 
 procedure TOneTokenManage.SaveToken();
 var
-  lDataSet: TFDMemTable;
-  lFileName: string;
-  lTokenItem: IOneTokenItem;
+  lFileName, lErrMsg: string;
+  lTokenItem: TOneTokenItem;
+  lList: TList<TOneTokenItem>;
 begin
-  lDataSet := TFDMemTable.Create(nil);
+  lList := TList<TOneTokenItem>.Create;
   try
-    lDataSet.CachedUpdates := true;
-    // 创建字段
-    lDataSet.FieldDefs.Add('FConnectionID', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FTokenID', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FPrivateKey', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FLoginIP', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FLoginMac', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FLoginTime', ftDateTime, 0, false);
-    lDataSet.FieldDefs.Add('FLoginPlatform', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FLoginUserCode', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FSysUserID', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FSysUserName', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FZTCode', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FPlatUserID', ftWidestring, 50, false);
-    lDataSet.FieldDefs.Add('FLastTime', ftDateTime, 0, false);
-    lDataSet.CreateDataSet;
     for lTokenItem in FTokenList.Values do
     begin
-      lDataSet.Append;
-      lDataSet.FieldByName('FConnectionID').AsString := lTokenItem.ConnectionID;
-      lDataSet.FieldByName('FTokenID').AsString := lTokenItem.TokenID;
-      lDataSet.FieldByName('FPrivateKey').AsString := lTokenItem.PrivateKey;
-      lDataSet.FieldByName('FLoginIP').AsString := lTokenItem.LoginIP;
-      lDataSet.FieldByName('FLoginMac').AsString := lTokenItem.LoginMac;
-      lDataSet.FieldByName('FLoginTime').AsDateTime := lTokenItem.LoginTime;
-      lDataSet.FieldByName('FLoginPlatform').AsString := lTokenItem.LoginPlatform;
-      lDataSet.FieldByName('FLoginUserCode').AsString := lTokenItem.LoginUserCode;
-      lDataSet.FieldByName('FSysUserID').AsString := lTokenItem.SysUserID;
-      lDataSet.FieldByName('FSysUserName').AsString := lTokenItem.SysUserName;
-      lDataSet.FieldByName('FZTCode').AsString := lTokenItem.ZTCode;
-      lDataSet.FieldByName('FPlatUserID').AsString := lTokenItem.PlatUserID;
-      lDataSet.FieldByName('FLastTime').AsDateTime := lTokenItem.LastTime;
-      lDataSet.Post;
+      lList.Add(lTokenItem);
     end;
-    lDataSet.MergeChangeLog;
+
     lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneToken');
     if not DirectoryExists(lFileName) then
       ForceDirectories(lFileName);
-    lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneToken\TokenStore.data');
-    lDataSet.SaveToFile(lFileName, TFDStorageFormat.sfBinary)
+    lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneToken\TokenJosnStore.data');
+    OneNeonHelper.ObjectToJsonFile(lList, lFileName, lErrMsg);
   finally
-    lDataSet.Close;
-    lDataSet.Free;
+    lList.Clear;
+    lList.Free;
   end;
 end;
 
 procedure TOneTokenManage.LoadToken();
 var
-  lDataSet: TFDMemTable;
-  lFileName: string;
-  lTokenItem: IOneTokenItem;
+  lFileName, lErrMsg: string;
+  lTokenItem: TOneTokenItem;
+  lList: TList<TOneTokenItem>;
+  I: Integer;
 begin
-  lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneToken\TokenStore.data');
+  lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneToken\TokenJosnStore.data');
   if not FileExists(lFileName) then
     exit;
-  lDataSet := TFDMemTable.Create(nil);
+  lList := TList<TOneTokenItem>.Create;
   try
-    lDataSet.CachedUpdates := true;
-    lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneToken\TokenStore.data');
-    lDataSet.LoadFromFile(lFileName, TFDStorageFormat.sfBinary);
-    if not lDataSet.Active then
-      exit;
-    if lDataSet.RecordCount = 0 then
-      exit;
-    lDataSet.First;
-    while not lDataSet.Eof do
+    OneNeonHelper.JSONToObjectFormFile(lList, lFileName, lErrMsg);
+    for I := 0 to lList.Count - 1 do
     begin
-      lTokenItem := TOneTokenItem.Create;
-      lTokenItem.SetConnectionID(lDataSet.FieldByName('FConnectionID').AsString);
-      lTokenItem.SetTokenID(lDataSet.FieldByName('FTokenID').AsString);
-      lTokenItem.SetPrivateKey(lDataSet.FieldByName('FPrivateKey').AsString);
-      lTokenItem.SetLoginIP(lDataSet.FieldByName('FLoginIP').AsString);
-      lTokenItem.SetLoginMac(lDataSet.FieldByName('FLoginMac').AsString);
-      lTokenItem.SetLoginTime(lDataSet.FieldByName('FLoginTime').AsDateTime);
-      lTokenItem.SetLoginPlatform(lDataSet.FieldByName('FLoginPlatform').AsString);
-      lTokenItem.SetLoginUserCode(lDataSet.FieldByName('FLoginUserCode').AsString);
-      lTokenItem.SetSysUserID(lDataSet.FieldByName('FSysUserID').AsString);
-      lTokenItem.SetSysUserName(lDataSet.FieldByName('FSysUserName').AsString);
-      lTokenItem.SetZTCode(lDataSet.FieldByName('FZTCode').AsString);
-      lTokenItem.SetPlatUserID(lDataSet.FieldByName('FPlatUserID').AsString);
-      lTokenItem.SetLastTime(lDataSet.FieldByName('FLastTime').AsDateTime);
-      if not self.TokenList.ContainsKey(lTokenItem.TokenID) then
-      begin
-        self.TokenList.Add(lTokenItem.TokenID, lTokenItem);
-      end;
-      lDataSet.Next;
+      lTokenItem := lList[I];
+      FTokenList.Add(lTokenItem.TokenID, lTokenItem);
     end;
+
   finally
-    lDataSet.Close;
-    lDataSet.Free;
+    lList.Clear;
+    lList.Free;
   end;
 end;
 

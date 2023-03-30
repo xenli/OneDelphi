@@ -39,7 +39,7 @@ end;
 function TUniBillSendController.GetBillSendList(QPageIndex: integer; QPageSize: integer; QStarTime: string; QEndTime: string; QCMFStatus: string): TActionResult<TList<TBillSendDemo>>;
 var
   lStartTime, lEndTime: TDateTime;
-  LTokenItem: IOneTokenItem;
+  LTokenItem: TOneTokenItem;
   lErrMsg: string;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
@@ -154,7 +154,7 @@ end;
 function TUniBillSendController.GetBillSendInfo(QBillID: string): TActionResult<TBillSendInfo>;
 var
   lStartTime, lEndTime: TDateTime;
-  LTokenItem: IOneTokenItem;
+  LTokenItem: TOneTokenItem;
   lErrMsg: string;
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;
@@ -252,7 +252,7 @@ function TUniBillSendController.SaveBillSendInfo(QBillInfo: TBillSendInfo): TAct
 var
   lBillSend: TBillSendDemo;
   lBillDetail: TBillDetailDemo;
-  LTokenItem: IOneTokenItem;
+  LTokenItem: TOneTokenItem;
   I, iNumber: integer;
   lSumAmount: double;
   lErrMsg: string;
@@ -328,7 +328,7 @@ begin
     lBillSend.FBillType := '要货单';
     // 创建人信息
     lBillSend.FCreateTime := FormatDateTime('yyyy-MM-dd hh:mm:ss', now);
-    lBillSend.FCreateID := LTokenItem.SysUserID();
+    lBillSend.FCreateID := LTokenItem.SysUserID;
     lBillSend.FCreateName := LTokenItem.SysUserName;
   end
   else
@@ -577,7 +577,7 @@ end;
 
 function TUniBillSendController.BillSendCmd(QBillID: string; QCmd: string): TActionResult<string>;
 var
-  LTokenItem: IOneTokenItem;
+  LTokenItem: TOneTokenItem;
   //
   lOneZTMange: TOneZTManage;
   lOneTokenManage: TOneTokenManage;

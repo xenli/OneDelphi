@@ -51,7 +51,7 @@ end;
 function TOneTokenController.ClientConnect(QCleintConnect: TClientConnect): TActionResult<TClientConnect>;
 var
   lOneGlobal: TOneGlobal;
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
   lList: TList<TOneTokenItem>;
   i: Integer;
 begin
@@ -65,8 +65,8 @@ begin
     exit;
   end;
   lTokenItem := lOneGlobal.TokenManage.AddNewToken();
-  lTokenItem.SetLoginIP(QCleintConnect.ClientIP);
-  lTokenItem.SetLoginMac(QCleintConnect.ClientMac);
+  lTokenItem.LoginIP := QCleintConnect.ClientIP;
+  lTokenItem.LoginMac := QCleintConnect.ClientMac;
   QCleintConnect.TokenID := lTokenItem.TokenID;
   QCleintConnect.PrivateKey := lTokenItem.PrivateKey;
   QCleintConnect.ConnectSecretkey := '';
@@ -95,7 +95,7 @@ end;
 function TOneTokenController.ClientConnectPing(QCleintConnect: TClientConnect): TActionResult<string>;
 var
   lOneGlobal: TOneGlobal;
-  lTokenItem: IOneTokenItem;
+  lTokenItem: TOneTokenItem;
 begin
   result := TActionResult<string>.Create(false, false);
   lOneGlobal := TOneGlobal.GetInstance();
