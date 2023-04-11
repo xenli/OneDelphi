@@ -79,6 +79,8 @@ type
     edSPReturnParams: TMemo;
     Label16: TLabel;
     tbClientDisConnect: TButton;
+    GroupBox1: TGroupBox;
+    edNoJoinFields: TMemo;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbOpenDataClick(Sender: TObject);
     procedure tbSaveDataClick(Sender: TObject);
@@ -99,6 +101,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 procedure TForm1.tbAppendClick(Sender: TObject);
 begin
@@ -258,7 +261,25 @@ begin
 end;
 
 procedure TForm1.tbSaveDataClick(Sender: TObject);
+var
+  i: integer;
+  lFieldName: string;
+  lField: TField;
 begin
+  // 不参与保存的字段,特别是多表关联单表保存
+  for i := 0 to edNoJoinFields.Lines.Count - 1 do
+  begin
+    lFieldName := edNoJoinFields.Lines[i];
+    if lFieldName = '' then
+      continue;
+    lField := qryOpenData.FindField(lFieldName);
+    if lField <> nil then
+    begin
+      // 不参与保存任何动作
+      lField.ProviderFlags := [];
+    end;
+  end;
+
   qryOpenData.DataInfo.Connection := OneConnection;
   qryOpenData.DataInfo.TableName := edTableName.Text;
   qryOpenData.DataInfo.PrimaryKey := edPrimaryKey.Text;
@@ -333,10 +354,18 @@ begin
     // 只是执行存储过程调用方法
     if not qrySPData.ExecStored then
     begin
+
       showMessage('执行存储过程异常:' + qrySPData.DataInfo.ErrMsg);
     end
     else
     begin
+      // 返回参数展示
+      edSPReturnParams.Lines.Clear;
+      for i := 0 to qrySPData.Params.Count - 1 do
+      begin
+        //
+        edSPReturnParams.Lines.Add(qrySPData.Params[i].AsString);
+      end;
       showMessage('执行存储过程成功');
     end;
   end;

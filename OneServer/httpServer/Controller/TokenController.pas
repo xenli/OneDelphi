@@ -28,13 +28,16 @@ type
     function ClientDisConnect(TokenID: string): TActionResult<string>;
     function ClientPing(): TActionResult<string>;
     function ClientConnectPing(QCleintConnect: TClientConnect): TActionResult<string>;
+    // 批量产生UUIDs
+    function GetUUID(): TActionResult<Int64>;
+    function GetUUIDs(QCount: Integer): TActionResult<TList<Int64>>;
   end;
 
 function CreateNewOneTokenController(QRouterItem: TOneRouterWorkItem): TObject;
 
 implementation
 
-uses OneGlobal;
+uses OneGlobal, OneUUID;
 
 function CreateNewOneTokenController(QRouterItem: TOneRouterWorkItem): TObject;
 var
@@ -106,6 +109,32 @@ begin
     exit;
   end;
   result.ResultData := '';
+  result.SetResultTrue();
+end;
+
+//只取一个
+function TOneTokenController.GetUUID(): TActionResult<Int64>;
+begin
+  result := TActionResult<Int64>.Create(false, false);
+  result.ResultData := OneUUID.GetUUID();
+  result.SetResultTrue();
+end;
+
+// 一次性取多少个ID到服务端
+function TOneTokenController.GetUUIDs(QCount: Integer): TActionResult<TList<Int64>>;
+var
+  i: Integer;
+begin
+  result := TActionResult < TList < Int64 >>.Create(true, false);
+  if QCount <= 0 then
+  begin
+    QCount := 1;
+  end;
+  result.ResultData := TList<Int64>.Create;
+  for i := 0 to QCount - 1 do
+  begin
+    result.ResultData.Add(OneUUID.GetUUID());
+  end;
   result.SetResultTrue();
 end;
 

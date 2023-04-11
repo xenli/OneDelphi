@@ -1154,7 +1154,15 @@ begin
     case lOneMethodRtti.MethodType of
       resultProcedure:
         begin
-          lOneMethodRtti.RttiMethod.Invoke(self, [QHTTPCtxt, QHTTPResult]);
+          try
+            lOneMethodRtti.RttiMethod.Invoke(self, [QHTTPCtxt, QHTTPResult]);
+          except
+            on e: Exception do
+            begin
+              QHTTPResult.ResultMsg := e.Message;
+              exit;
+            end;
+          end;
           isInvoke := true;
         end;
       sysProcedure, sysFunction:
@@ -1166,7 +1174,15 @@ begin
             exit;
           end;
           // 这边如果产生异常,会造成LValue未释放
-          LValue := lOneMethodRtti.RttiMethod.Invoke(self, lArgs);
+          try
+            LValue := lOneMethodRtti.RttiMethod.Invoke(self, lArgs);
+          except
+            on e: Exception do
+            begin
+              QHTTPResult.ResultMsg := e.Message;
+              exit;
+            end;
+          end;
           if (lOneMethodRtti.MethodType = sysProcedure) then
           begin
             exit;

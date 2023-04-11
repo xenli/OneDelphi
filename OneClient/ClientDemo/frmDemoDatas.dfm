@@ -18,6 +18,7 @@ object Form2: TForm2
     Height = 80
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 900
     object Label1: TLabel
       Left = 4
       Top = 17
@@ -255,6 +256,7 @@ object Form2: TForm2
     OnClick = tbSaveDatasClick
   end
   object OneConnection: TOneConnection
+    Connected = False
     IsHttps = False
     HTTPPort = 0
     ConnectionTimeout = 0
@@ -270,7 +272,6 @@ object Form2: TForm2
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
-    DataInfo.IsDesignGetFields = False
     DataInfo.Connection = OneConnection
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
@@ -287,6 +288,7 @@ object Form2: TForm2
     DataInfo.TranSpanSec = 0
     Params = <>
     MultiIndex = 0
+    ActiveDesign = False
     Left = 24
     Top = 368
   end
@@ -298,7 +300,6 @@ object Form2: TForm2
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
-    DataInfo.IsDesignGetFields = False
     DataInfo.Connection = OneConnection
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
@@ -315,6 +316,7 @@ object Form2: TForm2
     DataInfo.TranSpanSec = 0
     Params = <>
     MultiIndex = 0
+    ActiveDesign = False
     Left = 504
     Top = 360
   end

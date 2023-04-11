@@ -84,14 +84,27 @@ uses
   WeixinAuthController in 'OneFastWeiXin\WeixinAuthController.pas',
   WeixinAdminController in 'OneFastWeiXin\WeixinAdminController.pas',
   WeiXinMinApi in 'OneFastWeiXin\WeiXinMinApi.pas',
-  WeixinApiPublic in 'OneFastWeiXin\WeixinApiPublic.pas';
+  WeixinApiPublic in 'OneFastWeiXin\WeixinApiPublic.pas',
+  uDefaultIdGenerator in 'basLib\uuid\uDefaultIdGenerator.pas',
+  uYitIdHelper in 'basLib\uuid\uYitIdHelper.pas',
+  uIdGeneratorOptions in 'basLib\uuid\Contract\uIdGeneratorOptions.pas',
+  uIIdGenerator in 'basLib\uuid\Contract\uIIdGenerator.pas',
+  uISnowWorker in 'basLib\uuid\Contract\uISnowWorker.pas',
+  uTOverCostActionArg in 'basLib\uuid\Contract\uTOverCostActionArg.pas',
+  uSnowWorkerM1 in 'basLib\uuid\Core\uSnowWorkerM1.pas',
+  uSnowWorkerM2 in 'basLib\uuid\Core\uSnowWorkerM2.pas',
+  uSnowWorkerM3 in 'basLib\uuid\Core\uSnowWorkerM3.pas',
+  OneUUID in 'basLib\uuid\OneUUID.pas';
 
 var
   lpStartupInfo: TStartupInfo;
   lpProcessInformation: TProcessInformation;
+  tempID1,tempID2:Int64;
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  tempID1 := OneUUID.GetUUID();
+  tempID2 := OneUUID.GetUUID();
   // debug状态下弹出内存泄漏报告
   if DebugHook <> 0 then
     ReportMemoryLeaksOnShutdown := True;

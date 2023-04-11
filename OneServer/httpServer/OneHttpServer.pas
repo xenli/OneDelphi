@@ -69,7 +69,6 @@ uses OneHttpRouterManage, OneHttpController, OneGlobal;
 function TOneHttpServer.OnRequest(Ctxt: THttpServerRequestAbstract): cardinal;
 var
   lErrMsg: string; // 错误消息
-  lIsErr: boolean; // 是否产生错误
   lwatchTimer: TStopwatch; // 时间计数器
   lRequestMilSec: integer;
 
@@ -89,10 +88,10 @@ var
   lTThreadID: string;
 begin
   lErrMsg := '';
-  lIsErr := False;
   lHTTPResult := nil;
   lHTTPCtxt := nil;
-  Result := 0;
+  lRouterUrlPath := nil;
+  Result := 200;
   if self.FStopRequest then
   begin
     // 停止请求，返回404
@@ -104,12 +103,14 @@ begin
   lUrlPath := OneHttpCtxtResult.FormatRootName(lUrlPath);
   lwatchTimer := TStopwatch.StartNew;
   try
-    try
-      // 解析URL调用相关路由方法
-      // lUrlPath='/'+注册RootName根路径/控制器方法名称
-      lRouterUrlPath := OneHttpRouterManage.GetInitRouterManage().GetRouterUrlPath(lUrlPath, lErrMsg);
-      if lRouterUrlPath <> nil then
-      begin
+    // 解析URL调用相关路由方法
+    // lUrlPath='/'+注册RootName根路径/控制器方法名称
+    lRouterUrlPath := OneHttpRouterManage.GetInitRouterManage().GetRouterUrlPath(lUrlPath, lErrMsg);
+
+    if lRouterUrlPath <> nil then
+    begin
+{$REGION '模式干活' }
+      try
         lRouterWorkItem := lRouterUrlPath.RouterWorkItem;
         lHTTPResult := CreateNewHTTPResult;
         lHTTPCtxt := CreateNewHTTPCtxt(Ctxt);
@@ -119,30 +120,19 @@ begin
         if (lRouterWorkItem.RouterMode = emRouterMode.pool) or (lRouterWorkItem.RouterMode = emRouterMode.single) then
         begin
           lWorkObj := lRouterWorkItem.LockWorkItem(lErrMsg);
-          if lErrMsg <> '' then
+          if (lWorkObj = nil) then
           begin
-            Ctxt.OutContent := UTF8Encode(lErrMsg);
+            Ctxt.OutContent := UTF8Encode('获取的控制器对象为nil:' + lErrMsg);
             Ctxt.OutContentType := TEXT_CONTENT_TYPE;
             Result := 500;
-            lIsErr := True;
             exit;
           end;
-
           try
-            if (lWorkObj = nil) then
-            begin
-              Ctxt.OutContent := UTF8Encode('获取的控制器对象为nil');
-              Ctxt.OutContentType := TEXT_CONTENT_TYPE;
-              Result := 500;
-              lIsErr := True;
-              exit;
-            end;
             if not(lWorkObj is TOneControllerBase) then
             begin
               Ctxt.OutContent := UTF8Encode('控制器请继承TOneControllerBase');
               Ctxt.OutContentType := TEXT_CONTENT_TYPE;
               Result := 500;
-              lIsErr := True;
               exit;
             end;
             lOneControllerWork := TOneControllerBase(lWorkObj);
@@ -155,24 +145,14 @@ begin
         else if lRouterWorkItem.RouterMode = emRouterMode.even then
         begin
           lEvenControllerProcedure := lRouterWorkItem.LockWorkEven(lErrMsg);
-          if lErrMsg <> '' then
+          if not Assigned(lEvenControllerProcedure) then
           begin
-            Ctxt.OutContent := UTF8Encode(lErrMsg);
+            Ctxt.OutContent := UTF8Encode(lUrlPath + '相关路由回调方法已不存在:' + lErrMsg);
             Ctxt.OutContentType := TEXT_CONTENT_TYPE;
-            lIsErr := True;
             Result := 500;
             exit;
           end;
-
           try
-            if not Assigned(lEvenControllerProcedure) then
-            begin
-              Ctxt.OutContent := UTF8Encode(lUrlPath + '相关路由回调方法已不存在');
-              Ctxt.OutContentType := TEXT_CONTENT_TYPE;
-              Result := 500;
-              lIsErr := True;
-              exit;
-            end;
             // 进行调用
             lEvenControllerProcedure(lHTTPCtxt, lHTTPResult);
             // 结果处理
@@ -186,113 +166,99 @@ begin
         else
         begin
           Ctxt.OutContent := '[TOneHttpServer.OnRequest]未设计的路由模式';
-          Result := 500;
-          lIsErr := True;
-          exit;
-        end;
-      end
-      else
-      begin
-        if (lUrlPath = '') or (lUrlPath = '/one') then
-        begin
-          Ctxt.OutContent := UTF8Encode('欢迎来到OneDephi世界!!!!');
           Ctxt.OutContentType := TEXT_CONTENT_TYPE;
+          Result := 500;
           exit;
         end;
-        if lUrlPath.StartsWith('/oneweb/') then
+      finally
+        if lHTTPResult <> nil then
         begin
-          lFileName := lUrlPath.Substring(8, lUrlPath.Length - 8);
-          // 有中文进行解码
-          lFileName := HTTPDecode(lFileName);
-          lFileName := OneFileHelper.CombineExeRunPathB('OnePlatform\OneWeb', lFileName);
-          Ctxt.OutContent := UTF8Encode(lFileName);
-          Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
-          Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
-          Result := HTTP_SUCCESS;
-          exit;
-        end;
-        if lUrlPath.StartsWith('/onewebv/') then
-        begin
-          // 返回虚拟目录站点文件/onewebv/虚拟文件代码/文件路径
-          lUrlPath := lUrlPath.Substring(9, lUrlPath.Length - 9);
-          // 取出虚拟文件代码,和虚拟文件路径
-          tempI := lUrlPath.IndexOf('/');
-          lFileCode := lUrlPath.Substring(0, tempI);
-          lFileName := lUrlPath.Substring(tempI, lUrlPath.Length - tempI);
-
-          lPhy := TOneGlobal.GetInstance().VirtualManage.GetVirtualPhy(lFileCode, lErrMsg);
-          if lErrMsg <> '' then
+          if Result = 500 then
           begin
-            Ctxt.OutContent := UTF8Encode(lErrMsg);
-            Ctxt.OutContentType := TEXT_CONTENT_TYPE;
-            exit;
+            // 服务端异常不处理结果
+            Ctxt.OutContent := UTF8Encode(lHTTPResult.ResultException);
+          end
+          else if Result = HTTP_Status_TokenFail then
+          begin
+            // 验证Token失败
+            Ctxt.OutContent := UTF8Encode('Token验证失败,请重新登陆!!!');
+          end
+          else if lHTTPResult.ResultOutMode = THTTPResultMode.OUTFILE then
+          begin
+            Ctxt.OutContent := lHTTPCtxt.OutContent;
+            Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
+            Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
+            Result := HTTP_SUCCESS;
+          end
+          else if lHTTPResult.ResultOutMode = THTTPResultMode.HTML then
+          begin
+            Ctxt.OutContent := lHTTPCtxt.OutContent;
+            Ctxt.OutContentType := HTML_CONTENT_TYPE;
+            Result := HTTP_SUCCESS;
+          end
+          else
+          begin
+            Ctxt.OutContentType := 'text/plain;charset=' + lHTTPCtxt.RequestAcceptCharset;
+            Ctxt.OutCustomHeaders := lHTTPCtxt.ResponCustHeaderList;
+            Ctxt.OutContent := lHTTPCtxt.OutContent;
           end;
-          lFileName := HTTPDecode(lFileName);
-          lFileName := OneFileHelper.CombinePath(lPhy, lFileName);
-          Ctxt.OutContent := UTF8Encode(lFileName);
-          Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
-          Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
-          Result := HTTP_SUCCESS;
-          exit;
+          lHTTPResult.Free;
         end;
+        if lHTTPCtxt <> nil then
+          lHTTPCtxt.Free;
+      end;
+      exit;
+{$ENDREGION}
+    end
+    else if (lUrlPath = '') or (lUrlPath = '/one') then
+    begin
+      Ctxt.OutContent := UTF8Encode('欢迎来到OneDephi世界!!!!');
+      Ctxt.OutContentType := TEXT_CONTENT_TYPE;
+      Result := HTTP_SUCCESS;
+      exit;
+    end
+    else if lUrlPath.StartsWith('/oneweb/') then
+    begin
+      lFileName := lUrlPath.Substring(8, lUrlPath.Length - 8);
+      // 有中文进行解码
+      lFileName := HTTPDecode(lFileName);
+      lFileName := OneFileHelper.CombineExeRunPathB('OnePlatform\OneWeb', lFileName);
+      Ctxt.OutContent := UTF8Encode(lFileName);
+      Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
+      Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
+      Result := HTTP_SUCCESS;
+      exit;
+    end
+    else if lUrlPath.StartsWith('/onewebv/') then
+    begin
+      // 返回虚拟目录站点文件/onewebv/虚拟文件代码/文件路径
+      lUrlPath := lUrlPath.Substring(9, lUrlPath.Length - 9);
+      // 取出虚拟文件代码,和虚拟文件路径
+      tempI := lUrlPath.IndexOf('/');
+      lFileCode := lUrlPath.Substring(0, tempI);
+      lFileName := lUrlPath.Substring(tempI, lUrlPath.Length - tempI);
+
+      lPhy := TOneGlobal.GetInstance().VirtualManage.GetVirtualPhy(lFileCode, lErrMsg);
+      if lErrMsg <> '' then
+      begin
         Ctxt.OutContent := UTF8Encode(lErrMsg);
         Ctxt.OutContentType := TEXT_CONTENT_TYPE;
-        lIsErr := True;
+        Result := 500;
         exit;
       end;
-      if Result = 0 then
-      begin
-        // DoWork里面也有可能返回来
-        Result := HTTP_SUCCESS;
-      end;
-    finally
-      if lHTTPResult <> nil then
-      begin
-        if Result = 500 then
-        begin
-          // 服务端异常不处理结果
-          Ctxt.OutContent := UTF8Encode(lHTTPResult.ResultException);
-        end
-        else if Result = HTTP_Status_TokenFail then
-        begin
-          // 验证Token失败
-          Ctxt.OutContent := UTF8Encode('Token验证失败,请重新登陆!!!');
-        end
-        else if lHTTPResult.ResultOutMode = THTTPResultMode.OUTFILE then
-        begin
-          Ctxt.OutContent := lHTTPCtxt.OutContent;
-          Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
-          Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
-          Result := HTTP_SUCCESS;
-        end
-        else if lHTTPResult.ResultOutMode = THTTPResultMode.HTML then
-        begin
-          Ctxt.OutContent := lHTTPCtxt.OutContent;
-          Ctxt.OutContentType := HTML_CONTENT_TYPE;
-          Result := HTTP_SUCCESS;
-        end
-        else
-        begin
-          Ctxt.OutContentType := 'text/plain;charset=' + lHTTPCtxt.RequestAcceptCharset;
-          Ctxt.OutCustomHeaders := lHTTPCtxt.ResponCustHeaderList;
-          Ctxt.OutContent := lHTTPCtxt.OutContent;
-        end;
-        lHTTPResult.Free;
-      end;
-      if lHTTPCtxt <> nil then
-        lHTTPCtxt.Free;
-      if lIsErr then
-      begin
-        if Result = 500 then
-        begin
-          // 抛出异常到前端
-          // raise Exception.Create(Ctxt.OutContent);
-        end
-        else
-        begin
-          Result := HTTP_NOTFOUND;
-        end;
-      end;
+      lFileName := HTTPDecode(lFileName);
+      lFileName := OneFileHelper.CombinePath(lPhy, lFileName);
+      Ctxt.OutContent := UTF8Encode(lFileName);
+      Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
+      Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
+      Result := HTTP_SUCCESS;
+      exit;
+    end
+    else
+    begin
+      // 未解析的页面地址
+      Result := HTTP_NOTFOUND;
+      exit;
     end;
   finally
     lwatchTimer.Stop;

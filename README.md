@@ -48,6 +48,22 @@
 
 ## 更新日志
 
+************2023-04-11***********  
+服务端:  
+	1.增加UUID整开ID功能,同时开放取UUID接口 TokenController  
+客户端:  
+	1.oneCleint控件包,因为有删除增加属性，控件包clear重新编译,安装  
+	你的项目窗体上面有放TOneDataSet重新打开下,提示去掉没用的属性即可,claer工程，重编译  
+	去掉TOneDataSet.DataInfo.isPost;属性 
+	增加TOneDataSet.ActiveDesign设计时打开数据，获取字段  
+	2.OneClient控件包增加取UUID控件 TOneUUID，获取整型ID的  
+	3.增加Demo-OneClientDemoUUID  
+	4.以及一些功能增加和优化  
+
+客户端:OneFastCleint  
+	1.增加各种下拉配置  
+	2.脚本大体实现初版  
+	
 ************2023-03-29***********
 服务端:  
 	1.增加控制台版服务端OneServiceConsole功能  

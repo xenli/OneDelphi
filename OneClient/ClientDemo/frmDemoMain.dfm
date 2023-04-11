@@ -113,7 +113,7 @@ object Form1: TForm1
     Top = 80
     Width = 899
     Height = 479
-    ActivePage = tabDML
+    ActivePage = tabDataSet
     Align = alClient
     TabOrder = 2
     ExplicitWidth = 895
@@ -268,7 +268,7 @@ object Form1: TForm1
       object DBGrid1: TDBGrid
         Left = 60
         Top = 237
-        Width = 789
+        Width = 549
         Height = 172
         DataSource = dsOpenData
         TabOrder = 11
@@ -292,6 +292,23 @@ object Form1: TForm1
         Caption = #20445#23384#25968#25454
         TabOrder = 12
         OnClick = tbSaveDataClick
+      end
+      object GroupBox1: TGroupBox
+        Left = 615
+        Top = 237
+        Width = 234
+        Height = 172
+        Caption = #19981#21442#19982#20445#23384#30340#23383#27573#19968#34892#19968#20010
+        TabOrder = 13
+        object edNoJoinFields: TMemo
+          Left = 2
+          Top = 17
+          Width = 230
+          Height = 153
+          Align = alClient
+          ScrollBars = ssVertical
+          TabOrder = 0
+        end
       end
     end
     object tabDML: TTabSheet
@@ -519,23 +536,37 @@ object Form1: TForm1
   object OneConnection: TOneConnection
     Connected = False
     IsHttps = False
-    HTTPPort = 0
+    HTTPHost = '127.0.0.1'
+    HTTPPort = 9090
+    ConnectSecretkey = '354575E87B2642C68F798694B81AF6EF'
+    TokenID = '0EE8C899FFB54F66A3C5C3B742806FDA'
+    PrivateKey = '9AAE70B9545D4FCE98A5CB6FFCA69B2E'
     ConnectionTimeout = 0
     ResponseTimeout = 0
+    ErrMsg = #35831#27714#21457#29983#24322#24120':Error sending data: (12029) '#26080#27861#19982#26381#21153#22120#24314#31435#36830#25509
     Left = 400
     Top = 40
   end
   object qryOpenData: TOneDataSet
+    FieldDefs = <>
     CachedUpdates = True
+    IndexDefs = <>
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
+    FormatOptions.AssignedValues = [fvMaxBcdPrecision, fvMaxBcdScale]
+    FormatOptions.MaxBcdPrecision = 2147483647
+    FormatOptions.MaxBcdScale = 1073741823
     ResourceOptions.AssignedValues = [rvSilentMode]
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
-    DataInfo.IsDesignGetFields = False
+    StoreDefs = True
+    SQL.Strings = (
+      'select'
+      '*'
+      'from onefast_admin')
+    DataInfo.Connection = OneConnection
     DataInfo.OpenMode = openData
-    DataInfo.IsPost = False
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
     DataInfo.PageSize = -1
@@ -544,14 +575,15 @@ object Form1: TForm1
     DataInfo.PageTotal = 0
     DataInfo.AffectedMaxCount = -1
     DataInfo.AffectedMustCount = -1
-    DataInfo.RowsAffected = 0
+    DataInfo.RowsAffected = 4
     DataInfo.AsynMode = False
     DataInfo.IsReturnData = False
     DataInfo.TranSpanSec = 0
     Params = <>
     MultiIndex = 0
-    Left = 24
-    Top = 344
+    ActiveDesign = False
+    Left = 360
+    Top = 352
   end
   object dsOpenData: TDataSource
     DataSet = qryOpenData
@@ -566,10 +598,8 @@ object Form1: TForm1
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
-    DataInfo.IsDesignGetFields = False
     DataInfo.Connection = OneConnection
     DataInfo.OpenMode = openData
-    DataInfo.IsPost = False
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
     DataInfo.PageSize = -1
@@ -584,6 +614,7 @@ object Form1: TForm1
     DataInfo.TranSpanSec = 0
     Params = <>
     MultiIndex = 0
+    ActiveDesign = False
     Left = 132
     Top = 346
   end
@@ -595,9 +626,12 @@ object Form1: TForm1
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
-    DataInfo.IsDesignGetFields = False
+    SQL.Strings = (
+      'select 1'
+      'union'
+      'select 2')
+    DataInfo.Connection = OneConnection
     DataInfo.OpenMode = openData
-    DataInfo.IsPost = False
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
     DataInfo.PageSize = -1
@@ -610,8 +644,10 @@ object Form1: TForm1
     DataInfo.AsynMode = False
     DataInfo.IsReturnData = False
     DataInfo.TranSpanSec = 0
+    DataInfo.ErrMsg = #26410#36830#25509','#35831#20808#25191#34892'DoConnect'#20107#20214'.'
     Params = <>
     MultiIndex = 0
+    ActiveDesign = False
     Left = 244
     Top = 346
   end

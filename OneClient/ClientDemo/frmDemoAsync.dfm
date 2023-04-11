@@ -291,7 +291,6 @@ object Form5: TForm5
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
-    DataInfo.IsDesignGetFields = False
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
@@ -307,6 +306,7 @@ object Form5: TForm5
     DataInfo.TranSpanSec = 0
     Params = <>
     MultiIndex = 0
+    ActiveDesign = False
     Left = 168
     Top = 344
   end
@@ -316,6 +316,7 @@ object Form5: TForm5
     Top = 402
   end
   object OneConnection: TOneConnection
+    Connected = False
     IsHttps = False
     HTTPPort = 0
     ConnectionTimeout = 0

@@ -66,6 +66,7 @@ contains
   OneCrypto in 'baseLib\OneCrypto.pas',
   OneLog in 'baseLib\OneLog.pas',
   OneILog in 'baseLib\OneILog.pas',
-  OneThread in 'baseLib\OneThread.pas';
+  OneThread in 'baseLib\OneThread.pas',
+  OneClientUUID in 'OneClientUUID.pas';
 
 end.

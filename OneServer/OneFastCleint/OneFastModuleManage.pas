@@ -27,6 +27,7 @@ type
     FIsShowFilter_: boolean;
     FIsMulti_: boolean;
     FIsStart_: boolean;
+    FModuleScript_: string;
   published
     property FModuleID: string read FModuleID_ write FModuleID_;
     property FModuleCode: string read FModuleCode_ write FModuleCode_;
@@ -37,6 +38,7 @@ type
     property FIsShowFilter: boolean read FIsShowFilter_ write FIsShowFilter_;
     property FIsMulti: boolean read FIsMulti_ write FIsMulti_;
     property FIsStart: boolean read FIsStart_ write FIsStart_;
+    property FModuleScript: string read FModuleScript_ write FModuleScript_;
   end;
 
   TFastModuleData = class
@@ -242,6 +244,7 @@ type
     FControlReadOnly_: boolean;
     FControlEnabled_: boolean;
     FControlShowPass_: boolean;
+    FControlSet_: string;
     FColumnSum_: string;
   published
     property FControlID: string read FControlID_ write FControlID_;
@@ -260,6 +263,7 @@ type
     property FControlReadOnly: boolean read FControlReadOnly_ write FControlReadOnly_;
     property FControlEnabled: boolean read FControlEnabled_ write FControlEnabled_;
     property FControlShowPass: boolean read FControlShowPass_ write FControlShowPass_;
+    property FControlSet: string read FControlSet_ write FControlSet_;
     property FColumnSum: string read FColumnSum_ write FColumnSum_;
   end;
 

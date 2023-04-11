@@ -27,7 +27,7 @@ procedure Register;
 implementation
 
 uses
-  OneClientConnect, OneClientDataSet, OneClientVirtualFile;
+  OneClientConnect, OneClientDataSet, OneClientVirtualFile,OneClientUUID;
 
 procedure TOneUnitSelector.RequiresUnits(Proc: TGetStrProc);
 begin
@@ -48,7 +48,7 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('OneClient', [TOneConnection, TOneDataSet, TOneVirtualFile]);
+  RegisterComponents('OneClient', [TOneConnection, TOneDataSet, TOneVirtualFile,TOneUUID]);
   RegisterSelectionEditor(TOneConnection, TOneUnitSelector);
   RegisterSelectionEditor(TOneDataSet, TOneUnitSelector);
   // RegisterPropertyEditor(TypeInfo(TFDParams), TOneDataInfo, 'Params',

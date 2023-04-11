@@ -23,6 +23,8 @@ const
 
   URL_HTTP_HTTPServer_TOKEN_ClientDisConnect = 'OneServer/Token/ClientDisConnect';
   URL_HTTP_HTTPServer_TOKEN_ClientPing = 'OneServer/Token/ClientPing';
+  URL_HTTP_HTTPServer_TOKEN_GetUUID = 'OneServer/Token/GetUUID';
+  URL_HTTP_HTTPServer_TOKEN_GetUUIDs = 'OneServer/Token/GetUUIDs';
   // 操作数据相关
   URL_HTTP_HTTPServer_DATA_OpenDatas = 'OneServer/Data/OpenDatas';
   URL_HTTP_HTTPServer_DATA_SaveDatas = 'OneServer/Data/SaveDatas';
@@ -167,6 +169,11 @@ type
     function CommitTran(QTranInfo: TOneTran): boolean;
     // 5.回滚账套连接事务
     function RollbackTran(QTranInfo: TOneTran): boolean;
+
+    // 获取UUID
+    function GetUUID(var QErrMsg: string): int64;
+    // 申请多少个UUID
+    function GetUUIDs(QCount: Integer; var QErrMsg: string): TList<int64>;
   public
     property onTokenFailCallBack: TNotifyEvent read FTokenFailCallBack write FTokenFailCallBack;
   published
@@ -1140,7 +1147,7 @@ begin
     lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_DATA_OpenDatas, lPostJsonValue.ToJSON(), lErrMsg);
     if not self.IsErrTrueResult(lErrMsg) then
     begin
-      self.FErrMsg := lErrMsg;
+      Result.ResultMsg := lErrMsg;
       exit;
     end;
     if not OneNeonHelper.JsonToObject(Result, lResultJsonValue, lErrMsg) then
@@ -3005,6 +3012,108 @@ begin
       lList.Clear;
       lList.Free;
     end;
+  end;
+end;
+
+function TOneConnection.GetUUID(var QErrMsg: string): int64;
+var
+  lJsonObj: TJsonObject;
+  lResultJsonValue: TJsonValue;
+  lErrMsg: string;
+  lClientConnect: TClientConnect;
+  lServerResult: TActionResult<int64>;
+  IsOK: boolean;
+begin
+  Result := -1;
+  IsOK := false;
+  QErrMsg := '';
+  lResultJsonValue := nil;
+  lServerResult := TActionResult<int64>.Create;
+  lJsonObj := TJsonObject.Create;
+  try
+    lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_TOKEN_GetUUID, '', lErrMsg);
+    if not self.IsErrTrueResult(lErrMsg) then
+    begin
+      QErrMsg := lErrMsg;
+      exit;
+    end;
+    lServerResult.ResultData := -1;
+    if not OneNeonHelper.JsonToObject(lServerResult, lResultJsonValue, lErrMsg) then
+    begin
+      QErrMsg := '返回的数据解析成TResult<TClientConnect>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      exit;
+    end;
+    if not lServerResult.ResultSuccess then
+    begin
+      QErrMsg := '服务端消息:' + lServerResult.ResultMsg;
+      exit;
+    end;
+    Result := lServerResult.ResultData;
+    IsOK := true;
+  finally
+    if not IsOK then
+    begin
+      Result := -1;
+    end;
+    lJsonObj.Free;
+    if lResultJsonValue <> nil then
+    begin
+      lResultJsonValue.Free;
+    end;
+    lServerResult.Free;
+  end;
+end;
+
+function TOneConnection.GetUUIDs(QCount: Integer; var QErrMsg: string): TList<int64>;
+var
+  lJsonObj: TJsonObject;
+  lResultJsonValue: TJsonValue;
+  lErrMsg: string;
+  lClientConnect: TClientConnect;
+  lServerResult: TActionResult<TList<int64>>;
+  IsOK: boolean;
+begin
+  Result := TList<int64>.Create;
+  IsOK := false;
+  QErrMsg := '';
+  lResultJsonValue := nil;
+  lServerResult := TActionResult < TList < int64 >>.Create;
+  lJsonObj := TJsonObject.Create;
+  try
+    if QCount <= 0 then
+      QCount := 100;
+    lJsonObj.AddPair('QCount', TJSONNumber.Create(QCount));
+    lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_TOKEN_GetUUIDs, lJsonObj.ToJSON(), lErrMsg);
+    if not self.IsErrTrueResult(lErrMsg) then
+    begin
+      QErrMsg := lErrMsg;
+      exit;
+    end;
+    lServerResult.ResultData := Result;
+    if not OneNeonHelper.JsonToObject(lServerResult, lResultJsonValue, lErrMsg) then
+    begin
+      QErrMsg := '返回的数据解析成TResult<TClientConnect>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      exit;
+    end;
+    if not lServerResult.ResultSuccess then
+    begin
+      QErrMsg := '服务端消息:' + lServerResult.ResultMsg;
+      exit;
+    end;
+    IsOK := true;
+  finally
+    if not IsOK then
+    begin
+      Result.Free;
+      Result := nil;
+    end;
+    lJsonObj.Free;
+    if lResultJsonValue <> nil then
+    begin
+      lResultJsonValue.Free;
+    end;
+    lServerResult.ResultData := nil;
+    lServerResult.Free;
   end;
 end;
 

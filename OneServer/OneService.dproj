@@ -209,6 +209,16 @@
         <DCCReference Include="OneFastWeiXin\WeixinAdminController.pas"/>
         <DCCReference Include="OneFastWeiXin\WeiXinMinApi.pas"/>
         <DCCReference Include="OneFastWeiXin\WeixinApiPublic.pas"/>
+        <DCCReference Include="basLib\uuid\uDefaultIdGenerator.pas"/>
+        <DCCReference Include="basLib\uuid\uYitIdHelper.pas"/>
+        <DCCReference Include="basLib\uuid\Contract\uIdGeneratorOptions.pas"/>
+        <DCCReference Include="basLib\uuid\Contract\uIIdGenerator.pas"/>
+        <DCCReference Include="basLib\uuid\Contract\uISnowWorker.pas"/>
+        <DCCReference Include="basLib\uuid\Contract\uTOverCostActionArg.pas"/>
+        <DCCReference Include="basLib\uuid\Core\uSnowWorkerM1.pas"/>
+        <DCCReference Include="basLib\uuid\Core\uSnowWorkerM2.pas"/>
+        <DCCReference Include="basLib\uuid\Core\uSnowWorkerM3.pas"/>
+        <DCCReference Include="basLib\uuid\OneUUID.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

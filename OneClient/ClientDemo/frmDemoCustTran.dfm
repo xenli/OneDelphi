@@ -18,6 +18,7 @@ object Form3: TForm3
     Height = 80
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 919
     object Label1: TLabel
       Left = 4
       Top = 17
@@ -148,6 +149,7 @@ object Form3: TForm3
     OnClick = tbDMLClick
   end
   object OneConnection: TOneConnection
+    Connected = False
     IsHttps = False
     HTTPPort = 0
     ConnectionTimeout = 0
@@ -163,7 +165,6 @@ object Form3: TForm3
     ResourceOptions.SilentMode = True
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
-    DataInfo.IsDesignGetFields = False
     DataInfo.Connection = OneConnection
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
@@ -180,6 +181,7 @@ object Form3: TForm3
     DataInfo.TranSpanSec = 0
     Params = <>
     MultiIndex = 0
+    ActiveDesign = False
     Left = 408
     Top = 271
   end

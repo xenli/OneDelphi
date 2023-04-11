@@ -250,9 +250,10 @@ end;
 
 initialization
 
-if Unit_WeiXinManage <> nil then
-  Unit_WeiXinManage.Free;
 
 finalization
+
+if Unit_WeiXinManage <> nil then
+  Unit_WeiXinManage.Free;
 
 end.

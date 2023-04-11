@@ -18,8 +18,6 @@ type
   private
     //
     FCreateID: string;
-    // 设计时获取相关字段
-    FIsDesignGetFields: boolean;
     // 所属数据集
     FOwnerDataSet: TOneDataSet;
     // OneServer连接
@@ -36,8 +34,6 @@ type
     FOtherKeys: string;
     // 数据集打开数据模式
     FOpenMode: TDataOpenMode;
-    //
-    FIsPost: boolean;
     // 保存数据集模式
     FSaveMode: TDataSaveMode;
     // 服务端返回数据模式
@@ -82,14 +78,11 @@ type
     function GetConnection: TOneConnection;
     procedure SetConnection(const AValue: TOneConnection);
     // 设计模式下获取相关字段
-    procedure SetGetFields(value: boolean);
   public
     constructor Create(QDataSet: TOneDataSet); overload;
     destructor Destroy; override;
   published
     property CreateID: string read FCreateID write FCreateID;
-    /// <param name="IsDesignGetFields">设计时获取相关字段,请先设置好连接及SQL</param>
-    property IsDesignGetFields: boolean read FIsDesignGetFields write SetGetFields;
     /// <param name="OwnerDataSet">所属数据集</param>
     property OwnerDataSet: TOneDataSet read FOwnerDataSet;
     /// <param name="Connection">连接OneServer服务器的连接</param>
@@ -106,7 +99,6 @@ type
     property OtherKeys: string read FOtherKeys write FOtherKeys;
     /// <param name="OpenMode">数据集打开模式</param>
     property OpenMode: TDataOpenMode read FOpenMode write FOpenMode;
-    property IsPost: boolean read FIsPost write FIsPost;
     /// <param name="SaveMode">保存数据集模式,数据集delate和DML操作语句</param>
     property SaveMode: TDataSaveMode read FSaveMode write FSaveMode;
     /// <param name="DataReturnMode">数据集返回模式</param>
@@ -150,6 +142,7 @@ type
   [ComponentPlatformsAttribute(OneAllPlatforms)]
   TOneDataSet = class(TFDMemTable)
   private
+    FActiveDesign: boolean;
     // one扩展属性
     FDataInfo: TOneDataInfo;
     // 多个数据集
@@ -165,6 +158,7 @@ type
     procedure SetCommandText(const value: TStrings);
     procedure SQLListChanged(Sender: TObject);
     procedure SetMultiIndex(value: Integer);
+    procedure SetActiveDesign(value: boolean);
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -264,6 +258,8 @@ type
     /// <param name="MultiData">返回多个据存储的地方</param>
     property MultiData: TList<TFDMemTable> read FMultiData write FMultiData;
     property MultiIndex: Integer read FMultiIndex write SetMultiIndex;
+    /// <param name="ActiveDesign">设计时获取相关字段,请先设置好连接及SQL</param>
+    property ActiveDesign: boolean read FActiveDesign write SetActiveDesign;
   end;
 
 implementation
@@ -432,6 +428,87 @@ begin
     Self.Data := Self.FMultiData[Self.FMultiIndex];
   end;
 end;
+
+procedure TOneDataSet.SetActiveDesign(value: boolean);
+var
+  i, iField: Integer;
+  tempData: TOneDataSet;
+  lField, lFieldCopy: TField;
+begin
+
+  // 关闭数据集
+  if csDesigning in Self.ComponentState then
+  begin
+    if not value then
+    begin
+      exit;
+    end;
+    if Self.DataInfo.Connection = nil then
+    begin
+{$IFDEF MSWINDOWS}
+      ShowMessage('打开数据失败,Connection=nil');
+{$ENDIF}
+      exit;
+    end;
+
+    // 如果有参数,参数是否赋值
+    for i := 0 to Self.Params.Count - 1 do
+    begin
+      if Self.Params[i].IsNull then
+      begin
+{$IFDEF MSWINDOWS}
+        ShowMessage('打开数据失败,请先给参数赋值');
+{$ENDIF}
+        exit;
+      end;
+    end;
+    if not Self.DataInfo.Connection.DoConnect(true) then
+    begin
+{$IFDEF MSWINDOWS}
+      ShowMessage(Self.DataInfo.Connection.ErrMsg);
+{$ENDIF}
+      exit;
+    end;
+    tempData := TOneDataSet.Create(nil);
+    try
+      tempData.DataInfo.Connection := Self.DataInfo.Connection;
+      tempData.SQL.Text := Self.SQL.Text;
+      tempData.DataInfo.FPageSize := 50;
+      for i := 0 to Self.Params.Count - 1 do
+      begin
+        tempData.Params[i].value := Self.Params[i].value;
+      end;
+      if Self.Active then
+        Self.Close;
+      if not tempData.OpenData then
+      begin
+{$IFDEF MSWINDOWS}
+        ShowMessage(tempData.DataInfo.ErrMsg);
+{$ENDIF}
+      end
+      else
+      begin
+        for iField := Self.Fields.Count - 1 downto 0 do
+        begin
+          lField := Self.Fields[i];
+          if lField.FieldKind = fkData then
+          begin
+            // 计算字段自定义的字段不删除
+            Self.Fields.Remove(lField);
+            lField.Free;
+          end;
+        end;
+        Self.CopyDataSet(tempData, [coStructure]);
+        Self.Close;
+{$IFDEF MSWINDOWS}
+        ShowMessage('打开数据成功,请打开字段设计器,获取字段');
+{$ENDIF}
+      end;
+    finally
+      tempData.Free;
+    end;
+  end;
+END;
 
 function TOneDataSet.IsEdit: boolean;
 begin
@@ -1005,7 +1082,7 @@ constructor TOneDataInfo.Create(QDataSet: TOneDataSet);
 begin
   inherited Create();
   // 设计时获取相关字段
-  FIsDesignGetFields := False;
+  // FIsDesignGetFields := False;
   // 所属数据集
   FOwnerDataSet := QDataSet;
   FOpenMode := TDataOpenMode.OpenData;
@@ -1048,18 +1125,6 @@ end;
 procedure TOneDataInfo.SetConnection(const AValue: TOneConnection);
 begin
   Self.FConnection := AValue;
-end;
-
-procedure TOneDataInfo.SetGetFields(value: boolean);
-var
-  lStream: TMemoryStream;
-  lTemp: TFDMemTable;
-  i: Integer;
-  lFieldDef: TFieldDef;
-  lField: TField;
-  lListField: TList<TField>;
-begin
-  Self.FIsDesignGetFields := False;
 end;
 
 end.
