@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 75
     Width = 882
     Height = 516
-    ActivePage = tabServerReamk
+    ActivePage = tabZTManage
     Align = alClient
     TabOrder = 0
     ExplicitWidth = 878
@@ -47,6 +47,8 @@ object frmMain: TfrmMain
           '                                                 '#21483#20861'(FLM)'#20986#21697
           '                                                 QQ:378464060')
         TabOrder = 0
+        ExplicitWidth = 870
+        ExplicitHeight = 480
       end
     end
     object TabSheet1: TTabSheet
@@ -171,7 +173,6 @@ object frmMain: TfrmMain
         ParentColor = False
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 870
         object Label1: TLabel
           Left = 3
           Top = 56
@@ -391,8 +392,6 @@ object frmMain: TfrmMain
         Align = alClient
         Caption = #20854#23427#37197#32622
         TabOrder = 1
-        ExplicitWidth = 870
-        ExplicitHeight = 167
         object chWinTaskStart: TCheckBox
           Left = 15
           Top = 30
@@ -426,7 +425,6 @@ object frmMain: TfrmMain
         Align = alTop
         Caption = 'WebSocket(WS)'#37197#32622
         TabOrder = 2
-        ExplicitWidth = 870
       end
     end
     object tabZTManage: TTabSheet
@@ -1598,15 +1596,5 @@ object frmMain: TfrmMain
     DataSet = qryToken
     Left = 700
     Top = 413
-  end
-  object FDMetaInfoQuery1: TFDMetaInfoQuery
-    Connection = FDConnection1
-    Left = 476
-    Top = 500
-  end
-  object NetHTTPClient1: TNetHTTPClient
-    UserAgent = 'Embarcadero URI Client/1.0'
-    Left = 340
-    Top = 475
   end
 end

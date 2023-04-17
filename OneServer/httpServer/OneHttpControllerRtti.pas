@@ -476,7 +476,8 @@ begin
     // 分析参数
     if Length(lParameters) = 2 then
     begin
-      if (vRttiMethod.GetParameters[0].ParamType.ToString.ToLower = 'thttpctxt') and (vRttiMethod.GetParameters[1].ParamType.ToString.ToLower = 'thttpresult') then
+      if (vRttiMethod.GetParameters[0].ParamType.Name.ToLower = 'thttpctxt')
+        and (vRttiMethod.GetParameters[1].ParamType.Name.ToLower = 'thttpresult') then
       begin
         lOneMethodRtti.FMethodType := emOneMethodType.resultProcedure;
       end;

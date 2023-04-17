@@ -39,6 +39,8 @@ type
 
   TDemoController = class(TOneControllerBase)
   public
+    // OnetGet支持Get访问
+    procedure OneGetHelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
     // 最终结果:{ResultCode: "0001", ResultMsg: "", ResultCount: 0, ResultData: "欢迎来到HelloWorld"}
     procedure HelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
     // 最终结果只输出文本:欢迎来到HelloWorld
@@ -141,6 +143,11 @@ begin
     FPersons.Free;
   end;
   inherited Destroy;
+end;
+
+procedure TDemoController.OneGetHelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
+begin
+  QHTTPResult.ResultRedirect := 'https://baidu.com';
 end;
 
 procedure TDemoController.HelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);

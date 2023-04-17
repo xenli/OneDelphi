@@ -127,6 +127,7 @@
         <DCCReference Include="baseLib\OneILog.pas"/>
         <DCCReference Include="baseLib\OneThread.pas"/>
         <DCCReference Include="OneClientUUID.pas"/>
+        <DCCReference Include="OneClientLsh.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

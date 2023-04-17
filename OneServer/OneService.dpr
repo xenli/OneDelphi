@@ -94,7 +94,9 @@ uses
   uSnowWorkerM1 in 'basLib\uuid\Core\uSnowWorkerM1.pas',
   uSnowWorkerM2 in 'basLib\uuid\Core\uSnowWorkerM2.pas',
   uSnowWorkerM3 in 'basLib\uuid\Core\uSnowWorkerM3.pas',
-  OneUUID in 'basLib\uuid\OneUUID.pas';
+  OneUUID in 'basLib\uuid\OneUUID.pas',
+  OneFastLshManage in 'OneFastLsh\OneFastLshManage.pas',
+  OneFastLshController in 'OneFastLsh\OneFastLshController.pas';
 
 var
   lpStartupInfo: TStartupInfo;

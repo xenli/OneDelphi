@@ -66,6 +66,7 @@ begin
   Result := -1;
   if FCacheList.Count > 0 then
   begin
+    // 取最后一个,防止Move移动
     Result := FCacheList.Last;
     FCacheList.Delete(FCacheList.Count - 1);
     exit;
@@ -81,10 +82,12 @@ begin
   tempList := Self.FConnection.GetUUIDs(Self.FCacheCount, lErrMsg);
   try
     Self.FErrMsg := lErrMsg;
-    for i := 0 to tempList.Count - 1 do
+    // 倒的插入,从大到小，取时从尾部取出从小到大
+    for i := tempList.Count - 1 downto 0 do
     begin
       FCacheList.add(tempList[i]);
     end;
+    // 取最后一个,防止Move移动
     Result := FCacheList.Last;
     FCacheList.Delete(FCacheList.Count - 1);
   finally

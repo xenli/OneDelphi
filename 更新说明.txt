@@ -7,7 +7,27 @@
 ------OneFastCleint
 	快速开发框架,或报表或原型快速演示
 
-************2023-03-29***********
+
+************2023-04-17***********
+服务端:
+	1.增加流水号配置相关功能,目录OneFastLsh
+	2.优化一些，代码自行比较
+客户端:
+	1.OneClient包增加控件TOneFastLsh,专门获取流水号用的
+	2.增加Demo  OneClientDemoLsh 获取流水号Demo
+
+************2023-04-13***********
+服务端:
+	1.增加获取数据库结构方法
+	   DataController.GetDBMetaInfo
+
+客户端:
+	1.OneClient包OneClientDataSet.TOneDataSet.GetDBMetaInfo增加获取数据库结构方法
+	2.增加Demo OneClientDemoMetaInfo.dproj 获取数据库相关结构方法
+	3.增加Demo OneClientDemoSQLToClass.dproj 跟据SQL打开数据,把数据结构转化成D的类\
+	4.修正OneClientUUID获取GetUUID倒序问题
+
+************2023-04-11***********
 服务端:
 	1.增加UUID整开ID功能,同时开放取UUID接口 TokenController
 客户端:

@@ -221,6 +221,9 @@ type
     function SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>; var QOneDataResult: TOneDataResult): Boolean;
     // 执行存储过程
     function ExecStored(QOpenData: TOneDataOpen; var QOneDataResult: TOneDataResult): Boolean;
+
+    // 获取数据库相关信息
+    function GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): Boolean;
   public
     // 主要提供给Orm用的
     function OpenData(QOpenData: TOneDataOpen; QParams: array of Variant; var QErrMsg: string): TFDMemtable; overload;
@@ -2056,6 +2059,100 @@ begin
     end;
   end;
 
+end;
+
+function TOneZTManage.GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): Boolean;
+var
+  lZTItem: TOneZTItem;
+  lErrMsg: string;
+  lMetaInfoQuery: TFDMetaInfoQuery;
+  tempStr: string;
+  LOneParam: TOneParam;
+  lStream, lParamStream: TMemoryStream;
+  lDataResultItem: TOneDataResultItem;
+  lPTResult: integer;
+  lRequestMilSec: integer;
+  lwatchTimer: TStopwatch;
+begin
+  Result := false;
+  lPTResult := 0;
+  if QOneDataResult = nil then
+  begin
+    QOneDataResult := TOneDataResult.Create;
+  end;
+  // 处理数据
+  if QDBMetaInfo = nil then
+  begin
+    QOneDataResult.ResultMsg := '请传入要查询的数据库信息';
+    exit;
+  end;
+  if QDBMetaInfo.MetaInfoKind = 'mkTableFields' then
+  begin
+    if QDBMetaInfo.MetaObjName = '' then
+    begin
+      QOneDataResult.ResultMsg := '获取表字段,相关表名称[MetaObjName]不可为空';
+      exit;
+    end;
+  end;
+  //
+  lMetaInfoQuery := nil;
+  lZTItem := nil;
+  lErrMsg := '';
+  lwatchTimer := TStopwatch.StartNew;
+  try
+    if QDBMetaInfo.ZTCode = '' then
+      QDBMetaInfo.ZTCode := self.ZTMain;
+    QDBMetaInfo.ZTCode := QDBMetaInfo.ZTCode.ToUpper;
+    // 客户端发起事务,像两层一样运作
+    lZTItem := self.LockZTItem(QDBMetaInfo.ZTCode, lErrMsg);
+    if lZTItem = nil then
+    begin
+      if lErrMsg = '' then
+        lErrMsg := '获取账套' + QDBMetaInfo.ZTCode + '连接失败,原因未知';
+      exit;
+    end;
+    lMetaInfoQuery := TFDMetaInfoQuery.Create(nil);
+    lMetaInfoQuery.Connection := lZTItem.ADConnection;
+    lMetaInfoQuery.ObjectName := QDBMetaInfo.MetaObjName;
+    lMetaInfoQuery.MetaInfoKind := TFDPhysMetaInfoKind(GetEnumValue(TypeInfo(TFDPhysMetaInfoKind), QDBMetaInfo.MetaInfoKind));
+    // ExecProc 执行一个存储过程返回参数
+    try
+      lMetaInfoQuery.Open;
+      lDataResultItem := TOneDataResultItem.Create;
+      QOneDataResult.ResultItems.Add(lDataResultItem);
+      lDataResultItem.ResultDataMode := const_DataReturnMode_Stream;
+      lStream := TMemoryStream.Create;
+      lMetaInfoQuery.SaveToStream(lStream, TFDStorageFormat.sfBinary);
+      lDataResultItem.SetStream(lStream);
+      Result := true;
+      QOneDataResult.ResultOK := true;
+    except
+      on e: Exception do
+      begin
+        lErrMsg := '执行存储过程异常:' + e.Message;
+        exit;
+      end;
+    end;
+  finally
+    QOneDataResult.ResultMsg := lErrMsg;
+    if lZTItem <> nil then
+    begin
+      lZTItem.UnLockWork;
+    end;
+    if lMetaInfoQuery <> nil then
+    begin
+      lMetaInfoQuery.Free;
+    end;
+    lwatchTimer.Stop;
+    lRequestMilSec := lwatchTimer.ElapsedMilliseconds;
+    if (self.FLog <> nil) and (self.FLog.IsSQLLog) then
+    begin
+      self.FLog.WriteSQLLog('账套方法[GetDBMetaInfo]:');
+      self.FLog.WriteSQLLog('总共用时:[' + lRequestMilSec.ToString + ']毫秒');
+      self.FLog.WriteSQLLog('错误消息:[' + lErrMsg + ']');
+      self.FLog.WriteSQLLog('类型:[' + QDBMetaInfo.MetaInfoKind + ']');
+    end;
+  end;
 end;
 
 procedure InitPhyDriver;

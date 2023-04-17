@@ -22,6 +22,9 @@ type
     function SetTableName(QTableName: string): IOneOrm<T>;
     function SetPrimaryKey(QFieldName: string): IOneOrm<T>;
     function SetPage(iPageIndex: integer; iPageSize: integer): IOneOrm<T>;
+    function SetAffectedMustCount(QMustCount: integer): IOneOrm<T>;
+    //
+    function InitOrm(): IOneOrm<T>;
     // 执行原生SQL,查询数据
     function Query(QSQL: string; QParams: array of Variant): IOneOrmCmd<T>;
     // 执行原生SQL,进行update,insert,del
@@ -42,6 +45,9 @@ type
     function OrderBy(QOrderBySQL: string): IOneOrm<T>;
     //
     function toCmd(): IOneOrmCmd<T>;
+
+    function IsErr(): boolean;
+    function ErrMsg(): string;
   end;
 
   TOneOrm<T: class, constructor> = class(TInterfacedObject, IOneOrm<T>, IOneOrmCmd<T>)
@@ -56,6 +62,7 @@ type
     FPrimaryKey: string;
     FPageIndex: integer;
     FPageSize: integer;
+    FAffectedMustCount: integer;
     // Query原生SQL用法
     FQuerySQL: string;
     FQueryParams: array of Variant;
@@ -73,6 +80,7 @@ type
     //
     FListValue: TList<T>;
     //
+    FIsErr: boolean;
     FErrMsg: string;
   private
     function buildSQL(): boolean;
@@ -86,6 +94,9 @@ type
     function SetTableName(QTableName: string): IOneOrm<T>;
     function SetPrimaryKey(QFieldName: string): IOneOrm<T>;
     function SetPage(iPageIndex: integer; iPageSize: integer): IOneOrm<T>;
+    function SetAffectedMustCount(QMustCount: integer): IOneOrm<T>;
+    //
+    function InitOrm(): IOneOrm<T>;
     // 执行原生SQL
     function Query(QSQL: string; QParams: array of Variant): IOneOrmCmd<T>;
     function ExecSQL(QSQL: string; QParams: array of Variant): IOneOrmCmd<T>;
@@ -118,6 +129,10 @@ type
     function ToExecCommand(): integer;
     //
     function DataSetToList(QDataSet: TFDMemtable): TList<T>;
+
+    //
+    function IsErr(): boolean;
+    function ErrMsg(): string;
   end;
 
 var
@@ -138,7 +153,10 @@ begin
   inherited Create;
   self.FPageIndex := -1;
   self.FPageSize := -1;
+  self.FAffectedMustCount := -1;
   self.FCmd := emOneOrmCmd.cmdNull;
+  self.FIsErr := false;
+  self.FErrMsg := '';
   self.FListValue := TList<T>.Create;
 end;
 
@@ -174,15 +192,36 @@ begin
   self.FPageSize := iPageSize;
 end;
 
+function TOneOrm<T>.SetAffectedMustCount(QMustCount: integer): IOneOrm<T>;
+begin
+  result := self;
+  self.FAffectedMustCount := QMustCount;
+end;
+
+function TOneOrm<T>.InitOrm(): IOneOrm<T>;
+begin
+  result := self;
+  self.FPageIndex := -1;
+  self.FPageSize := -1;
+  self.FAffectedMustCount := -1;
+  self.FCmd := emOneOrmCmd.cmdNull;
+  self.FIsErr := false;
+  self.FErrMsg := '';
+  self.FListValue.Clear;
+end;
+
 function TOneOrm<T>.Query(QSQL: string; QParams: array of Variant): IOneOrmCmd<T>;
 var
   iParam, iParamLen: integer;
 begin
   result := self;
   // 说明有其它命令，在语法就是错了
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdQuery]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdQuery],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
 
@@ -202,9 +241,12 @@ var
 begin
   result := self;
   // 说明有其它命令，在语法就是错了
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdExecSQL]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdExecSQL],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
 
@@ -222,11 +264,15 @@ function TOneOrm<T>.Select(QTableName: string = ''): IOneOrm<T>;
 begin
   result := self;
   // 说明有其它命令，在语法就是错了
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdSelect]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdSelect],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
+
   self.FCmd := emOneOrmCmd.cmdSelect;
   self.FTableName := QTableName;
 end;
@@ -234,9 +280,12 @@ end;
 function TOneOrm<T>.Inserter(QValue: T): IOneOrm<T>;
 begin
   result := self;
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdInsert]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdInsert],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
   self.FCmd := emOneOrmCmd.cmdInsert;
@@ -246,9 +295,12 @@ end;
 function TOneOrm<T>.Update(QValue: T): IOneOrm<T>;
 begin
   result := self;
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdUpdate]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdUpdate],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
   self.FCmd := emOneOrmCmd.cmdUpdate;
@@ -258,9 +310,12 @@ end;
 function TOneOrm<T>.Delete(QValue: T): IOneOrm<T>;
 begin
   result := self;
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdDelete]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdDelete],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
   self.FCmd := emOneOrmCmd.cmdDelete;
@@ -272,11 +327,15 @@ var
   i: integer;
 begin
   result := self;
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdInsert]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdInsert],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
+
   self.FCmd := emOneOrmCmd.cmdInsert;
   for i := 0 to QValues.Count - 1 do
   begin
@@ -289,9 +348,12 @@ var
   i: integer;
 begin
   result := self;
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdUpdate]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdUpdate],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
   self.FCmd := emOneOrmCmd.cmdUpdate;
@@ -306,9 +368,12 @@ var
   i: integer;
 begin
   result := self;
+  if self.FIsErr then
+    exit;
   if self.FCmd <> emOneOrmCmd.cmdNull then
   begin
-    raise Exception.Create('已设置命令模式,不可在设置命令模式[cmdDelete]');
+    self.FIsErr := true;
+    self.FErrMsg := '已设置命令模式,不可在设置命令模式[cmdDelete],如要使用请先调用InitOrm清除Orm所有相关信息';
     exit;
   end;
   self.FCmd := emOneOrmCmd.cmdDelete;
@@ -394,9 +459,15 @@ var
   LParams: TList<Variant>;
   iParam, iParamLen: integer;
 begin
+  if self.FIsErr then
+  begin
+    // 有错误退出
+    exit;
+  end;
   if (self.FCmd <> emOneOrmCmd.cmdQuery) and (self.FCmd <> emOneOrmCmd.cmdSelect) then
   begin
-    raise Exception.Create('只有查询才能统计总条数');
+    self.FIsErr := true;
+    self.FErrMsg := '只有查询才能统计总条数';
     exit;
   end;
 end;
@@ -408,19 +479,27 @@ var
   lDataSet: TFDMemtable;
 begin
   result := nil;
+  if self.FIsErr then
+  begin
+    // 有错误退出
+    exit;
+  end;
   if unit_OrmZTManage = nil then
   begin
-    raise Exception.Create('orm账套未初始化[unit_OrmZTManage]');
+    self.FIsErr := true;
+    self.FErrMsg := 'orm账套未初始化[unit_OrmZTManage]';
     exit;
   end;
   if (self.FCmd <> emOneOrmCmd.cmdQuery) and (self.FCmd <> emOneOrmCmd.cmdSelect) then
   begin
-    raise Exception.Create('只有查询语句才能转化成对象列表');
+    self.FIsErr := true;
+    self.FErrMsg := '只有查询语句才能转化成对象列表';
     exit;
   end;
   if not self.buildSQL() then
   begin
-    raise Exception.Create('组装SQL语句异常,原因:' + self.FErrMsg);
+    self.FIsErr := true;
+    self.FErrMsg := '组装SQL语句异常,原因:' + self.FErrMsg;
     exit;
   end;
   // 执行SQL获得数据集
@@ -434,7 +513,8 @@ begin
     lDataSet := unit_OrmZTManage.OpenData(lDataOpen, self.FCmdParams, lErrMsg);
     if lDataSet = nil then
     begin
-      raise Exception.Create(lErrMsg);
+      self.FIsErr := true;
+      self.FErrMsg := lErrMsg;
       exit;
     end;
     // 把数据集转成List
@@ -454,19 +534,27 @@ var
   lList: TList<T>;
 begin
   result := nil;
+  if self.FIsErr then
+  begin
+    // 有错误退出
+    exit;
+  end;
   if unit_OrmZTManage = nil then
   begin
-    raise Exception.Create('orm账套未初始化[unit_OrmZTManage]');
+    self.FIsErr := true;
+    self.FErrMsg := 'orm账套未初始化[unit_OrmZTManage]';
     exit;
   end;
   if (self.FCmd <> emOneOrmCmd.cmdQuery) and (self.FCmd <> emOneOrmCmd.cmdSelect) then
   begin
-    raise Exception.Create('只有查询语句才能转化成对象列表');
+    self.FIsErr := true;
+    self.FErrMsg := '只有查询语句才能转化成对象列表';
     exit;
   end;
   if not self.buildSQL() then
   begin
-    raise Exception.Create('组装SQL语句异常,原因:' + self.FErrMsg);
+    self.FIsErr := true;
+    self.FErrMsg := '组装SQL语句异常,原因:' + self.FErrMsg;
     exit;
   end;
   // 执行SQL获得数据集
@@ -480,7 +568,8 @@ begin
     lDataSet := unit_OrmZTManage.OpenData(lDataOpen, self.FCmdParams, lErrMsg);
     if lDataSet = nil then
     begin
-      raise Exception.Create(lErrMsg);
+      self.FIsErr := true;
+      self.FErrMsg := lErrMsg;
       exit;
     end;
     if lDataSet.RecordCount = 0 then
@@ -489,7 +578,8 @@ begin
     end;
     if lDataSet.RecordCount > 1 then
     begin
-      raise Exception.Create('返回的数据记录不是唯一的，请检查');
+      self.FIsErr := true;
+      self.FErrMsg := '返回的数据记录不是唯一的，请检查';
       exit;
     end;
     // 把数据集转成List
@@ -528,19 +618,27 @@ begin
   //
   result := -1;
   lErrMsg := '';
+  if self.FIsErr then
+  begin
+    // 有错误退出
+    exit;
+  end;
   if unit_OrmZTManage = nil then
   begin
-    raise Exception.Create('orm账套未初始化[unit_OrmZTManage]');
+    self.FIsErr := true;
+    self.FErrMsg := 'orm账套未初始化[unit_OrmZTManage]';
     exit;
   end;
   if (self.FCmd = emOneOrmCmd.cmdQuery) or (self.FCmd = emOneOrmCmd.cmdSelect) then
   begin
-    raise Exception.Create('cmdSelect命令只支持查询');
+    self.FIsErr := true;
+    self.FErrMsg := 'cmdSelect命令只支持查询';
     exit;
   end;
   if not self.buildSQL() then
   begin
-    raise Exception.Create('组装SQL语句异常,原因:' + self.FErrMsg);
+    self.FIsErr := true;
+    self.FErrMsg := '组装SQL语句异常,原因:' + self.FErrMsg;
     exit;
   end;
 
@@ -551,10 +649,12 @@ begin
         try
           lDataSaveDML.ZTCode := self.FZTCode;
           lDataSaveDML.SQL := self.FCmdSQL;
+          lDataSaveDML.AffectedMustCount := self.FAffectedMustCount;
           result := unit_OrmZTManage.ExecSQL(lDataSaveDML, self.FCmdParams, lErrMsg);
           if lErrMsg <> 'true' then
           begin
-            raise Exception.Create(lErrMsg);
+            self.FIsErr := true;
+            self.FErrMsg := lErrMsg;
             exit;
           end;
         finally
@@ -577,7 +677,8 @@ begin
           lZTItem := unit_OrmZTManage.LockZTItem(self.FZTCode, lErrMsg);
           if lZTItem = nil then
           begin
-            raise Exception.Create(lErrMsg);
+            self.FIsErr := true;
+            self.FErrMsg := lErrMsg;
             exit;
           end;
           isCommit := false;
@@ -619,8 +720,9 @@ begin
                 iCommit := lQuery.RowsAffected;
                 if iCommit <> self.FListValue.Count then
                 begin
-                  raise Exception.Create('影响行数不一至:当前影响行数[' + iCommit.ToString
-                    + ']与实际数据行数不一至[' + self.FListValue.Count.ToString + ']');
+                  self.FIsErr := true;
+                  self.FErrMsg := '影响行数不一至:当前影响行数[' + iCommit.ToString
+                    + ']与实际数据行数不一至[' + self.FListValue.Count.ToString + ']';
                   exit;
                 end;
               end;
@@ -653,8 +755,9 @@ begin
                   iCommit := lQuery.RowsAffected;
                   if iCommit <> 1 then
                   begin
-                    raise Exception.Create('第[' + (iArrValue + 1).ToString() + ']条数据,更新失败, 当前影响行数[' + iCommit.ToString
-                      + ']');
+                    self.FIsErr := true;
+                    self.FErrMsg := '第[' + (iArrValue + 1).ToString() + ']条数据,更新失败, 当前影响行数[' + iCommit.ToString
+                      + ']';
                     exit;
                   end;
                 end;
@@ -687,8 +790,9 @@ begin
                   iCommit := lQuery.RowsAffected;
                   if iCommit <> 1 then
                   begin
-                    raise Exception.Create('第[' + (iArrValue + 1).ToString() + ']条数据,删除失败,当前影响行数[' + iCommit.ToString
-                      + ']');
+                    self.FIsErr := true;
+                    self.FErrMsg := '第[' + (iArrValue + 1).ToString() + ']条数据,删除失败,当前影响行数[' + iCommit.ToString
+                      + ']';
                     exit;
                   end;
                 end;
@@ -699,7 +803,8 @@ begin
             except
               on e: Exception do
               begin
-                raise Exception.Create('提交数据发生异常:' + e.Message);
+                self.FIsErr := true;
+                self.FErrMsg := '提交数据发生异常:' + e.Message;
                 isCommit := false;
               end;
             end;
@@ -717,7 +822,8 @@ begin
       end;
   else
     begin
-      raise Exception.Create('未设计的cmd命令' + GetEnumName(system.TypeInfo(emOneOrmCmd), ord(self.FCmd)));
+      self.FIsErr := true;
+      self.FErrMsg := '未设计的cmd命令' + GetEnumName(system.TypeInfo(emOneOrmCmd), ord(self.FCmd));
       exit;
     end;
   end;
@@ -1142,7 +1248,7 @@ begin
                     end;
                 else
                   begin
-
+                    lRttiProperty.SetValue(TObject(lTempT), lField.AsString);
                   end;
                 end;
               end;
@@ -1165,7 +1271,7 @@ begin
                     end;
                 else
                   begin
-
+                    lRttiProperty.SetValue(TObject(lTempT), lField.AsString);
                   end;
                 end;
               end;
@@ -1193,7 +1299,7 @@ begin
                       else
                         lRttiField.SetValue(TObject(lTempT), lField.AsInteger);
                     end;
-                  ftTimeStamp:
+                  ftTimeStamp, ftDateTime:
                     begin
                       if lOneFieldRtti.FIsProperty then
                         lRttiProperty.SetValue(TObject(lTempT), lField.AsDateTime)
@@ -1202,7 +1308,7 @@ begin
                     end;
                 else
                   begin
-
+                    lRttiProperty.SetValue(TObject(lTempT), lField.AsString);
                   end;
                 end;
               end;
@@ -1293,6 +1399,16 @@ begin
     lOrmFieldRttis.Clear;
     lOrmFieldRttis.Free;
   end;
+end;
+
+function TOneOrm<T>.IsErr(): boolean;
+begin
+  result := self.FIsErr;
+end;
+
+function TOneOrm<T>.ErrMsg(): string;
+begin
+  result := self.FErrMsg;
 end;
 
 end.

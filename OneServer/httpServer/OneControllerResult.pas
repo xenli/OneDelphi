@@ -57,7 +57,7 @@ begin
   self.FFreeResultData := QFreeResultData;
   self.FFreeListItem := QFreeListItem;
   self.FResultSuccess := false;
-  self.resultCode := HTTP_ResultCode_Fail;
+  self.ResultCode := HTTP_ResultCode_Fail;
   self.FIsFile := false;
 end;
 
@@ -70,7 +70,7 @@ begin
   begin
     // 判断是不是对象
     // 要自动释放类的，需要释放
-    TValue.Make(@self.resultData, system.TypeInfo(T), lTValue);
+    TValue.Make(@self.ResultData, system.TypeInfo(T), lTValue);
     OneRttiHelper.FreeTValue(lTValue, self.FFreeListItem);
   end;
   inherited Destroy;
@@ -79,14 +79,14 @@ end;
 procedure TActionResult<T>.SetResultTrue();
 begin
   self.FResultSuccess := true;
-  self.resultCode := HTTP_ResultCode_True;
+  self.ResultCode := HTTP_ResultCode_True;
 end;
 
 procedure TActionResult<T>.SetResultTrueFile();
 begin
   self.FIsFile := true;
   self.FResultSuccess := true;
-  self.resultCode := HTTP_ResultCode_True;
+  self.ResultCode := HTTP_ResultCode_True;
 end;
 
 function TActionResult<T>.GetData(): T;

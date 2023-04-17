@@ -172,7 +172,6 @@ type
     chWinRegisterStart: TCheckBox;
     Label12: TLabel;
     edTokenOutSec: TEdit;
-    FDMetaInfoQuery1: TFDMetaInfoQuery;
     Label13: TLabel;
     edSuperAdminPass: TEdit;
     edHttps: TCheckBox;
@@ -184,7 +183,6 @@ type
     edPrivateKeyPassword: TEdit;
     Label17: TLabel;
     edCACertificatesFile: TEdit;
-    NetHTTPClient1: TNetHTTPClient;
     procedure FormCreate(Sender: TObject);
     procedure tbStartClick(Sender: TObject);
     procedure tbStopClick(Sender: TObject);

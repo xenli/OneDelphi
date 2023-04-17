@@ -72,12 +72,27 @@ uses
   OneFastLoginController in 'OneFastCleint\OneFastLoginController.pas',
   OneFastModuleController in 'OneFastCleint\OneFastModuleController.pas',
   OneFastModuleManage in 'OneFastCleint\OneFastModuleManage.pas',
-  WeiXinManage in 'OneFastWeiXin\WeiXinManage.pas',
   UniBillSendController in 'OneUniDemo\UniBillSendController.pas',
   UniClass in 'OneUniDemo\UniClass.pas',
   UniGoodsController in 'OneUniDemo\UniGoodsController.pas',
   UniLoginController in 'OneUniDemo\UniLoginController.pas',
-  UniSendReceivController in 'OneUniDemo\UniSendReceivController.pas';
+  UniSendReceivController in 'OneUniDemo\UniSendReceivController.pas',
+  OneUUID in 'basLib\uuid\OneUUID.pas',
+  uDefaultIdGenerator in 'basLib\uuid\uDefaultIdGenerator.pas',
+  uYitIdHelper in 'basLib\uuid\uYitIdHelper.pas',
+  uIdGeneratorOptions in 'basLib\uuid\Contract\uIdGeneratorOptions.pas',
+  uIIdGenerator in 'basLib\uuid\Contract\uIIdGenerator.pas',
+  uISnowWorker in 'basLib\uuid\Contract\uISnowWorker.pas',
+  uTOverCostActionArg in 'basLib\uuid\Contract\uTOverCostActionArg.pas',
+  uSnowWorkerM1 in 'basLib\uuid\Core\uSnowWorkerM1.pas',
+  uSnowWorkerM2 in 'basLib\uuid\Core\uSnowWorkerM2.pas',
+  uSnowWorkerM3 in 'basLib\uuid\Core\uSnowWorkerM3.pas',
+  WeixinAdminController in 'OneFastWeiXin\WeixinAdminController.pas',
+  WeixinApi in 'OneFastWeiXin\WeixinApi.pas',
+  WeixinApiPublic in 'OneFastWeiXin\WeixinApiPublic.pas',
+  WeixinAuthController in 'OneFastWeiXin\WeixinAuthController.pas',
+  WeiXinManage in 'OneFastWeiXin\WeiXinManage.pas',
+  WeiXinMinApi in 'OneFastWeiXin\WeiXinMinApi.pas';
 
 var
   lCmd, lErrmsg: string;

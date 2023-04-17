@@ -252,7 +252,7 @@ object Form1: TForm1
         Top = 206
         Width = 113
         Height = 25
-        Caption = #22686#21152#19968#26465#25968#25454
+        Caption = #22686#21152#37197#32622
         TabOrder = 9
         OnClick = tbAppendClick
       end
@@ -566,6 +566,7 @@ object Form1: TForm1
       '*'
       'from onefast_admin')
     DataInfo.Connection = OneConnection
+    DataInfo.MetaInfoKind = mkNone
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
@@ -599,6 +600,7 @@ object Form1: TForm1
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
     DataInfo.Connection = OneConnection
+    DataInfo.MetaInfoKind = mkNone
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
@@ -631,6 +633,7 @@ object Form1: TForm1
       'union'
       'select 2')
     DataInfo.Connection = OneConnection
+    DataInfo.MetaInfoKind = mkNone
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream

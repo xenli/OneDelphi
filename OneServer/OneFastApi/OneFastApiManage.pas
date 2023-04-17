@@ -12,7 +12,7 @@ type
   // dmlUpdate 执行DMl语句更新
   // dmlDel执行DML语句删除
   // appendDatas 批量执行插入数据
-  emDataOpenMode = (unkown, openData, openDataStore, doStore,doDMLSQL, appendDatas);
+  emDataOpenMode = (unkown, openData, openDataStore, doStore, doDMLSQL, appendDatas);
 
   TFastApi = class;
   TFastApiData = class;
@@ -239,12 +239,12 @@ type
 
 function UnitFastApiManage(): TOneFastApiManage;
 
-var
-  Unit_FastApiManage: TOneFastApiManage = nil;
-
 implementation
 
 uses OneOrm;
+
+var
+  Unit_FastApiManage: TOneFastApiManage = nil;
 
 function UnitFastApiManage(): TOneFastApiManage;
 begin

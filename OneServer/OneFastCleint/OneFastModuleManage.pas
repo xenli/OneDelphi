@@ -166,6 +166,7 @@ type
     FUIGridCanDel_: boolean;
     FTreeKeyID_: string;
     FTreePKeyID_: string;
+    FUISet_: string;
     //
     FChildBands_: TList<TFastModuleBand>;
     FChildControls_: TList<TFastModuleControl>;
@@ -192,6 +193,7 @@ type
     property FUIGridCanDel: boolean read FUIGridCanDel_ write FUIGridCanDel_;
     property FTreeKeyID: string read FTreeKeyID_ write FTreeKeyID_;
     property FTreePKeyID: string read FTreePKeyID_ write FTreePKeyID_;
+    property FUISet: string read FUISet_ write FUISet_;
     //
     property ChildBands: TList<TFastModuleBand> read FChildBands_ write FChildBands_;
     property ChildControls: TList<TFastModuleControl> read FChildControls_ write FChildControls_;

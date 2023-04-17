@@ -143,6 +143,18 @@ type
   end;
 
   //
+  TOneDBMetaInfo = class
+  private
+    FZTCode: string;
+    FMetaInfoKind: string; // table,field,
+    FMetaObjName: string; // 获取字段时要代上相关的表名
+  public
+    property ZTCode: string read FZTCode write FZTCode;
+    property MetaInfoKind: string read FMetaInfoKind write FMetaInfoKind;
+    property MetaObjName: string read FMetaObjName write FMetaObjName;
+  end;
+
+  //
   TOneDataResultItem = class
   private
     FResultPage: Boolean; // 分页

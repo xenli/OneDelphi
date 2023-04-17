@@ -33,6 +33,9 @@ type
     function CommitTranItem(QTranInfo: TOneTran): TOneDataResult;
     // 5.回滚账套连接事务
     function RollbackTranItem(QTranInfo: TOneTran): TOneDataResult;
+
+    // 获取数据库表信息相
+    function GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo): TOneDataResult;
   end;
 
 function CreateNewOneDataController(QRouterItem: TOneRouterWorkItem): TObject;
@@ -280,6 +283,26 @@ begin
     exit;
   end;
   result.ResultOK := true;
+end;
+
+// 获取数据库表信息相
+function TOneDataController.GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo): TOneDataResult;
+var
+  lOneGlobal: TOneGlobal;
+  i: Integer;
+begin
+  result := TOneDataResult.Create;
+  lOneGlobal := TOneGlobal.GetInstance();
+  // 打开数据
+  if not lOneGlobal.ZTManage.GetDBMetaInfo(QDBMetaInfo, result) then
+  begin
+    exit;
+  end;
+  // 解析相关数据
+  if result.ResultOK then
+  begin
+    result.DoResultitems();
+  end;
 end;
 
 initialization

@@ -7,7 +7,7 @@ uses
   system.Variants, system.IOUtils, system.ZLib, system.DateUtils,
   system.Generics.Collections, Data.DB, system.Net.HttpClientComponent,
   system.Net.HttpClient, system.JSON, Rest.JSON, system.Net.URLClient,
-  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageBin,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageBin, FireDAC.Phys.Intf,
   FireDAC.Stan.StorageJSON, FireDAC.Stan.StorageXML, system.TypInfo,
   OneClientResult, OneNeonHelper, OneClientDataInfo, OneStreamString,
   OneSQLCrypto, FireDAC.Stan.Param, system.Zip, system.Math, system.NetEncoding;
@@ -31,6 +31,7 @@ const
   URL_HTTP_HTTPServer_DATA_ExecStored = 'OneServer/Data/ExecStored';
   URL_HTTP_HTTPServer_DATA_DownLoadDataFile = 'OneServer/Data/DownLoadDataFile';
   URL_HTTP_HTTPServer_DATA_DelDataFile = 'OneServer/Data/DelDataFile';
+  URL_HTTP_HTTPServer_DATA_GetDBMetaInfo = 'OneServer/Data/GetDBMetaInfo';
   // 账套相关
   URL_HTTP_HTTPServer_ZTManage_OneGetZTList = 'OneServer/ZTManage/OneGetZTList';
   // 二层事务先关事件
@@ -96,11 +97,12 @@ type
   private
     // 组装URL
     function MakeUrl(var QUrl: string; var QErrMsg: string): boolean;
-    procedure SetErrTrueResult(var QErrMsg: string);
-    function IsErrTrueResult(QErrMsg: string): boolean;
     // 获取最终状态
     function GetZTCode(QDataSetZTCode: string): string;
   public
+    procedure SetErrTrueResult(var QErrMsg: string);
+    function IsErrTrueResult(QErrMsg: string): boolean;
+    //
     constructor Create(AOwner: TComponent); override;
     function DoConnect(qForceConnect: boolean = false): boolean;
     function DoConnectPing(): boolean;
@@ -131,6 +133,7 @@ type
     function OpenDatasPost(QDataOpens: TList<TOneDataOpen>): TOneDataResult; overload;
     //
     function ExecStored(Sender: TObject): boolean;
+    function GetDBMetaInfo(Sender: TObject): boolean;
     // 执行存储过程
     function ExecStoredPost(QDataOpen: TOneDataOpen): TOneDataResult;
     // 跟据dataSet保存数据
@@ -1191,6 +1194,61 @@ begin
     Result := true;
   finally
     lDataOpen.Free;
+    if lDataResult <> nil then
+      lDataResult.Free;
+  end;
+end;
+
+function TOneConnection.GetDBMetaInfo(Sender: TObject): boolean;
+var
+  lPostJsonValue, lResultJsonValue: TJsonValue;
+  lDataResult: TOneDataResult;
+  lDBMetaInfo: TOneDBMetaInfo;
+  lOneDataSet: TOneDataSet;
+  lErrMsg: string;
+begin
+  Result := false;
+  if not(Sender is TOneDataSet) then
+    exit;
+  lOneDataSet := TOneDataSet(Sender);
+  lResultJsonValue := nil;
+  lPostJsonValue := nil;
+  lDataResult := nil;
+  lDBMetaInfo := TOneDBMetaInfo.Create;
+  try
+    lDBMetaInfo.ZTCode := self.GetZTCode(lOneDataSet.DataInfo.ZTCode);
+    lDBMetaInfo.MetaInfoKind := GetEnumName(TypeInfo(TFDPhysMetaInfoKind), Ord(lOneDataSet.DataInfo.MetaInfoKind));
+    lDBMetaInfo.MetaObjName := lOneDataSet.DataInfo.TableName;
+    lPostJsonValue := OneNeonHelper.ObjectToJson(lDBMetaInfo, lErrMsg);
+    if lErrMsg <> '' then
+    begin
+      lOneDataSet.DataInfo.ErrMsg := lErrMsg;
+      exit;
+    end;
+    lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_DATA_GetDBMetaInfo, lPostJsonValue.ToJSON(), lErrMsg);
+    if not self.IsErrTrueResult(lErrMsg) then
+    begin
+      lOneDataSet.DataInfo.ErrMsg := lErrMsg;
+      exit;
+    end;
+    lDataResult := TOneDataResult.Create;
+    if not OneNeonHelper.JsonToObject(lDataResult, lResultJsonValue, lErrMsg) then
+    begin
+      lOneDataSet.DataInfo.ErrMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;;
+      exit;
+    end;
+    if not self.DataResultToDataSet(lDataResult, Sender, lErrMsg) then
+    begin
+      lOneDataSet.DataInfo.ErrMsg := lErrMsg;
+      exit;
+    end;
+    Result := true;
+  finally
+    lDBMetaInfo.Free;
+    if lPostJsonValue <> nil then
+      lPostJsonValue.Free;
+    if lResultJsonValue <> nil then
+      lResultJsonValue.Free;
     if lDataResult <> nil then
       lDataResult.Free;
   end;
@@ -3069,7 +3127,6 @@ var
   lJsonObj: TJsonObject;
   lResultJsonValue: TJsonValue;
   lErrMsg: string;
-  lClientConnect: TClientConnect;
   lServerResult: TActionResult<TList<int64>>;
   IsOK: boolean;
 begin

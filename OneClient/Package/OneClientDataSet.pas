@@ -6,7 +6,7 @@ interface
 uses
   System.SysUtils, System.StrUtils, System.Classes, Data.DB,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.Stan.Intf,
-  FireDAC.Stan.Param, System.Threading,
+  FireDAC.Stan.Param, FireDAC.Phys.Intf, System.Threading,
   System.Generics.Collections, {$IFDEF MSWINDOWS} Vcl.Dialogs, {$ENDIF}
   OneClientConnect, OneClientDataInfo, OneClientConst;
 
@@ -26,6 +26,8 @@ type
     FZTCode: string;
     // 控件描述
     FDescription: string;
+    // 获取数据库相关信息
+    FMetaInfoKind: TFDPhysMetaInfoKind;
     // 表名,保存时用到
     FTableName: string;
     // 主键,保存时用到
@@ -91,6 +93,8 @@ type
     property ZTCode: string read FZTCode write FZTCode;
     /// <param name="FDescription">控件描述</param>
     property Description: string read FDescription write FDescription;
+    /// <param name="FDescription">获取数据库相关信息</param>
+    property MetaInfoKind: TFDPhysMetaInfoKind read FMetaInfoKind write FMetaInfoKind default mkTables;
     /// <param name="TableName">表名,保存时会用到</param>
     property TableName: string read FTableName write FTableName;
     /// <param name="PrimaryKey">主键,保存时用到</param>
@@ -222,6 +226,7 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function ExecStored: boolean;
+    function GetDBMetaInfo: boolean;
     /// <summary>
     /// 事务控制第一步:获取账套连接,标识成事务账套
     /// </summary>
@@ -887,6 +892,19 @@ begin
   end;
   Self.FDataInfo.IsReturnData := False;
   Result := Self.FDataInfo.FConnection.ExecStored(Self);
+end;
+
+function TOneDataSet.GetDBMetaInfo: boolean;
+begin
+  Result := False;
+  if Self.FDataInfo.FConnection = nil then
+    Self.FDataInfo.FConnection := OneClientConnect.Unit_Connection;
+  if Self.FDataInfo.FConnection = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集Connection=nil';
+    exit;
+  end;
+  Result := Self.FDataInfo.FConnection.GetDBMetaInfo(Self);
 end;
 
 // 1.先获取一个账套连接,标记成事务账套
