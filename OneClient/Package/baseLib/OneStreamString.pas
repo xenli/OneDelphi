@@ -6,8 +6,8 @@ uses System.Classes, System.NetEncoding, System.SysUtils;
 // 流转base64字符串
 function StreamToBase64Str(aStream: TStream): string;
 // 流写入base64字符串
-function StreamWriteBase64Str(aStream: TStream; QRawByteString: string)
-  : Boolean;
+function StreamWriteBase64Str(aStream: TStream; QRawByteString: string): Boolean;
+
 // basd64字符串转成流
 function Base64ToStream(QRawByteString: string): TStream;
 // 字符串转base64
@@ -50,8 +50,7 @@ begin
   end;
 end;
 
-function StreamWriteBase64Str(aStream: TStream; QRawByteString: string)
-  : Boolean;
+function StreamWriteBase64Str(aStream: TStream; QRawByteString: string): Boolean;
 var
   vDataBytes: TBytes;
   iSize: Integer;

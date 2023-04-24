@@ -68,6 +68,7 @@ contains
   OneILog in 'baseLib\OneILog.pas',
   OneThread in 'baseLib\OneThread.pas',
   OneClientUUID in 'OneClientUUID.pas',
-  OneClientLsh in 'OneClientLsh.pas';
+  OneClientLsh in 'OneClientLsh.pas',
+  OneClientFastUpdate in 'OneClientFastUpdate.pas';
 
 end.

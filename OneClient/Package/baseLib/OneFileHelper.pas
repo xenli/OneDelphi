@@ -19,11 +19,8 @@ function CombinePathD(QPathA: string; QPathB: string; QPathC: string;
 implementation
 
 function GetExeRunPath(): string;
-var
-  lFullExeName: string;
 begin
-  lFullExeName := ParamStr(0);
-  result := ExtractFilePath(lFullExeName);
+  result := TDirectory.GetCurrentDirectory();
 end;
 
 function GetExeName(): string;

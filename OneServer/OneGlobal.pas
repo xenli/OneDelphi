@@ -240,6 +240,8 @@ begin
     // 临时存储数据的
     lListPath.Add('OneDataTemp');
     lListPath.Add('OneWeb');
+    // 更新目录
+    lListPath.Add('OneFastUpload');
     // 以下多是驱动的目录
     lListPath.Add(const_OraOciDll32);
     lListPath.Add(const_OraOciDll64);

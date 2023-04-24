@@ -113,7 +113,7 @@ object Form1: TForm1
     Top = 80
     Width = 899
     Height = 479
-    ActivePage = tabDataSet
+    ActivePage = tabStroe
     Align = alClient
     TabOrder = 2
     ExplicitWidth = 895

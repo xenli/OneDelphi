@@ -150,7 +150,6 @@
         <DCCReference Include="NeonSerialization\Neon.Core.Serializers.DB.pas"/>
         <DCCReference Include="NeonSerialization\Neon.Core.Serializers.Nullables.pas"/>
         <DCCReference Include="NeonSerialization\Neon.Core.Serializers.RTL.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Serializers.VCL.pas"/>
         <DCCReference Include="NeonSerialization\Neon.Core.TypeInfo.pas"/>
         <DCCReference Include="NeonSerialization\Neon.Core.Types.pas"/>
         <DCCReference Include="NeonSerialization\Neon.Core.Utils.pas"/>
@@ -221,6 +220,8 @@
         <DCCReference Include="basLib\uuid\OneUUID.pas"/>
         <DCCReference Include="OneFastLsh\OneFastLshManage.pas"/>
         <DCCReference Include="OneFastLsh\OneFastLshController.pas"/>
+        <DCCReference Include="OneFastUpload\OneFastUpdateManage.pas"/>
+        <DCCReference Include="OneFastUpload\OneFastUpdateController.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

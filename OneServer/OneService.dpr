@@ -6,7 +6,8 @@ program OneService;
 uses
   Vcl.Forms,
   Winapi.Windows,
-  frm_main in 'frm_main.pas' {frmMain},
+  system.IOUtils,
+  frm_main in 'frm_main.pas' {frmMain} ,
   OneTokenManage in 'basLib\token\OneTokenManage.pas',
   OneHttpServer in 'httpServer\OneHttpServer.pas',
   OneHttpController in 'httpServer\OneHttpController.pas',
@@ -26,7 +27,6 @@ uses
   Neon.Core.Serializers.DB in 'NeonSerialization\Neon.Core.Serializers.DB.pas',
   Neon.Core.Serializers.Nullables in 'NeonSerialization\Neon.Core.Serializers.Nullables.pas',
   Neon.Core.Serializers.RTL in 'NeonSerialization\Neon.Core.Serializers.RTL.pas',
-  Neon.Core.Serializers.VCL in 'NeonSerialization\Neon.Core.Serializers.VCL.pas',
   Neon.Core.TypeInfo in 'NeonSerialization\Neon.Core.TypeInfo.pas',
   Neon.Core.Types in 'NeonSerialization\Neon.Core.Types.pas',
   Neon.Core.Utils in 'NeonSerialization\Neon.Core.Utils.pas',
@@ -96,17 +96,17 @@ uses
   uSnowWorkerM3 in 'basLib\uuid\Core\uSnowWorkerM3.pas',
   OneUUID in 'basLib\uuid\OneUUID.pas',
   OneFastLshManage in 'OneFastLsh\OneFastLshManage.pas',
-  OneFastLshController in 'OneFastLsh\OneFastLshController.pas';
+  OneFastLshController in 'OneFastLsh\OneFastLshController.pas',
+  OneFastUpdateManage in 'OneFastUpload\OneFastUpdateManage.pas',
+  OneFastUpdateController in 'OneFastUpload\OneFastUpdateController.pas';
 
 var
   lpStartupInfo: TStartupInfo;
   lpProcessInformation: TProcessInformation;
-  tempID1,tempID2:Int64;
+
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  tempID1 := OneUUID.GetUUID();
-  tempID2 := OneUUID.GetUUID();
   // debug状态下弹出内存泄漏报告
   if DebugHook <> 0 then
     ReportMemoryLeaksOnShutdown := True;
@@ -128,4 +128,3 @@ begin
   end;
 
 end.
-

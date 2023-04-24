@@ -31,7 +31,7 @@ object frDemoLsh: TfrDemoLsh
     Height = 80
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 876
+    ExplicitWidth = 1048
     object Label1: TLabel
       Left = 4
       Top = 17

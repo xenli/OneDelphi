@@ -6,10 +6,10 @@
         <Projects Include="Package\OneClient.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ClientDemo\OneClientDemo.dproj">
+        <Projects Include="ClientDemo\OneCleintDemoDatas.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ClientDemo\OneCleintDemoDatas.dproj">
+        <Projects Include="ClientDemo\OneClientDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ClientDemo\OneCleintDemoCustTran.dproj">
@@ -39,6 +39,9 @@
         <Projects Include="ClientDemo\OneClientDemoLsh.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="ClientDemo\OneClientDemoUpdate.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -56,15 +59,6 @@
     <Target Name="OneClient:Make">
         <MSBuild Projects="Package\OneClient.dproj" Targets="Make"/>
     </Target>
-    <Target Name="OneClientDemo">
-        <MSBuild Projects="ClientDemo\OneClientDemo.dproj"/>
-    </Target>
-    <Target Name="OneClientDemo:Clean">
-        <MSBuild Projects="ClientDemo\OneClientDemo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="OneClientDemo:Make">
-        <MSBuild Projects="ClientDemo\OneClientDemo.dproj" Targets="Make"/>
-    </Target>
     <Target Name="OneCleintDemoDatas">
         <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj"/>
     </Target>
@@ -73,6 +67,15 @@
     </Target>
     <Target Name="OneCleintDemoDatas:Make">
         <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneClientDemo">
+        <MSBuild Projects="ClientDemo\OneClientDemo.dproj"/>
+    </Target>
+    <Target Name="OneClientDemo:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemo:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="OneCleintDemoCustTran">
         <MSBuild Projects="ClientDemo\OneCleintDemoCustTran.dproj"/>
@@ -155,14 +158,23 @@
     <Target Name="OneClientDemoLsh:Make">
         <MSBuild Projects="ClientDemo\OneClientDemoLsh.dproj" Targets="Make"/>
     </Target>
+    <Target Name="OneClientDemoUpdate">
+        <MSBuild Projects="ClientDemo\OneClientDemoUpdate.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoUpdate:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoUpdate.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoUpdate:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoUpdate.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="OneClient;OneClientDemo;OneCleintDemoDatas;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh"/>
+        <CallTarget Targets="OneClient;OneCleintDemoDatas;OneClientDemo;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="OneClient:Clean;OneClientDemo:Clean;OneCleintDemoDatas:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean"/>
+        <CallTarget Targets="OneClient:Clean;OneCleintDemoDatas:Clean;OneClientDemo:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="OneClient:Make;OneClientDemo:Make;OneCleintDemoDatas:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make"/>
+        <CallTarget Targets="OneClient:Make;OneCleintDemoDatas:Make;OneClientDemo:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

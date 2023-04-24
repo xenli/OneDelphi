@@ -47,6 +47,14 @@
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
 ## 更新日志
+************2023-04-23***********  
+服务端:  
+	1.增加OneFastUpdate升级功能机制,提供升级管理功能  
+	2.以及一些功能优化  
+客户端:
+	1.OneClient包增加控件TOneFastUpdate 提供升级功能  
+	2.增加Demo  OneClientDemoUpdate 如何自已升级自已  
+	3.以及一些功能优化  
 
 ************2023-04-17***********
 服务端:  
