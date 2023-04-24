@@ -2,7 +2,8 @@
 ## OneDelphi是叫兽(FLM)QQ:378464060基于Delphi IDE开发的三层中间件，开源免费，支持MVC及传统DataSet框架，使用的是Mormot2的HTTP通讯
 >                                                 叫兽(FLM)出品
 >                                                 QQ:378464060
-
+点击链接加入群聊【OneDelphi开源群】：https://jq.qq.com/?_wv=1027&k=AGDV4HQi
+QQ群：814696487（原来的群被封了，请加新群）
 ------OneDelphi基于Delphi IDE开发的
 
 ------OneLaz基于Lazarus+fpc相当于D7开发的
