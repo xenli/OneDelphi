@@ -183,6 +183,8 @@ type
     edPrivateKeyPassword: TEdit;
     Label17: TLabel;
     edCACertificatesFile: TEdit;
+    Label14: TLabel;
+    edHTTPSPort: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure tbStartClick(Sender: TObject);
     procedure tbStopClick(Sender: TObject);
@@ -362,6 +364,7 @@ begin
   edSuperAdminPass.Text := lOneGlobal.ServerSet.SuperAdminPass;
   // ssl
   edHttps.Checked := lOneGlobal.ServerSet.IsHttps;
+  edHTTPSPort.Text := lOneGlobal.ServerSet.HTTPsPort.ToString;
   edCertificateFile.Text := lOneGlobal.ServerSet.CertificateFile;
   edPrivateKeyFile.Text := lOneGlobal.ServerSet.PrivateKeyFile;
   edPrivateKeyPassword.Text := lOneGlobal.ServerSet.PrivateKeyPassword;
@@ -634,6 +637,17 @@ begin
   lOneGlobal.ServerSet.WinRegisterStart := chWinRegisterStart.Checked;
   // ssl
   lOneGlobal.ServerSet.IsHttps := edHttps.Checked;
+  if edHttps.Checked then
+  begin
+    tempStr := edHTTPSPort.Text;
+    if not tryStrToInt(tempStr, lPort) then
+    begin
+      showMessage('请输入正确的HTTPS端口');
+      exit;
+    end;
+    lOneGlobal.ServerSet.HTTPsPort := lPort;
+  end;
+
   lOneGlobal.ServerSet.CertificateFile := edCertificateFile.Text;
   lOneGlobal.ServerSet.PrivateKeyFile := edPrivateKeyFile.Text;
   lOneGlobal.ServerSet.PrivateKeyPassword := edPrivateKeyPassword.Text;

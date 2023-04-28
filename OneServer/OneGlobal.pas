@@ -27,6 +27,7 @@ type
     FSuperAdminPass: string;
     //
     FIsHttps: boolean;
+    FHttpsPort: Integer;
     FCertificateFile: string;
     FPrivateKeyFile: string;
     FCACertificatesFile: string;
@@ -45,6 +46,7 @@ type
     property SuperAdminPass: string read FSuperAdminPass write FSuperAdminPass;
     //
     property IsHttps: boolean read FIsHttps write FIsHttps;
+    property HttpsPort: Integer read FHttpsPort write FHttpsPort;
     property CertificateFile: string read FCertificateFile write FCertificateFile;
     property PrivateKeyFile: string read FPrivateKeyFile write FPrivateKeyFile;
     property CACertificatesFile: string read FCACertificatesFile write FCACertificatesFile;
@@ -124,6 +126,7 @@ begin
   FHTTPPool := 32;
   FHTTPQueue := 1000;
   FIsHttps := false;
+  FHttpsPort := 9095;
 end;
 
 class function TOneGlobal.GetInstance(QIsConsole: boolean = false): TOneGlobal;
@@ -427,6 +430,7 @@ begin
   end;
   //
   FHTTPServer.Port := FServerSet.FHTTPPort;
+  FHTTPServer.HttpsPort := FServerSet.FHttpsPort;
   FHTTPServer.ThreadPoolCount := FServerSet.FHTTPPool;
   FHTTPServer.HttpQueueLength := FServerSet.FHTTPQueue;
   if not FHTTPServer.ServerStart then

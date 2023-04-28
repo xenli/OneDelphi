@@ -56,7 +56,7 @@ type
     function GetLshHisLast(QLshSet: TFastLshSet; QNow: TDateTime; var QErrMsg: string): TFastLshHis;
     function UpdateLsh(QLshHis: TFastLshHis; QNewMax: integer; var QErrMsg: string): boolean;
   public
-    constructor Create;
+    constructor Create(QZTCode: string = '');
     destructor Destroy; override;
   public
     // 批量获取流水号
@@ -89,11 +89,12 @@ begin
   Result := Unit_LshMange;
 end;
 
-constructor TFastLshMange.Create;
+constructor TFastLshMange.Create(QZTCode: string = '');
 begin
   inherited Create;
   FLshSetDict := TDictionary<string, TFastLshSet>.Create;
   FLshHisDict := TDictionary<string, TFastLshHis>.Create;
+  self.FZTCode := QZTCode;
 end;
 
 destructor TFastLshMange.Destroy;

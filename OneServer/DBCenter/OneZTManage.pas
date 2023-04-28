@@ -22,7 +22,7 @@ uses
 {$IF CompilerVersion >= 35}FireDAC.Phys.SQLiteWrapper.Stat, {$ENDIF}
   FireDAC.Phys.SQLiteDef, OneDataInfo,
   OneThread, OneGUID, OneFileHelper, System.Threading, OneNeonHelper,
-  OneStreamString, OneILog, System.DateUtils;
+  OneStreamString, OneILog, System.DateUtils, System.IOUtils;
 
 type
   TOneZTSet = class;
@@ -178,6 +178,7 @@ type
     FStop: Boolean;
     FZTPools: TDictionary<String, TOneZTPool>;
     FTranZTItemList: TDictionary<String, TOneZTItem>;
+    FFileDataDict: TDictionary<String, TDateTime>;
     FLockObject: TObject;
     FLog: IOneLog;
     FKeepList: TList<TZTKeepInfo>;
@@ -652,6 +653,7 @@ begin
   self.FLog := QOneLog;
   FZTPools := TDictionary<String, TOneZTPool>.Create;
   FTranZTItemList := TDictionary<String, TOneZTItem>.Create;
+  FFileDataDict := TDictionary<String, TDateTime>.Create;
   FLockObject := TObject.Create;
   FKeepList := TList<TZTKeepInfo>.Create;
   FTimerThread := TOneTimerThread.Create(self.onTimerWork);
@@ -664,6 +666,7 @@ var
   i: integer;
   lZTPool: TOneZTPool;
   lZTItem: TOneZTItem;
+  lFileName, lFileID: string;
 begin
   if FTimerThread <> nil then
     FTimerThread.FreeWork;
@@ -685,6 +688,18 @@ begin
   end;
   FZTPools.Clear;
   FZTPools.Free;
+  try
+    // 临时文件删除
+    for lFileID in FFileDataDict.Keys do
+    begin
+      lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' + lFileID + '.data');
+      TFile.Delete(lFileName);
+    end;
+    FFileDataDict.Clear;
+    FFileDataDict.Free;
+  except
+
+  end;
   FLockObject.Free;
   for i := 0 to FKeepList.Count - 1 do
   begin
@@ -700,6 +715,9 @@ var
   lZTItem: TOneZTItem;
   lNow: TDateTime;
   lSpanSec: integer;
+  //
+  lFileName, lFileID: string;
+  lFileDateTime: TDateTime;
 begin
   TMonitor.Enter(FLockObject);
   try
@@ -727,6 +745,20 @@ begin
         FTranZTItemList.Remove(lZTItem.FCreateID);
       end;
     end;
+
+    for lFileID in FFileDataDict.Keys do
+    begin
+      if FFileDataDict.TryGetValue(lFileID, lFileDateTime) then
+      begin
+        // 临时保存文件的地方,10分钟后自动删除,保持硬盘健康
+        if SecondsBetween(lNow, lFileDateTime) >= 600 then
+        begin
+          lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' + lFileID + '.data');
+          TFile.Delete(lFileName);
+        end;
+      end;
+    end;
+
   finally
     TMonitor.exit(FLockObject);
   end;
@@ -1293,6 +1325,7 @@ begin
               lZip.Open(lFileName, TZipMode.zmWrite);
               lZip.Add(lMemoryStream, lFileName);
               lDataResultItem.ResultContext := lFileGuid;
+              self.FFileDataDict.Add(lFileGuid, Now);
             finally
               lZip.Free;
               lMemoryStream.Free;
@@ -1313,6 +1346,7 @@ begin
                 lZip.Open(lFileName, TZipMode.zmWrite);
                 lZip.Add(lMemoryStream, lFileName);
                 lDataResultItem.ResultContext := lFileGuid;
+                self.FFileDataDict.Add(lFileGuid, Now);
               finally
                 lZip.Free;
                 lMemoryStream.Clear;

@@ -42,6 +42,12 @@
         <Projects Include="ClientDemo\OneClientDemoUpdate.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="ClientDemo\OneClientDemoFastFile.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneClientDemoFastApi.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -167,14 +173,32 @@
     <Target Name="OneClientDemoUpdate:Make">
         <MSBuild Projects="ClientDemo\OneClientDemoUpdate.dproj" Targets="Make"/>
     </Target>
+    <Target Name="OneClientDemoFastFile">
+        <MSBuild Projects="ClientDemo\OneClientDemoFastFile.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoFastFile:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoFastFile.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoFastFile:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoFastFile.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneClientDemoFastApi">
+        <MSBuild Projects="ClientDemo\OneClientDemoFastApi.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoFastApi:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoFastApi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoFastApi:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoFastApi.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="OneClient;OneCleintDemoDatas;OneClientDemo;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate"/>
+        <CallTarget Targets="OneClient;OneCleintDemoDatas;OneClientDemo;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate;OneClientDemoFastFile;OneClientDemoFastApi"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="OneClient:Clean;OneCleintDemoDatas:Clean;OneClientDemo:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean"/>
+        <CallTarget Targets="OneClient:Clean;OneCleintDemoDatas:Clean;OneClientDemo:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean;OneClientDemoFastFile:Clean;OneClientDemoFastApi:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="OneClient:Make;OneCleintDemoDatas:Make;OneClientDemo:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make"/>
+        <CallTarget Targets="OneClient:Make;OneCleintDemoDatas:Make;OneClientDemo:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make;OneClientDemoFastFile:Make;OneClientDemoFastApi:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

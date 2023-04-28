@@ -59,6 +59,7 @@ implementation
 
 {$REGION 'TOneTimerThread-固定间隔时间唤醒干活'}
 
+
 constructor TOneTimerThread.Create(QEventWorkSend: EventOneWorkSend = nil;
   QEventOneWork: EventOneWork = nil);
 var
@@ -149,10 +150,15 @@ end;
 
 procedure TOneTimerThread.FreeWork;
 begin
-  self.Free;
+  try
+    self.Free;
+  except
+
+  end;
 end;
 {$ENDREGION}
 {$REGION 'TOneSingleWorkThread-循环执行,接收到信号量就执行'}
+
 
 constructor TOneSingleWorkThread.Create(QEventWorkSend: EventOneWorkSend = nil;
   QEventOneWork: EventOneWork = nil);
@@ -246,7 +252,11 @@ end;
 
 procedure TOneSingleWorkThread.FreeWork;
 begin
-  self.Free;
+  try
+    self.Free;
+  except
+
+  end;
 end;
 {$ENDREGION}
 

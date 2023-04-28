@@ -127,8 +127,9 @@
         <DCCReference Include="baseLib\OneILog.pas"/>
         <DCCReference Include="baseLib\OneThread.pas"/>
         <DCCReference Include="OneClientUUID.pas"/>
-        <DCCReference Include="OneClientLsh.pas"/>
-        <DCCReference Include="OneClientFastUpdate.pas"/>
+        <DCCReference Include="OneFast\OneClientFastLsh.pas"/>
+        <DCCReference Include="OneFast\OneClientFastUpdate.pas"/>
+        <DCCReference Include="OneFast\OneClientFastFile.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

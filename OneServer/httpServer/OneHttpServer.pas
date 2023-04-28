@@ -18,6 +18,7 @@ type
     FStopRequest: boolean;
     // 绑定HTTP端口，默认9090
     FPort: integer;
+    FHttpsPort: integer;
     // 线程池 ThreadPoolCount<0 将使用单个线程来对其进行全部规则, =0将为每个连接创建一个线程,>0将利用线程池
     // 一般设定大于0用线程池性能最好
     FThreadPoolCount: integer;
@@ -26,6 +27,7 @@ type
     // 队列默认1000,请求放进队列,然后有线程消费完成
     FHttpQueueLength: integer;
     FHttpServer: THttpServerSocketGeneric;
+    FHttpsServer: THttpServerSocketGeneric;
     // 错误消息
     FErrMsg: string;
     FLog: IOneLog;
@@ -49,6 +51,7 @@ type
     property StopRequest: boolean read FStopRequest;
     // 绑定HTTP端口，默认9090
     property Port: integer read FPort write FPort;
+    property HttpsPort: integer read FHttpsPort write FHttpsPort;
     // 线程池
     property ThreadPoolCount: integer read FThreadPoolCount write FThreadPoolCount;
     // 默认30000毫秒，即30秒 连接保持活动的时间
@@ -336,8 +339,6 @@ begin
   try
     lHttpServerOptions := [hsoNoXPoweredHeader];
     lServerSet := TOneGlobal.GetInstance().ServerSet;
-    if lServerSet.IsHttps then
-      lHttpServerOptions := lHttpServerOptions + [hsoEnableTls];
     // hsoEnableTls开始ssl证书
     self.FHttpServer := THttpAsyncServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi',
       self.FThreadPoolCount, self.FKeepAliveTimeOut, lHttpServerOptions);
@@ -347,11 +348,23 @@ begin
     self.FHttpServer.RegisterCompress(CompressGZip);
     self.FHttpServer.RegisterCompress(CompressZLib);
     self.FHttpServer.RegisterCompress(CompressSynLZ);
+    self.FHttpServer.WaitStarted();
     if lServerSet.IsHttps then
-      self.FHttpServer.WaitStarted(10, lServerSet.CertificateFile, lServerSet.PrivateKeyFile,
+    begin
+      // 启动https
+      lHttpServerOptions := lHttpServerOptions + [hsoEnableTls];
+      self.FHttpsServer := THttpAsyncServer.Create(self.FHttpsPort.ToString(), nil, nil, 'oneDelphi',
+        self.FThreadPoolCount, self.FKeepAliveTimeOut, lHttpServerOptions);
+      self.FHttpsServer.HttpQueueLength := self.FHttpQueueLength;
+      self.FHttpsServer.OnRequest := self.OnRequest;
+      self.FHttpsServer.RegisterCompress(CompressDeflate);
+      self.FHttpsServer.RegisterCompress(CompressGZip);
+      self.FHttpsServer.RegisterCompress(CompressZLib);
+      self.FHttpsServer.RegisterCompress(CompressSynLZ);
+      self.FHttpsServer.WaitStarted(10, lServerSet.CertificateFile, lServerSet.PrivateKeyFile,
         lServerSet.PrivateKeyPassword, lServerSet.CACertificatesFile)
-    else
-      self.FHttpServer.WaitStarted();
+    end;
+
     // raise exception e.g. on binding issue
     self.FStopRequest := False;
     self.FStarted := True;

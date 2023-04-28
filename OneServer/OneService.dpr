@@ -7,7 +7,7 @@ uses
   Vcl.Forms,
   Winapi.Windows,
   system.IOUtils,
-  frm_main in 'frm_main.pas' {frmMain} ,
+  frm_main in 'frm_main.pas' {frmMain},
   OneTokenManage in 'basLib\token\OneTokenManage.pas',
   OneHttpServer in 'httpServer\OneHttpServer.pas',
   OneHttpController in 'httpServer\OneHttpController.pas',
@@ -98,7 +98,9 @@ uses
   OneFastLshManage in 'OneFastLsh\OneFastLshManage.pas',
   OneFastLshController in 'OneFastLsh\OneFastLshController.pas',
   OneFastUpdateManage in 'OneFastUpload\OneFastUpdateManage.pas',
-  OneFastUpdateController in 'OneFastUpload\OneFastUpdateController.pas';
+  OneFastUpdateController in 'OneFastUpload\OneFastUpdateController.pas',
+  OneFastFileMange in 'OneFastFile\OneFastFileMange.pas',
+  OneFastFileController in 'OneFastFile\OneFastFileController.pas';
 
 var
   lpStartupInfo: TStartupInfo;

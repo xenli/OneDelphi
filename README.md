@@ -48,6 +48,18 @@ QQ群：814696487（原来的群被封了，请加新群）
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
 ## 更新日志
+************2023-04-28***********  
+服务端:  
+	1.增加OneFastFile 附件功能机制,提供附件上传下载删除等功能  
+	2.TOneZTManage.OpenDatas 以文件流下载产生的临时文件，10分钟后自动删除，保证硬盘的健康  
+	3.修正Token释放问题,及一些优化  
+客户端:  
+	1.OneClinet控件包增加目录OneFast记得把lib也要加进去,同时移动几个相关文件及单元名称oneCleintLsh改成oneCleintFastLsh  
+	2.OneClient包增加控件TOneFastFile 附件功能  
+	3.增加Demo  OneClientDemoFastFile  附件功能展示  
+	4.增加Demo OneClientFastApi 需要安装Dev,未完成相关功能下个版本就好了只是初步界面设计  
+	5.以及一些功能优化  
+	
 ************2023-04-23***********  
 服务端:  
 	1.增加OneFastUpdate升级功能机制,提供升级管理功能  

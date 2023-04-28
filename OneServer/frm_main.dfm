@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 75
     Width = 882
     Height = 516
-    ActivePage = tabZTManage
+    ActivePage = tabHTTPServer
     Align = alClient
     TabOrder = 0
     ExplicitWidth = 878
@@ -47,8 +47,6 @@ object frmMain: TfrmMain
           '                                                 '#21483#20861'(FLM)'#20986#21697
           '                                                 QQ:378464060')
         TabOrder = 0
-        ExplicitWidth = 870
-        ExplicitHeight = 480
       end
     end
     object TabSheet1: TTabSheet
@@ -160,7 +158,7 @@ object frmMain: TfrmMain
         Left = 0
         Top = 0
         Width = 874
-        Height = 183
+        Height = 217
         Align = alTop
         Caption = 'HTTP'#37197#32622'-'#20445#23384#37197#32622#22914#38656#29983#25928','#35831#37325#26032#21551#21160#20013#38388#23618
         Color = clBtnFace
@@ -173,6 +171,7 @@ object frmMain: TfrmMain
         ParentColor = False
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 870
         object Label1: TLabel
           Left = 3
           Top = 56
@@ -217,31 +216,38 @@ object frmMain: TfrmMain
         end
         object lbCertificateFile: TLabel
           Left = 3
-          Top = 123
+          Top = 150
           Width = 72
           Height = 15
           Caption = 'CertificateFile'
         end
         object Label15: TLabel
           Left = 419
-          Top = 123
+          Top = 150
           Width = 73
           Height = 15
           Caption = 'PrivateKeyFile'
         end
         object Label16: TLabel
           Left = 3
-          Top = 152
+          Top = 179
           Width = 105
           Height = 15
           Caption = 'PrivateKeyPassword'
         end
         object Label17: TLabel
           Left = 419
-          Top = 152
+          Top = 179
           Width = 93
           Height = 15
           Caption = 'CACertificatesFile'
+        end
+        object Label14: TLabel
+          Left = 115
+          Top = 121
+          Width = 60
+          Height = 15
+          Caption = 'HTTPS'#31471#21475
         end
         object tbStart: TButton
           Left = 3
@@ -348,8 +354,8 @@ object frmMain: TfrmMain
           TabOrder = 11
         end
         object edHttps: TCheckBox
-          Left = 697
-          Top = 88
+          Left = 3
+          Top = 119
           Width = 89
           Height = 17
           Caption = 'HTTPS'#25903#25345
@@ -357,41 +363,52 @@ object frmMain: TfrmMain
         end
         object edCertificateFile: TEdit
           Left = 114
-          Top = 120
+          Top = 147
           Width = 263
           Height = 23
           TabOrder = 13
         end
         object edPrivateKeyFile: TEdit
           Left = 521
-          Top = 120
+          Top = 147
           Width = 273
           Height = 23
           TabOrder = 14
         end
         object edPrivateKeyPassword: TEdit
           Left = 114
-          Top = 149
+          Top = 176
           Width = 263
           Height = 23
           TabOrder = 15
         end
         object edCACertificatesFile: TEdit
           Left = 521
-          Top = 149
+          Top = 176
           Width = 273
           Height = 23
           TabOrder = 16
         end
+        object edHTTPSPort: TEdit
+          Left = 199
+          Top = 118
+          Width = 178
+          Height = 23
+          NumbersOnly = True
+          TabOrder = 17
+          Text = '9091'
+        end
       end
       object groupWebSocket: TGroupBox
         Left = 0
-        Top = 313
+        Top = 322
         Width = 874
-        Height = 168
+        Height = 159
         Align = alClient
         Caption = #20854#23427#37197#32622
         TabOrder = 1
+        ExplicitWidth = 870
+        ExplicitHeight = 158
         object chWinTaskStart: TCheckBox
           Left = 15
           Top = 30
@@ -419,12 +436,13 @@ object frmMain: TfrmMain
       end
       object GroupBox1: TGroupBox
         Left = 0
-        Top = 183
+        Top = 217
         Width = 874
-        Height = 130
+        Height = 105
         Align = alTop
         Caption = 'WebSocket(WS)'#37197#32622
         TabOrder = 2
+        ExplicitWidth = 870
       end
     end
     object tabZTManage: TTabSheet
@@ -1194,10 +1212,11 @@ object frmMain: TfrmMain
     end
   end
   object plZTSet: TPanel
-    Left = 213
-    Top = 181
+    Left = 237
+    Top = 188
     Width = 401
     Height = 232
+    Caption = '9091'
     Color = clSkyBlue
     ParentBackground = False
     TabOrder = 2

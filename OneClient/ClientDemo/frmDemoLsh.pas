@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  OneClientHelper, OneClientConnect, OneClientLsh, FireDAC.Stan.Intf,
+  OneClientHelper, OneClientConnect, OneClientFastLsh, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, Data.DB, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, OneClientDataSet, Vcl.Grids, Vcl.DBGrids, System.StrUtils, System.Generics.Collections;

@@ -162,6 +162,11 @@ begin
     begin
       iChunSize := lFileStream.Size - QUpdateDown.FilePosition;
     end;
+    if iChunSize <= 0 then
+    begin
+      result.ResultMsg := '已超过文件最大容量，无需继续请求下载';
+      exit;
+    end;
     setLength(lBytes, iChunSize);
     lFileStream.Read(lBytes, iChunSize);
     result.ResultData := TNetEncoding.Base64.EncodeBytesToString(lBytes);

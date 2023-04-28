@@ -388,9 +388,17 @@ begin
 end;
 
 procedure TOneTokenManage.RemoveToken(QTokenID: string);
+var
+  lTokenItem: TOneTokenItem;
 begin
   TMonitor.TryEnter(self.FLockObj);
   try
+    lTokenItem := nil;
+    if FTokenList.TryGetValue(QTokenID, lTokenItem) then
+    begin
+      if lTokenItem<>nil then
+       lTokenItem.Free;
+    end;
     FTokenList.Remove(QTokenID);
   finally
     TMonitor.exit(self.FLockObj);

@@ -583,15 +583,23 @@ begin
       exit;
     end;
     // 把数据集转成List
-    lList := TList<T>.Create;
+    lList := nil;
     try
       lList := self.DataSetToList(lDataSet);
+      if lList = nil then
+      begin
+        self.FIsErr := true;
+        self.FErrMsg := '数据集转化成TList<T>失败';
+        exit;
+      end;
       result := lList[0];
     finally
-      lList.Clear;
-      lList.Free;
+      if lList <> nil then
+      begin
+        lList.Clear;
+        lList.Free;
+      end;
     end;
-
   finally
     lDataOpen.Free;
     if lDataSet <> nil then

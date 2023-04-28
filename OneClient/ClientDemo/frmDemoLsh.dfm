@@ -2,8 +2,8 @@ object frDemoLsh: TfrDemoLsh
   Left = 0
   Top = 0
   Caption = #27969#27700#21495#21151#33021
-  ClientHeight = 549
-  ClientWidth = 1052
+  ClientHeight = 548
+  ClientWidth = 1048
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -27,11 +27,11 @@ object frDemoLsh: TfrDemoLsh
   object plSet: TPanel
     Left = 0
     Top = 0
-    Width = 1052
+    Width = 1048
     Height = 80
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 1048
+    ExplicitWidth = 1044
     object Label1: TLabel
       Left = 4
       Top = 17
@@ -169,7 +169,7 @@ object frDemoLsh: TfrDemoLsh
     OnClick = tbOpenDataClick
   end
   object tbAppend: TButton
-    Left = 532
+    Left = 540
     Top = 113
     Width = 113
     Height = 25
@@ -178,7 +178,7 @@ object frDemoLsh: TfrDemoLsh
     OnClick = tbAppendClick
   end
   object tbSaveData: TButton
-    Left = 651
+    Left = 659
     Top = 113
     Width = 94
     Height = 25

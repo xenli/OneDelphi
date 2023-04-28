@@ -113,7 +113,7 @@ object Form1: TForm1
     Top = 80
     Width = 899
     Height = 479
-    ActivePage = tabStroe
+    ActivePage = tabDataSet
     Align = alClient
     TabOrder = 2
     ExplicitWidth = 895
@@ -209,16 +209,16 @@ object Form1: TForm1
         TabOrder = 3
       end
       object edPageCount: TEdit
-        Left = 653
-        Top = 136
+        Left = 655
+        Top = 172
         Width = 192
         Height = 23
         NumbersOnly = True
         TabOrder = 4
       end
       object edPageTotal: TEdit
-        Left = 653
-        Top = 172
+        Left = 655
+        Top = 136
         Width = 192
         Height = 23
         NumbersOnly = True
