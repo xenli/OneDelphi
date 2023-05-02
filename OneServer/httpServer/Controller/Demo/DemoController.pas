@@ -45,6 +45,8 @@ type
     procedure HelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
     // 最终结果只输出文本:欢迎来到HelloWorld
     procedure HelloWorldStr(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
+    // 输出文件
+    procedure GetFile(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
     // 最终结果:{ResultCode: "0001", ResultMsg: "", ResultCount: 0, ResultData: {name: "范联满flm123", aag: 32}}
     procedure person(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
     // 无参数方法调用,如果要用到控制层 HTTPCtxt,HTTPResult必需是多例模式
@@ -164,6 +166,12 @@ begin
   // 最终结果只输出文本:欢迎来到HelloWorld
   QHTTPResult.ResultOutMode := THTTPResultMode.TEXT;
   QHTTPResult.SetHTTPResultTrue();
+end;
+
+procedure TDemoController.GetFile(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
+begin
+  QHTTPResult.ResultOutMode := THTTPResultMode.OUTFILE;
+  QHTTPResult.ResultOut := 'C:\Users\Administrator\Pictures\测试ABCD47030062.bmp';
 end;
 
 procedure TDemoController.person(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);

@@ -36,7 +36,10 @@ requires
   FireDACCommonDriver,
   FireDACCommon,
   soaprtl,
-  DesignIDE;
+  DesignIDE,
+  IndySystem,
+  IndyProtocols,
+  IndyCore;
 
 contains
   OneClientConnect in 'OneClientConnect.pas',
@@ -70,6 +73,7 @@ contains
   OneClientUUID in 'OneClientUUID.pas',
   OneClientFastLsh in 'OneFast\OneClientFastLsh.pas',
   OneClientFastUpdate in 'OneFast\OneClientFastUpdate.pas',
-  OneClientFastFile in 'OneFast\OneClientFastFile.pas';
+  OneClientFastFile in 'OneFast\OneClientFastFile.pas',
+  OneWebSocketClient in 'websocket\OneWebSocketClient.pas';
 
 end.

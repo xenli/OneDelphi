@@ -48,6 +48,18 @@ QQ群：814696487（原来的群被封了，请加新群）
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
 ## 更新日志
+************2023-05-01***********  
+--祝大家五一快乐,给大家一份大礼包吧  
+服务端:  
+	1.增加WebSocket服务,单元 OneWebSocketServer  
+	2.修正OneZTManage获取驱动目录  
+	3.主界面增加WebSocket相关配置  
+	3.以及一些优化  
+客户端:	
+	1.增加Demo OneClientFastApi 需要安装Dev  
+	2.增加新的控件 OneWebSocketClient.TOneWebSocketClient   
+	3.增加Demo OneClientDemoWebSocket  
+	
 ************2023-04-28***********  
 服务端:  
 	1.增加OneFastFile 附件功能机制,提供附件上传下载删除等功能  

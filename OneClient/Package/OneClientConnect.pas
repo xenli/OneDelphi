@@ -591,7 +591,7 @@ begin
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        if LResponse.ContentEncoding = 'zlib' then
+        if (LResponse.ContentEncoding = 'zlib') and (not Result.IsFile) then
         begin
           setLength(lZlibBytes, 0);
           ZDecompress(lBytes, lZlibBytes);

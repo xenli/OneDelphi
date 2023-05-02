@@ -6,10 +6,8 @@ interface
 uses
   System.SysUtils, System.IOUtils, System.Generics.Collections, System.Classes,
   System.JSON, Rest.JSON, System.NetEncoding,
-  OneHttpServer, OneZTManage, OneFileHelper,
-  OneNeonHelper, OneTokenManage, OneVirtualFile,
-  Neon.Core.Persistence, Neon.Core.Persistence.JSON,
-  OneILog, OneLog;
+  OneHttpServer, OneZTManage, OneFileHelper, OneNeonHelper, OneTokenManage, OneVirtualFile,
+  Neon.Core.Persistence, Neon.Core.Persistence.JSON, OneILog, OneLog, OneWebSocketServer;
 
 type
 
@@ -32,6 +30,12 @@ type
     FPrivateKeyFile: string;
     FCACertificatesFile: string;
     FPrivateKeyPassword: string;
+    //
+    FIsWs: boolean;
+    FWsAutoStart: boolean;
+    FWsPort: Integer;
+    FWsPool: Integer;
+    FWsQueue: Integer;
   public
     constructor Create;
   public
@@ -51,6 +55,12 @@ type
     property PrivateKeyFile: string read FPrivateKeyFile write FPrivateKeyFile;
     property CACertificatesFile: string read FCACertificatesFile write FCACertificatesFile;
     property PrivateKeyPassword: string read FPrivateKeyPassword write FPrivateKeyPassword;
+    //
+    property IsWebSocket: boolean read FIsWs write FIsWs;
+    property WsAutoStart: boolean read FWsAutoStart write FWsAutoStart;
+    property WsPort: Integer read FWsPort write FWsPort;
+    property WsPool: Integer read FWsPool write FWsPool;
+    property WsQueue: Integer read FWsQueue write FWsQueue;
   end;
 
   TOneGlobal = class
@@ -70,6 +80,7 @@ type
     FVirtualSet: TOneVirtualSet;
     // HTT服务
     FHTTPServer: TOneHttpServer;
+    FWsServer: TOneWebSocketServer;
     // 账套管理服务
     FZTManage: TOneZTManage;
     // TOken管理服务
@@ -101,6 +112,7 @@ type
     property ZTMangeSet: TOneZTMangeSet read FZTMangeSet;
     property VirtualSet: TOneVirtualSet read FVirtualSet;
     property HttpServer: TOneHttpServer read FHTTPServer;
+    property WsServer: TOneWebSocketServer read FWsServer;
     property Log: IOneLog read FLog;
     property ZTManage: TOneZTManage read FZTManage;
     property TokenManage: TOneTokenManage read FTokenManage;
@@ -127,6 +139,8 @@ begin
   FHTTPQueue := 1000;
   FIsHttps := false;
   FHttpsPort := 9095;
+  FIsWs := false;
+  FWsPort := 9099;
 end;
 
 class function TOneGlobal.GetInstance(QIsConsole: boolean = false): TOneGlobal;
@@ -168,6 +182,7 @@ begin
   self.LoadVirtualSet();
   // 服务实例化
   FHTTPServer := TOneHttpServer.Create(self.FLog);
+  FWsServer := TOneWebSocketServer.Create(self.FLog);
   FZTManage := TOneZTManage.Create(self.FLog);
   OneZTManage.Unit_ZTManage := FZTManage;
   FTokenManage := TOneTokenManage.Create(self.FLog);
@@ -189,6 +204,10 @@ begin
   if FHTTPServer <> nil then
   begin
     FHTTPServer.Free;
+  end;
+  if FWsServer <> nil then
+  begin
+    FWsServer.Free;
   end;
   if FZTManage <> nil then
   begin
@@ -372,6 +391,34 @@ begin
         writeln('HTTP服务未启动,原因HTTP服务设置不是自启动');
     end;
   end;
+  if self.FWsServer <> nil then
+  begin
+    if self.IsConsole then
+      writeln('WebSocket端口:' + IntToStr(FServerSet.FWsPort));
+    self.FWsServer.Port := FServerSet.FWsPort;
+    self.FWsServer.ThreadPoolCount := FServerSet.FWsPool;
+    self.FWsServer.HttpQueueLength := FServerSet.FWsQueue;
+    if FServerSet.FWsAutoStart then
+    begin
+      if not FWsServer.ServerStart then
+      begin
+        QErrMsg := FWsServer.ErrMsg;
+        if self.IsConsole then
+          writeln('启动Ws异常原因:' + QErrMsg);
+      end
+      else
+      begin
+        if self.IsConsole then
+          writeln('启动Ws服务成功');
+      end;
+    end
+    else
+    begin
+      if self.IsConsole then
+        writeln('Ws服务未启动,原因Ws服务设置不是自启动');
+    end;
+  end;
+
   if FVirtualManage <> nil then
   begin
     FVirtualManage.StarWork(self.FVirtualSet.VirtualSetList);

@@ -260,6 +260,8 @@ var
 
 implementation
 
+uses OneGlobal;
+
 constructor TOneZTMangeSet.Create();
 begin
   inherited Create;
@@ -470,6 +472,8 @@ begin
   if (AException <> nil) and (AException.Message <> '') then
   begin
     self.FException.FErrmsg := AException.Message;
+    //
+    OneGlobal.TOneGlobal.GetInstance().Log.WriteLog('SQLErr', AException.Message);
   end;
 end;
 
@@ -2218,7 +2222,7 @@ const
   // MSAcc驱动
 
 var
-  vExeName, lExePath: string;
+  vExeName, lExePath, lFileName: string;
 begin
   if Var_MSSQLDriverLink = nil then
     Var_MSSQLDriverLink := TFDPhysMSSQLDriverLink.Create(nil);
@@ -2253,54 +2257,80 @@ begin
 
   lExePath := OneFileHelper.GetExeRunPath;
 {$IF Defined(CPUX86)}
-  if FileExists(lExePath + const_OraOciDll32) then
-    Var_OracleDriverLink.VendorLib := lExePath + const_OraOciDll32;
-  if FileExists(lExePath + const_Libmysql32) then
-    Var_MySQLDriverLink.VendorLib := lExePath + const_Libmysql32;
-  if FileExists(lExePath + const_Libpg32) then
-    var_PGDriverLink.VendorLib := lExePath + const_Libpg32;
-  if FileExists(lExePath + const_Libfb32) then
+  lFileName := OneFileHelper.CombinePath(lExePath, const_OraOciDll32);
+  if FileExists(lFileName) then
+    Var_OracleDriverLink.VendorLib := lFileName;
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libmysql32);
+  if FileExists(lFileName) then
+    Var_MySQLDriverLink.VendorLib := lFileName;
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libpg32);
+  if FileExists(lFileName) then
+    var_PGDriverLink.VendorLib := lFileName;
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libfb32);
+  if FileExists(lFileName) then
   begin
     var_FireBirdDriverLinK := TFDPhysFBDriverLink.Create(nil);
-    var_FireBirdDriverLinK.VendorLib := lExePath + const_Libfb32;
+    var_FireBirdDriverLinK.VendorLib := lFileName;
   end;
-  if FileExists(lExePath + const_Libfbb32) then
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libfbb32);
+  if FileExists(lFileName) then
   begin
     var_FireBirdDriverLinKB := TFDPhysFBDriverLink.Create(nil);
-    var_FireBirdDriverLinKB.VendorLib := lExePath + const_Libfbb32;
+    var_FireBirdDriverLinKB.VendorLib := lFileName;
   end;
-  if FileExists(lExePath + const_Lib3SQLite32) then
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Lib3SQLite32);
+  if FileExists(lFileName) then
   begin
-    var_SQLiteDriverLinK.VendorLib := lExePath + const_Lib3SQLite32;
+    var_SQLiteDriverLinK.VendorLib := lFileName;
   end;
-  if FileExists(lExePath + const_LibASA32) then
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_LibASA32);
+  if FileExists(lFileName) then
   begin
-    var_ASADriverLink.VendorLib := lExePath + const_LibASA32;
+    var_ASADriverLink.VendorLib := lFileName;
   end;
 {$ELSEIF Defined(CPUX64)}
-  if FileExists(lExePath + const_OraOciDll64) then
-    Var_OracleDriverLink.VendorLib := lExePath + const_OraOciDll64;
-  if FileExists(lExePath + const_Libmysql64) then
-    Var_MySQLDriverLink.VendorLib := lExePath + const_Libmysql64;
-  if FileExists(lExePath + const_Libpg64) then
-    var_PGDriverLink.VendorLib := lExePath + const_Libpg64;
-  if FileExists(lExePath + const_Libfb64) then
+  lFileName := OneFileHelper.CombinePath(lExePath, const_OraOciDll64);
+  if FileExists(lFileName) then
+    Var_OracleDriverLink.VendorLib := lFileName;
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libmysql64);
+  if FileExists(lFileName) then
+    Var_MySQLDriverLink.VendorLib := lFileName;
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libpg64);
+  if FileExists(lFileName) then
+    var_PGDriverLink.VendorLib := lFileName;
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libfb64);
+  if FileExists(lFileName) then
   begin
     var_FireBirdDriverLinK := TFDPhysFBDriverLink.Create(nil);
-    var_FireBirdDriverLinK.VendorLib := lExePath + const_Libfb64;
+    var_FireBirdDriverLinK.VendorLib := lFileName;
   end;
-  if FileExists(lExePath + const_Libfbb64) then
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Libfbb64);
+  if FileExists(lFileName) then
   begin
     var_FireBirdDriverLinKB := TFDPhysFBDriverLink.Create(nil);
-    var_FireBirdDriverLinKB.VendorLib := lExePath + const_Libfbb64;
+    var_FireBirdDriverLinKB.VendorLib := lFileName;
   end;
-  if FileExists(lExePath + const_Lib3SQLite64) then
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_Lib3SQLite64);
+  if FileExists(lFileName) then
   begin
-    var_SQLiteDriverLinK.VendorLib := lExePath + const_Lib3SQLite64;
+    var_SQLiteDriverLinK.VendorLib := lFileName;
   end;
-  if FileExists(lExePath + const_LibASA64) then
+  //
+  lFileName := OneFileHelper.CombinePath(lExePath, const_LibASA64);
+  if FileExists(lFileName) then
   begin
-    var_ASADriverLink.VendorLib := lExePath + const_LibASA64;
+    var_ASADriverLink.VendorLib := lFileName;
   end;
 {$ENDIF CPUX64}
 end;

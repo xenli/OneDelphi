@@ -3,7 +3,7 @@ object frDemoFastApi: TfrDemoFastApi
   Top = 0
   Caption = 'FastApi'#31649#29702#30028#38754
   ClientHeight = 754
-  ClientWidth = 1646
+  ClientWidth = 1560
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,16 +11,17 @@ object frDemoFastApi: TfrDemoFastApi
   Font.Name = 'Segoe UI'
   Font.Style = []
   WindowState = wsMaximized
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   TextHeight = 15
   object plSet: TPanel
     Left = 0
     Top = 0
-    Width = 1646
+    Width = 1560
     Height = 80
     Align = alTop
     TabOrder = 0
-    ExplicitLeft = -50
-    ExplicitWidth = 867
+    ExplicitWidth = 1556
     object Label1: TLabel
       Left = 4
       Top = 17
@@ -102,16 +103,16 @@ object frDemoFastApi: TfrDemoFastApi
   object grdMain: TcxGrid
     Left = 0
     Top = 139
-    Width = 353
+    Width = 330
     Height = 615
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
     Margins.Bottom = 4
     Align = alLeft
-    TabOrder = 5
+    TabOrder = 1
     LookAndFeel.ScrollbarMode = sbmClassic
-    ExplicitHeight = 602
+    ExplicitHeight = 614
     object vwMain: TcxGridDBTableView
       Navigator.Buttons.CustomButtons = <>
       ScrollbarAnnotations.CustomAnnotations = <>
@@ -153,42 +154,39 @@ object frDemoFastApi: TfrDemoFastApi
     end
   end
   object pgDesign: TcxPageControl
-    Left = 353
+    Left = 330
     Top = 139
-    Width = 1293
+    Width = 1230
     Height = 615
     Align = alClient
     TabOrder = 6
     Properties.ActivePage = tabSheetData
     Properties.CustomButtons.Buttons = <>
     Properties.Style = 10
-    ExplicitLeft = -82
-    ExplicitTop = 97
-    ExplicitWidth = 1265
-    ExplicitHeight = 509
+    ExplicitWidth = 1226
+    ExplicitHeight = 614
     ClientRectBottom = 615
-    ClientRectRight = 1293
+    ClientRectRight = 1230
     ClientRectTop = 21
     object tabSheetData: TcxTabSheet
       Caption = #25968#25454#35774#35745
       ImageIndex = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 1226
+      ExplicitHeight = 593
       object pgData: TcxPageControl
-        Left = 257
+        Left = 230
         Top = 0
-        Width = 1036
+        Width = 1000
         Height = 594
         Align = alClient
         TabOrder = 0
-        Properties.ActivePage = tabSheetField
+        Properties.ActivePage = tabSheetParams
         Properties.CustomButtons.Buttons = <>
         Properties.Style = 10
-        ExplicitWidth = 1008
-        ExplicitHeight = 483
+        ExplicitWidth = 996
+        ExplicitHeight = 593
         ClientRectBottom = 594
-        ClientRectRight = 1036
+        ClientRectRight = 1000
         ClientRectTop = 21
         object tabSheetDataInfo: TcxTabSheet
           Caption = #25968#25454#38598#20449#24687
@@ -199,11 +197,10 @@ object frDemoFastApi: TfrDemoFastApi
           object Panel10: TPanel
             Left = 0
             Top = 0
-            Width = 1036
+            Width = 1000
             Height = 137
             Align = alTop
             TabOrder = 0
-            ExplicitWidth = 1008
             object cxLabel5: TcxLabel
               Left = 4
               Top = 6
@@ -425,10 +422,8 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alClient
             Caption = 'SQL'#35821#21477#21450'SQL'#21442#25968'--->SQL'#22266#23450#26465#20214#34892' and 101=102'
             TabOrder = 1
-            ExplicitWidth = 1008
-            ExplicitHeight = 320
             Height = 436
-            Width = 1036
+            Width = 1000
             object dbFDataSQL: TcxDBMemo
               Left = 2
               Top = 20
@@ -437,28 +432,25 @@ object frDemoFastApi: TfrDemoFastApi
               DataBinding.DataSource = dsData
               Properties.ScrollBars = ssBoth
               TabOrder = 0
-              ExplicitTop = 25
-              ExplicitWidth = 1004
-              ExplicitHeight = 293
               Height = 414
-              Width = 1032
+              Width = 996
             end
           end
         end
         object tabSheetField: TcxTabSheet
           Caption = #23383#27573#20449#24687
           ImageIndex = 1
-          ExplicitWidth = 573
-          ExplicitHeight = 560
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Panel3: TPanel
             Left = 0
             Top = 0
-            Width = 1036
+            Width = 1000
             Height = 35
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
-            ExplicitWidth = 573
             object tbFieldAdd: TcxButton
               Left = 2
               Top = 4
@@ -467,6 +459,7 @@ object frDemoFastApi: TfrDemoFastApi
               Caption = #26032#22686
               OptionsImage.ImageIndex = 0
               TabOrder = 0
+              OnClick = tbFieldAddClick
             end
             object tbFieldDel: TcxButton
               Left = 83
@@ -475,8 +468,8 @@ object frDemoFastApi: TfrDemoFastApi
               Height = 25
               Caption = #21024#38500
               OptionsImage.ImageIndex = 10
-              OptionsImage.Images = dmImg.img16
               TabOrder = 1
+              OnClick = tbFieldDelClick
             end
             object tbFieldAddAll: TcxButton
               Left = 164
@@ -486,6 +479,7 @@ object frDemoFastApi: TfrDemoFastApi
               Caption = #25209#37327#29983#25104#23383#27573
               OptionsImage.ImageIndex = 0
               TabOrder = 2
+              OnClick = tbFieldAddAllClick
             end
             object tbFieldDelAll: TcxButton
               Left = 295
@@ -495,17 +489,16 @@ object frDemoFastApi: TfrDemoFastApi
               Caption = #21024#38500#25152#26377
               OptionsImage.ImageIndex = 10
               TabOrder = 3
+              OnClick = tbFieldDelAllClick
             end
           end
           object grdField: TcxGrid
             Left = 0
             Top = 35
-            Width = 1036
+            Width = 1000
             Height = 538
             Align = alClient
             TabOrder = 1
-            ExplicitWidth = 573
-            ExplicitHeight = 525
             object vwField: TcxGridDBTableView
               Navigator.Buttons.CustomButtons = <>
               ScrollbarAnnotations.CustomAnnotations = <>
@@ -583,18 +576,17 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetParams: TcxTabSheet
           Caption = #26465#20214#21442#25968#35774#32622
           ImageIndex = 2
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
+          ExplicitWidth = 996
+          ExplicitHeight = 572
           object Panel11: TPanel
             Left = 0
             Top = 0
-            Width = 1036
+            Width = 1000
             Height = 35
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
-            ExplicitWidth = 573
+            ExplicitWidth = 996
             object tbParamsGet: TcxButton
               Left = 5
               Top = 4
@@ -602,8 +594,8 @@ object frDemoFastApi: TfrDemoFastApi
               Height = 25
               Caption = #33719#21462'SQL'#21442#25968
               OptionsImage.ImageIndex = 0
-              OptionsImage.Images = dmImg.img16
               TabOrder = 0
+              OnClick = tbParamsGetClick
             end
             object tbParamsAdd: TcxButton
               Left = 138
@@ -612,8 +604,8 @@ object frDemoFastApi: TfrDemoFastApi
               Height = 25
               Caption = #26032#22686
               OptionsImage.ImageIndex = 0
-              OptionsImage.Images = dmImg.img16
               TabOrder = 1
+              OnClick = tbParamsAddClick
             end
             object tbParamsDel: TcxButton
               Left = 219
@@ -622,19 +614,19 @@ object frDemoFastApi: TfrDemoFastApi
               Height = 25
               Caption = #21024#38500
               OptionsImage.ImageIndex = 10
-              OptionsImage.Images = dmImg.img16
               TabOrder = 2
+              OnClick = tbParamsDelClick
             end
           end
           object grdParam: TcxGrid
             Left = 0
             Top = 35
-            Width = 1036
+            Width = 1000
             Height = 345
             Align = alClient
             TabOrder = 1
-            ExplicitWidth = 573
-            ExplicitHeight = 332
+            ExplicitWidth = 996
+            ExplicitHeight = 344
             object vwParam: TcxGridDBBandedTableView
               Navigator.Buttons.CustomButtons = <>
               ScrollbarAnnotations.CustomAnnotations = <>
@@ -866,10 +858,10 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alBottom
             Caption = #36807#28388#27169#24335'->'#22810#23383#27573#25110#20540#36873#25321
             TabOrder = 2
-            ExplicitTop = 264
-            ExplicitWidth = 1008
+            ExplicitTop = 379
+            ExplicitWidth = 996
             Height = 193
-            Width = 1036
+            Width = 1000
             object dbFFilterFieldItems: TcxDBMemo
               Left = 2
               Top = 20
@@ -877,15 +869,13 @@ object frDemoFastApi: TfrDemoFastApi
               DataBinding.DataField = 'FFilterFieldItems'
               DataBinding.DataSource = dsFilter
               TabOrder = 0
-              ExplicitTop = 25
-              ExplicitHeight = 166
               Height = 171
               Width = 550
             end
             object memoFilterItemRemark: TMemo
               Left = 552
               Top = 20
-              Width = 482
+              Width = 446
               Height = 171
               Align = alClient
               Lines.Strings = (
@@ -903,7 +893,7 @@ object frDemoFastApi: TfrDemoFastApi
                 '---'#36755#20837'3'#21462#24471'SQL and 1=1 '#32452#35013)
               ScrollBars = ssBoth
               TabOrder = 1
-              ExplicitWidth = 19
+              ExplicitWidth = 442
             end
           end
         end
@@ -911,16 +901,16 @@ object frDemoFastApi: TfrDemoFastApi
       object Panel1: TPanel
         Left = 0
         Top = 0
-        Width = 257
+        Width = 230
         Height = 594
         Align = alLeft
         Caption = 'Panel1'
         TabOrder = 1
-        ExplicitHeight = 483
+        ExplicitHeight = 593
         object Panel2: TPanel
           Left = 1
           Top = 1
-          Width = 255
+          Width = 228
           Height = 35
           Align = alTop
           BevelOuter = bvNone
@@ -933,30 +923,33 @@ object frDemoFastApi: TfrDemoFastApi
             Caption = #26032#22686
             OptionsImage.ImageIndex = 4
             TabOrder = 0
+            OnClick = tbDataAddClick
           end
           object tbDataDel: TcxButton
-            Left = 183
+            Left = 151
             Top = 4
             Width = 67
             Height = 25
             Caption = #21024#38500
             OptionsImage.ImageIndex = 5
             TabOrder = 1
+            OnClick = tbDataDelClick
           end
           object tbDataChildAdd: TcxButton
             Left = 78
             Top = 4
-            Width = 103
+            Width = 75
             Height = 25
             Caption = #26032#22686#23376#33410#28857
             OptionsImage.ImageIndex = 4
             TabOrder = 2
+            OnClick = tbDataChildAddClick
           end
         end
         object DataTree: TcxDBTreeList
           Left = 1
           Top = 36
-          Width = 255
+          Width = 228
           Height = 557
           Align = alClient
           Bands = <
@@ -971,11 +964,11 @@ object frDemoFastApi: TfrDemoFastApi
           RootValue = -1
           ScrollbarAnnotations.CustomAnnotations = <>
           TabOrder = 1
-          ExplicitHeight = 446
+          ExplicitHeight = 556
           object colFMenuTreeCode: TcxDBTreeListColumn
             Caption.Text = #33410#28857
             DataBinding.FieldName = 'FTreeCode'
-            Width = 103
+            Width = 94
             Position.ColIndex = 0
             Position.RowIndex = 0
             Position.BandIndex = 0
@@ -993,6 +986,136 @@ object frDemoFastApi: TfrDemoFastApi
             Summary.GroupFooterSummaryItems = <>
           end
         end
+      end
+    end
+    object cxTabSheet1: TcxTabSheet
+      Caption = #30456#20851#34920#25968#25454#32467#26500','#35831#20808#21019#24314#22909#34920#32467#26500#22312#26469
+      ImageIndex = 1
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object edSQL: TMemo
+        Left = 0
+        Top = 0
+        Width = 1230
+        Height = 594
+        Align = alClient
+        Lines.Strings = (
+          '-------FastApi'#37197#32622#20027#34920'-------------'
+          ''
+          'CREATE TABLE dbo.onefast_api('
+          #9'FApiID nvarchar(32) primary key,'
+          #9'FPApiID nvarchar(32) NULL,'
+          #9'FApiCode nvarchar(50) NULL,'
+          #9'FApiCaption nvarchar(50) NULL,'
+          #9'FOrderNumber int NULL,'
+          #9'FIsMenu bit NULL,'
+          #9'FIsEnabled bit NULL)'
+          ''
+          '-------FastApi'#25968#25454#28304#34920'-------------'
+          'CREATE TABLE dbo.onefast_api_data('
+          #9'FDataID nvarchar(32) primary key ,'
+          #9'FPDataID nvarchar(32) NULL,'
+          #9'FApiID nvarchar(32) NULL,'
+          #9'FTreeCode nvarchar(30) NULL,'
+          #9'FDataName nvarchar(50) NULL,'
+          #9'FDataCaption nvarchar(50) NULL,'
+          #9'FDataJsonName nvarchar(50) NULL,'
+          #9'FDataJsonType nvarchar(20) NULL,'
+          #9'FDataZTCode nvarchar(50) NULL,'
+          #9'FDataTable nvarchar(50) NULL,'
+          #9'FDataStoreName nvarchar(100) NULL,'
+          #9'FDataPrimaryKey nvarchar(50) NULL,'
+          #9'FDataOpenMode nvarchar(20) NULL,'
+          #9'FDataPageSize int NULL,'
+          #9'FDataUpdateMode nvarchar(20) NULL,'
+          #9'FDataSQL text NULL,'
+          #9'FMinAffected int NULL,'
+          #9'FMaxAffected int NULL)'
+          ''
+          '-------FastApi'#23383#27573#34920'-------------'
+          'CREATE TABLE dbo.onefast_api_field('
+          #9'FFieldID nvarchar(32) primary key,'
+          #9'FDataID nvarchar(32) NULL,'
+          #9'FApiID nvarchar(32) NULL,'
+          #9'FOrderNumber int NULL,'
+          #9'FFieldName nvarchar(50) NULL,'
+          #9'FFieldCaption nvarchar(50) NULL,'
+          #9'FFieldJsonName nvarchar(50) NULL,'
+          #9'FFieldKind nvarchar(20) NULL,'
+          #9'FFieldDataType nvarchar(30) NULL,'
+          #9'FFieldSize int NULL,'
+          #9'FFieldPrecision int NULL,'
+          #9'FFieldProvidFlagKey bit NULL,'
+          #9'FFieldProvidFlagUpdate bit NULL,'
+          #9'FFieldProvidFlagWhere bit NULL,'
+          #9'FFieldDefaultValueType nvarchar(30) NULL,'
+          #9'FFieldDefaultValue nvarchar(30) NULL,'
+          #9'FFieldShowPass bit NULL,'
+          #9'FFieldCheckEmpty bit NULL'
+          ')'
+          '-------FastApi'#26465#20214#34920'-------------'
+          'CREATE TABLE dbo.onefast_api_filter('
+          #9'FFilterID nvarchar(32) primary key ,'
+          #9'FDataID nvarchar(32) NULL,'
+          #9'FApiID nvarchar(32) NULL,'
+          #9'FOrderNumber int NULL,'
+          #9'FFilterName nvarchar(50) NULL,'
+          #9'FFilterCaption nvarchar(50) NULL,'
+          #9'FFilterJsonName nvarchar(50) NULL,'
+          #9'FFilterFieldMode nvarchar(20) NULL,'
+          #9'FFilterField nvarchar(50) NULL,'
+          #9'FPFilterField nvarchar(50) NULL,'
+          #9'FFilterFieldItems nvarchar(500) NULL,'
+          #9'FFilterDataType nvarchar(20) NULL,'
+          #9'FFilterFormat nvarchar(20) NULL,'
+          #9'FFilterExpression nvarchar(10) NULL,'
+          #9'FFilterbMust bit NULL,'
+          #9'FFilterbValue bit NULL,'
+          #9'FFilterDefaultType nvarchar(20) NULL,'
+          #9'FFilterDefaultValue nvarchar(50) NULL,'
+          #9'FbOutParam bit NULL,'
+          #9'FOutParamTag nvarchar(30) NULL)')
+        TabOrder = 0
+      end
+    end
+    object cxTabSheet2: TcxTabSheet
+      Caption = #35831#27714#25968#25454#30340#26684#24335#21442#32771
+      ImageIndex = 2
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object Memo1: TMemo
+        Left = 249
+        Top = 0
+        Width = 448
+        Height = 594
+        Align = alLeft
+        Lines.Strings = (
+          '{'
+          '    "apiCode":"'#25509#21475#20195#30721'",'
+          '    "apiData":{'#25509#21475#25552#20132#30340#25968#25454#21487#20197#26159'Json'#23545#35937#20063#21487#20197#26159'Json'#25968#32452'},'
+          '    "apiParam":{'#25509#21475#25552#20132#30340#21442#25968',Json'#23545#35937'},'
+          '    "apiPage":{"pageIndex":1,"pageSize":20},//'#20998#39029#20449#24687
+          '    "apiZTCode":""  //'#25351#23450#26597#35810#21738#20010#36134#22871','#21487#20197#25918#31354#65292#25918#31354#23601#26159#20027#36134#22871
+          '}')
+        TabOrder = 0
+      end
+      object Memo2: TMemo
+        Left = 0
+        Top = 0
+        Width = 249
+        Height = 594
+        Align = alLeft
+        Lines.Strings = (
+          '{'
+          '    "apiCode":"TEST",'
+          '    "apiData":{},'
+          '    "apiParam":{},'
+          '    "apiPage":{},'
+          '    "apiZTCode":""'
+          '}')
+        TabOrder = 1
       end
     end
   end
@@ -1032,8 +1155,8 @@ object frDemoFastApi: TfrDemoFastApi
     MenusShowRecentItemsFirst = False
     PopupMenuLinks = <>
     UseSystemFont = False
-    Left = 351
-    Top = 236
+    Left = 463
+    Top = 476
     PixelsPerInch = 96
     DockControlHeights = (
       0
@@ -1052,11 +1175,15 @@ object frDemoFastApi: TfrDemoFastApi
       DockedLeft = 0
       DockedTop = 0
       DockingStyle = dsTop
-      FloatLeft = 820
-      FloatTop = -11
-      FloatClientWidth = 76
-      FloatClientHeight = 423
+      FloatLeft = 990
+      FloatTop = 235
+      FloatClientWidth = 51
+      FloatClientHeight = 236
       ItemLinks = <
+        item
+          Visible = True
+          ItemName = 'tbRefsh'
+        end
         item
           Visible = True
           ItemName = 'tbNew'
@@ -1071,7 +1198,11 @@ object frDemoFastApi: TfrDemoFastApi
         end
         item
           Visible = True
-          ItemName = 'tbRefsh'
+          ItemName = 'tbRefreshApi'
+        end
+        item
+          Visible = True
+          ItemName = 'tbSaveSet'
         end>
       OneOnRow = True
       Row = 0
@@ -1081,10 +1212,11 @@ object frDemoFastApi: TfrDemoFastApi
       WholeRow = True
     end
     object tbSave: TdxBarLargeButton
-      Caption = #20445#23384
+      Caption = #20445#23384#25509#21475
       Category = 0
-      Hint = #20445#23384
+      Hint = #20445#23384#25509#21475
       Visible = ivAlways
+      OnClick = tbSaveClick
       AutoGrayScale = False
       LargeImageIndex = 0
       SyncImageIndex = False
@@ -1101,26 +1233,48 @@ object frDemoFastApi: TfrDemoFastApi
       ImageIndex = 10
     end
     object tbApiEdit: TdxBarLargeButton
-      Caption = #32534#36753
+      Caption = #32534#36753#25509#21475
       Category = 0
-      Hint = #32534#36753
+      Hint = #32534#36753#25509#21475
       Visible = ivAlways
+      OnClick = tbApiEditClick
       AutoGrayScale = False
       LargeImageIndex = 2
     end
     object tbNew: TdxBarLargeButton
-      Caption = #26032#22686
+      Caption = #26032#22686#25509#21475
       Category = 0
-      Hint = #26032#22686
+      Hint = #26032#22686#25509#21475
       Visible = ivAlways
+      OnClick = tbNewClick
       AutoGrayScale = False
       LargeImageIndex = 1
     end
     object tbRefsh: TdxBarLargeButton
-      Caption = #21047#26032
+      Caption = #25171#24320
       Category = 0
-      Hint = #21047#26032
+      Hint = #25171#24320
       Visible = ivAlways
+      OnClick = tbRefshClick
+      AutoGrayScale = False
+      LargeImageIndex = 3
+    end
+    object tbSaveSet: TdxBarLargeButton
+      Align = iaCenter
+      Caption = #20445#23384#37197#32622
+      Category = 0
+      Hint = #20445#23384#37197#32622
+      Visible = ivAlways
+      OnClick = tbSaveSetClick
+      AutoGrayScale = False
+      LargeImageIndex = 0
+    end
+    object tbRefreshApi: TdxBarLargeButton
+      Caption = #21047#26032#26381#21153#31471'Api'#37197#32622
+      Category = 0
+      Hint = #21047#26032#26381#21153#31471'Api'#37197#32622
+      Visible = ivAlways
+      OnClick = tbRefreshApiClick
       AutoGrayScale = False
       LargeImageIndex = 3
     end
@@ -1552,6 +1706,7 @@ object frDemoFastApi: TfrDemoFastApi
       end>
   end
   object qryFastApi: TOneDataSet
+    OnNewRecord = qryFastApiNewRecord
     CachedUpdates = True
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
@@ -1566,7 +1721,6 @@ object frDemoFastApi: TfrDemoFastApi
       'select'
       '*'
       'from onefast_api'
-      'where  FIsMenu=:FIsMenu'
       'order by FOrderNumber asc')
     DataInfo.CreateID = '4ed2e60909114644becf5897edb63348'
     DataInfo.MetaInfoKind = mkNone
@@ -1585,15 +1739,11 @@ object frDemoFastApi: TfrDemoFastApi
     DataInfo.AsynMode = False
     DataInfo.IsReturnData = False
     DataInfo.TranSpanSec = 0
-    Params = <
-      item
-        Name = 'FIsMenu'
-        Value = Null
-      end>
+    Params = <>
     MultiIndex = 0
     ActiveDesign = False
-    Left = 368
-    Top = 352
+    Left = 144
+    Top = 432
     object qryFastApiFApiID: TWideStringField
       FieldName = 'FApiID'
       Size = 32
@@ -1626,8 +1776,8 @@ object frDemoFastApi: TfrDemoFastApi
   end
   object dsFastApi: TDataSource
     DataSet = qryFastApi
-    Left = 432
-    Top = 352
+    Left = 224
+    Top = 432
   end
   object dsData: TDataSource
     DataSet = qryData
@@ -1635,6 +1785,8 @@ object frDemoFastApi: TfrDemoFastApi
     Top = 48
   end
   object qryData: TOneDataSet
+    AfterScroll = qryDataAfterScroll
+    OnNewRecord = qryDataNewRecord
     CachedUpdates = True
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
@@ -1761,9 +1913,10 @@ object frDemoFastApi: TfrDemoFastApi
   object dsField: TDataSource
     DataSet = qryField
     Left = 540
-    Top = 64
+    Top = 48
   end
   object qryField: TOneDataSet
+    OnNewRecord = qryFieldNewRecord
     CachedUpdates = True
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
@@ -1799,7 +1952,7 @@ object frDemoFastApi: TfrDemoFastApi
       end>
     MultiIndex = 0
     ActiveDesign = False
-    Left = 580
+    Left = 572
     Top = 48
     object qryFieldFFieldID: TWideStringField
       FieldName = 'FFieldID'
@@ -1897,6 +2050,7 @@ object frDemoFastApi: TfrDemoFastApi
     end
   end
   object qryFilter: TOneDataSet
+    OnNewRecord = qryFilterNewRecord
     CachedUpdates = True
     FetchOptions.AssignedValues = [evMode]
     FetchOptions.Mode = fmAll
@@ -2032,5 +2186,33 @@ object frDemoFastApi: TfrDemoFastApi
     DataSet = qryFilter
     Left = 684
     Top = 56
+  end
+  object qryFieldGet: TOneDataSet
+    CachedUpdates = True
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    DataInfo.MetaInfoKind = mkNone
+    DataInfo.OpenMode = openData
+    DataInfo.SaveMode = saveData
+    DataInfo.DataReturnMode = dataStream
+    DataInfo.PageSize = 1
+    DataInfo.PageIndex = 0
+    DataInfo.PageCount = 0
+    DataInfo.PageTotal = 0
+    DataInfo.AffectedMaxCount = 0
+    DataInfo.AffectedMustCount = 1
+    DataInfo.RowsAffected = 0
+    DataInfo.AsynMode = False
+    DataInfo.IsReturnData = False
+    DataInfo.TranSpanSec = 0
+    Params = <>
+    MultiIndex = 0
+    ActiveDesign = False
+    Left = 264
+    Top = 347
   end
 end

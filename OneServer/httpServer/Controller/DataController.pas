@@ -86,7 +86,7 @@ begin
   except
     on e: Exception do
     begin
-
+      result.ResultMsg := e.Message;
     end;
   end;
 end;
@@ -116,22 +116,30 @@ var
   i: Integer;
 begin
   result := TOneDataResult.Create;
-  lOneGlobal := TOneGlobal.GetInstance();
-  for i := 0 to QSaveDMLDatas.Count - 1 do
-  begin
-    // 客户端提交的 SQL还原
-    QSaveDMLDatas[i].SQL := OneSQLCrypto.SwapDecodeCrypto(QSaveDMLDatas[i].SQL);
+  try
+    lOneGlobal := TOneGlobal.GetInstance();
+    for i := 0 to QSaveDMLDatas.Count - 1 do
+    begin
+      // 客户端提交的 SQL还原
+      QSaveDMLDatas[i].SQL := OneSQLCrypto.SwapDecodeCrypto(QSaveDMLDatas[i].SQL);
+    end;
+    // 保存数据
+    if not lOneGlobal.ZTManage.SaveDatas(QSaveDMLDatas, result) then
+    begin
+      exit;
+    end;
+    // 解析相关数据
+    if result.ResultOK then
+    begin
+      result.DoResultitems();
+    end;
+  except
+    on e: Exception do
+    begin
+      result.ResultMsg := e.Message;
+    end;
   end;
-  // 保存数据
-  if not lOneGlobal.ZTManage.SaveDatas(QSaveDMLDatas, result) then
-  begin
-    exit;
-  end;
-  // 解析相关数据
-  if result.ResultOK then
-  begin
-    result.DoResultitems();
-  end;
+
 end;
 
 // 下载文件

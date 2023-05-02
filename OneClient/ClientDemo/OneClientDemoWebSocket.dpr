@@ -1,8 +1,8 @@
-﻿program OneClientDemoFastApi;
+﻿program OneClientDemoWebSocket;
 
 uses
   Vcl.Forms,
-  frmDemoFastApi in 'frmDemoFastApi.pas' {frDemoFastApi};
+  frmDemoWebSocket in 'frmDemoWebSocket.pas' {frDemoWebSocket};
 
 {$R *.res}
 
@@ -12,7 +12,7 @@ begin
   if DebugHook <> 0 then
     ReportMemoryLeaksOnShutdown := true;
   Application.MainFormOnTaskbar := true;
-  Application.CreateForm(TfrDemoFastApi, frDemoFastApi);
+  Application.CreateForm(TfrDemoWebSocket, frDemoWebSocket);
   Application.Run;
 
 end.

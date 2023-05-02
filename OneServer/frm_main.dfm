@@ -443,6 +443,93 @@ object frmMain: TfrmMain
         Caption = 'WebSocket(WS)'#37197#32622
         TabOrder = 2
         ExplicitWidth = 870
+        object Label18: TLabel
+          Left = 246
+          Top = 35
+          Width = 54
+          Height = 20
+          Caption = 'WS'#31471#21475
+        end
+        object Label19: TLabel
+          Left = 10
+          Top = 68
+          Width = 80
+          Height = 20
+          Caption = #24037#20316#32447#31243#25968
+        end
+        object Label20: TLabel
+          Left = 246
+          Top = 68
+          Width = 64
+          Height = 20
+          Caption = #38431#21015#22823#23567
+        end
+        object Label21: TLabel
+          Left = 480
+          Top = 68
+          Width = 96
+          Height = 20
+          Caption = #24191#25773#28040#24687#27979#35797
+        end
+        object checkWS: TCheckBox
+          Left = 15
+          Top = 32
+          Width = 138
+          Height = 17
+          Caption = 'WebSocket'#24320#21551
+          TabOrder = 0
+        end
+        object edWSPort: TEdit
+          Left = 329
+          Top = 32
+          Width = 117
+          Height = 28
+          NumbersOnly = True
+          TabOrder = 1
+          Text = '9099'
+        end
+        object edWsThreadPool: TEdit
+          Left = 104
+          Top = 65
+          Width = 121
+          Height = 28
+          NumbersOnly = True
+          TabOrder = 2
+          Text = '100'
+        end
+        object edWsQueue: TEdit
+          Left = 329
+          Top = 65
+          Width = 121
+          Height = 28
+          NumbersOnly = True
+          TabOrder = 3
+          Text = '1000'
+        end
+        object checkWsAutoStart: TCheckBox
+          Left = 469
+          Top = 32
+          Width = 97
+          Height = 17
+          Caption = #33258#21551#21160#26381#21153
+          TabOrder = 4
+        end
+        object edSendMsgTest: TEdit
+          Left = 590
+          Top = 65
+          Width = 186
+          Height = 28
+          TabOrder = 5
+        end
+        object tbSendMsg: TButton
+          Left = 784
+          Top = 67
+          Width = 75
+          Height = 25
+          Caption = #21457#36865#28040#24687
+          TabOrder = 6
+          OnClick = tbSendMsgClick
+        end
       end
     end
     object tabZTManage: TTabSheet
@@ -837,7 +924,7 @@ object frmMain: TfrmMain
         Align = alTop
         TabOrder = 0
         object tbTokenSelect: TButton
-          Left = 0
+          Left = 4
           Top = 8
           Width = 105
           Height = 25
@@ -855,7 +942,7 @@ object frmMain: TfrmMain
           OnClick = tbTokenDeleteClick
         end
         object tbTokenSave: TButton
-          Left = 256
+          Left = 235
           Top = 8
           Width = 105
           Height = 25
@@ -1213,7 +1300,7 @@ object frmMain: TfrmMain
   end
   object plZTSet: TPanel
     Left = 237
-    Top = 188
+    Top = 140
     Width = 401
     Height = 232
     Caption = '9091'

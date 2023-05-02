@@ -373,7 +373,21 @@ begin
       Result.FFileID := lFastFile.FFileID;
       Result.FFileName := lFastFile.FFileName;
       Result.FFilePosition := 0;
+{$IF CompilerVersion > 34}
+      // 11才有这个方法
       Result.FFileSize := TFile.GetSize(lFastFile.FFilePhyPath);
+{$ELSE}
+      lFileStream := nil;
+      try
+        lFileStream := TFileStream.Create(lSaveFilePath, fmOpenRead);
+        Result.FFileSize := lFileStream.Size;
+
+        // Result.FFileSize := TFile.GetSize(lFastFile.FFilePhyPath);
+      finally
+        if lFileStream <> nil then
+          lFileStream.Free;
+      end;
+{$ENDIF}
       // Result.FSaveFileName := lFileName;
       Result.FSavePhyPath := lFastFile.FFilePhyPath;
       Result.FDataBase64 := '';

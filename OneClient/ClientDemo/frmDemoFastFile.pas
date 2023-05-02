@@ -179,6 +179,8 @@ begin
   end
   else
   begin
+    // 全局设置，如果控件没挂勾 connetion,默认走的就是全局的
+    OneClientConnect.Unit_Connection := OneConnection;
     showMessage('连接成功');
   end;
 end;

@@ -273,6 +273,7 @@ object Form2: TForm2
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
     DataInfo.Connection = OneConnection
+    DataInfo.MetaInfoKind = mkNone
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
@@ -301,6 +302,7 @@ object Form2: TForm2
     UpdateOptions.AssignedValues = [uvUpdateMode, uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
     DataInfo.Connection = OneConnection
+    DataInfo.MetaInfoKind = mkNone
     DataInfo.OpenMode = openData
     DataInfo.SaveMode = saveData
     DataInfo.DataReturnMode = dataStream
