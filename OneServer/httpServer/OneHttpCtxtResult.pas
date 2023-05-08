@@ -82,6 +82,7 @@ type
 
   THTTPCtxt = class
   private
+    FConnectionID: int64;
     // HTTP请求方法 GET,POST等
     FMethod: string;
     // 执行控制器哪个方法
@@ -92,7 +93,7 @@ type
     FClientMAC: string;
     // URL路径 有参数代参数 ?xxxx=zzzz
     FUrl: String;
-    //url不代参数 ？?xxxx=zzzz
+    // url不代参数 ？?xxxx=zzzz
     FUrlPath: string;
     // URL请求的参数
     FUrlParams: TStringList;
@@ -111,7 +112,7 @@ type
     FRequestAccept: string;
     FRequestAcceptCharset: string;
     { 自定义head解析 }
-    FResponCustHeaderList: string;
+    FResponCustHeaderList: RawByteString;
     FTokenUserCode: string;
   public
     destructor Destroy; override;
@@ -120,6 +121,7 @@ type
     procedure SetInContent(qInContent: RawByteString);
   public
     procedure AddCustomerHead(QHead: string; QConnect: string);
+    property ConnectionID: int64 read FConnectionID write FConnectionID;
     property URL: String read FUrl write FUrl;
     property URLPath: String read FUrlPath write FUrlPath;
     property ClientIP: String read FClientIP write FClientIP;
@@ -132,7 +134,7 @@ type
     property RequestInHeaders: RawByteString read FRequestInHeaders write FRequestInHeaders;
     property OutContent: RawByteString read FOutContent write FOutContent;
     property RequestAccept: String read FRequestAccept write FRequestAccept;
-    property ResponCustHeaderList: String read FResponCustHeaderList write FResponCustHeaderList;
+    property ResponCustHeaderList: RawByteString read FResponCustHeaderList write FResponCustHeaderList;
     property TokenUserCode: String read FTokenUserCode write FTokenUserCode;
     property Method: String read FMethod write FMethod;
     property ControllerMethodName: String read FControllerMethodName write FControllerMethodName;

@@ -65,6 +65,7 @@ type
   TFastFile = class
   private
     FFileID_: string;
+    FFileSetCode_: string;
     FFileName_: string; // 文件名称
     FFilePhyPath_: string; // 保存的物理路径
     FFileHttpUrl_: string; // 保存的http路径,后期预留
@@ -75,6 +76,7 @@ type
     FCreateTime_: TDateTime; // 创建时间
   published
     property FFileID: string read FFileID_ write FFileID_;
+    property FFileSetCode: string read FFileSetCode_ write FFileSetCode_;
     property FFileName: string read FFileName_ write FFileName_;
     property FFilePhyPath: string read FFilePhyPath_ write FFilePhyPath_;
     property FFileHttpUrl: string read FFileHttpUrl_ write FFileHttpUrl_;
@@ -553,6 +555,7 @@ begin
       lFastFile := TFastFile.Create;
       lFastFile.FFileID := lFileTask.FFileID;
       lFastFile.FFileName := lFileTask.FFileName;
+      lFastFile.FFileSetCode := lFileTask.FFileSetCode;
       lFastFile.FFilePhyPath := lFileTask.FSavePhyPath;
       lFastFile.FFileHttpUrl := '';
       lFastFile.FFileSize := lFileTask.FFileSize;

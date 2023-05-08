@@ -48,6 +48,16 @@ QQ群：814696487（原来的群被封了，请加新群）
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
 ## 更新日志
+************2023-05-07***********  
+--祝大家五一快乐,给大家一份大礼包吧  
+服务端:  
+	1.增加WebSocket互相发送消息功能，及修正一些乱码问题  
+	2.增加WebSocket对外相关controll接口  
+客户端:	  
+	1.为OneWebSocketClient.TOneWebSocketClient增加功能及修正  
+	1.增加Demo OneClientDemoWebSocketChat 发送消息  
+
+
 ************2023-05-01***********  
 --祝大家五一快乐,给大家一份大礼包吧  
 服务端:  

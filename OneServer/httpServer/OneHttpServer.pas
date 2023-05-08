@@ -194,6 +194,10 @@ begin
               Ctxt.OutContent := lHTTPCtxt.OutContent;
               Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
               Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
+              if lHTTPCtxt.ResponCustHeaderList <> '' then
+              begin
+                Ctxt.OutCustomHeaders := Ctxt.OutCustomHeaders + #13#10 + lHTTPCtxt.ResponCustHeaderList;
+              end;
               Result := HTTP_SUCCESS;
             end
             else if lHTTPResult.ResultOutMode = THTTPResultMode.HTML then
@@ -301,6 +305,8 @@ begin
   self.FThreadPoolCount := 100;
   self.FKeepAliveTimeOut := 30000;
   self.FHttpQueueLength := 1000;
+  self.FHttpServer := nil;
+  self.FHttpsServer := nil;
 end;
 
 destructor TOneHttpServer.Destroy;
@@ -308,6 +314,10 @@ begin
   if FHttpServer <> nil then
   begin
     FHttpServer.Free;
+  end;
+  if FHttpsServer <> nil then
+  begin
+    FHttpsServer.Free;
   end;
   inherited Destroy;
 end;
@@ -384,10 +394,19 @@ end;
 function TOneHttpServer.ServerStop(): boolean;
 begin
   Result := False;
-  if self.FHttpServer <> nil then
-  begin
-    self.FHttpServer.Free;
-    self.FHttpServer := nil;
+  try
+    if self.FHttpServer <> nil then
+    begin
+      self.FHttpServer.Free;
+      self.FHttpServer := nil;
+    end;
+    if self.FHttpsServer <> nil then
+    begin
+      self.FHttpsServer.Free;
+      self.FHttpsServer := nil;
+    end;
+  except
+    exit;
   end;
   self.FStarted := False;
   Result := True;

@@ -122,18 +122,4 @@ object frDemoWebSocket: TfrDemoWebSocket
     Left = 216
     Top = 152
   end
-  object IdIOHandlerStack1: TIdIOHandlerStack
-    MaxLineAction = maException
-    Port = 0
-    DefaultPort = 0
-    Left = 632
-    Top = 392
-  end
-  object IdIOHandlerStream1: TIdIOHandlerStream
-    MaxLineAction = maException
-    Port = 0
-    FreeStreams = False
-    Left = 632
-    Top = 336
-  end
 end

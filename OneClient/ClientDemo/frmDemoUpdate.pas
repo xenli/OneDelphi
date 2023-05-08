@@ -5,7 +5,9 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, OneClientFastUpdate, Vcl.StdCtrls,
-  Vcl.ExtCtrls, OneClientHelper, OneClientConnect, Vcl.ComCtrls;
+  Vcl.ExtCtrls, OneClientHelper, OneClientConnect, Vcl.ComCtrls,
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdIOHandler,
+  IdIOHandlerSocket, IdIOHandlerStack, IdIOHandlerStream, IdHTTP;
 
 type
   TfrDemoUpdate = class(TForm)
@@ -27,6 +29,10 @@ type
     tbUpdateOK: TButton;
     tbResh: TButton;
     edUpdate: TMemo;
+    IdTCPClient1: TIdTCPClient;
+    IdIOHandlerStack1: TIdIOHandlerStack;
+    IdIOHandlerStream1: TIdIOHandlerStream;
+    IdHTTP1: TIdHTTP;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbClientDisConnectClick(Sender: TObject);
     procedure OneFastUpdate1CallBack(QDownStep: enumUpdateDownStep; QFileCount,

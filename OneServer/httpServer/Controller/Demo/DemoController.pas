@@ -4,7 +4,7 @@ interface
 
 uses OneHttpController, OneHttpCtxtResult, OneHttpRouterManage, System.SysUtils,
   System.Generics.Collections, System.Contnrs, System.Classes,
-  FireDAC.Comp.Client, Data.DB, System.JSON;
+  FireDAC.Comp.Client, Data.DB, System.JSON, System.IOUtils;
 
 type
   TPersonResult = class
@@ -172,6 +172,7 @@ procedure TDemoController.GetFile(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult
 begin
   QHTTPResult.ResultOutMode := THTTPResultMode.OUTFILE;
   QHTTPResult.ResultOut := 'C:\Users\Administrator\Pictures\测试ABCD47030062.bmp';
+  QHTTPCtxt.AddCustomerHead('Content-Disposition', 'attachment;filename=' + TPath.GetFileName(QHTTPResult.ResultOut));
 end;
 
 procedure TDemoController.person(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);

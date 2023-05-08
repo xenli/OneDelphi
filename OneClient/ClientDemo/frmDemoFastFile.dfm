@@ -142,6 +142,7 @@ object frDemoFastFile: TfrDemoFastFile
           '--------'#40664#35748#25346#21246#30340#25968#25454#34920'-----------------------'
           'CREATE TABLE dbo.onefast_file('
           #9'FFileID nvarchar(32) primary key,'
+          '               FFileSetCode nvarchar(50),'
           #9'FFileName nvarchar(200),'
           #9'FFileType nvarchar(50),'
           #9'FFilePhyPath nvarchar(500),'

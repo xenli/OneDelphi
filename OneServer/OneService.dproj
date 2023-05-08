@@ -224,6 +224,8 @@
         <DCCReference Include="OneFastUpload\OneFastUpdateController.pas"/>
         <DCCReference Include="OneFastFile\OneFastFileMange.pas"/>
         <DCCReference Include="OneFastFile\OneFastFileController.pas"/>
+        <DCCReference Include="httpServer\Controller\OneWsChatController.pas"/>
+        <DCCReference Include="httpServer\OneWebSocketConst.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

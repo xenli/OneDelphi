@@ -4,9 +4,12 @@
 // https://github.com/yitter/IdGenerator/tree/master/Delphi
 interface
 
-uses uIdGeneratorOptions, uIIdGenerator, uDefaultIdGenerator, uYitIdHelper;
+uses
+  system.Classes, system.StrUtils, system.SysUtils,
+  uIdGeneratorOptions, uIIdGenerator, uDefaultIdGenerator, uYitIdHelper;
 
 function GetUUID(): int64;
+function GetUUIDStr(): string;
 
 implementation
 
@@ -53,7 +56,11 @@ begin
   Result := GetYitIdHelper().NextId();
 end;
 
-// 注册到路由
+function GetUUIDStr(): string;
+begin
+  Result := GetUUID().ToString;
+end;
+
 initialization
 
 

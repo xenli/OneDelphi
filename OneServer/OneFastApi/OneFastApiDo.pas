@@ -362,6 +362,10 @@ begin
       end;
       // 结果输出
       lApiAll.isDoOK := true;
+      if lApiAll.resultCode = 'FastApiFail' then
+      begin
+        lApiAll.resultCode := 'FastApiSuccess'
+      end;
     finally
       lZTItemDict.Clear;
       lZTItemDict.Free;
@@ -507,6 +511,7 @@ begin
       end;
       DoChildStepResult(lStepResult.FChilds);
     end;
+    //
   except
     on e: exception do
     begin

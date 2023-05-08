@@ -192,6 +192,7 @@ begin
     exit;
   end;
   // 获取流水号
+  IsOK := false;
   lResultJsonValue := nil;
   lServerResult := TActionResult < TList < string >>.Create;
   lServerResult.ResultData := TList<string>.Create;
@@ -207,7 +208,7 @@ begin
     end;
     if not OneNeonHelper.JsonToObject(lServerResult, lResultJsonValue, lErrMsg) then
     begin
-      QErrMsg := '返回的数据解析成TResult<TClientConnect>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      QErrMsg := '返回的数据解析成TResult<TList<string>>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
       exit;
     end;
     if not lServerResult.ResultSuccess then

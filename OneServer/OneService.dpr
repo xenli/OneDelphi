@@ -100,7 +100,9 @@ uses
   OneFastUpdateManage in 'OneFastUpload\OneFastUpdateManage.pas',
   OneFastUpdateController in 'OneFastUpload\OneFastUpdateController.pas',
   OneFastFileMange in 'OneFastFile\OneFastFileMange.pas',
-  OneFastFileController in 'OneFastFile\OneFastFileController.pas';
+  OneFastFileController in 'OneFastFile\OneFastFileController.pas',
+  OneWsChatController in 'httpServer\Controller\OneWsChatController.pas',
+  OneWebSocketConst in 'httpServer\OneWebSocketConst.pas';
 
 var
   lpStartupInfo: TStartupInfo;
@@ -113,6 +115,7 @@ begin
   if DebugHook <> 0 then
     ReportMemoryLeaksOnShutdown := True;
   // 设置软件系统时间格式
+  Application.UpdateFormatSettings := false;
   OneDateTimeHelper.SetSystemDataTimeFormatSettings();
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);

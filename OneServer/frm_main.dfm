@@ -1299,8 +1299,8 @@ object frmMain: TfrmMain
     end
   end
   object plZTSet: TPanel
-    Left = 237
-    Top = 140
+    Left = 235
+    Top = 154
     Width = 401
     Height = 232
     Caption = '9091'

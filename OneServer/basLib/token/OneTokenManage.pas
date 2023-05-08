@@ -59,6 +59,20 @@ type
   // function LastTime(): TDateTime;
   // procedure SetLastTime(QValue: TDateTime);
   // end;
+  TWsToken = class
+  private
+    FWsUserID: string;
+    FConnectionID: Int64;
+    FOneTokenID: string; // TOneTokenItem
+    FUserName: string;
+  public
+    function Copy(): TWsToken;
+  published
+    property WsUserID: string read FWsUserID write FWsUserID;
+    property ConnectionID: Int64 read FConnectionID write FConnectionID;
+    property OneTokenID: string read FOneTokenID write FOneTokenID;
+    property UserName: string read FUserName write FUserName;
+  end;
 
   // 如果此token没办法满足你，你自已继承 IOneTokenItem写个
   TOneTokenItem = Class(TObject)
@@ -195,6 +209,15 @@ implementation
 
 uses OneCrypto, OneGUID, OneFileHelper, OneNeonHelper;
 
+function TWsToken.Copy(): TWsToken;
+begin
+  Result := TWsToken.Create;
+  Result.FWsUserID := self.FWsUserID;
+  // Result.FConnectionID := self.FConnectionID;
+  // Result := self.FTokenID;
+  Result.FUserName := self.FUserName;
+end;
+
 procedure TOneTokenItem.SetSysUserType(value: string);
 begin
   self.FSysUserType := value;
@@ -305,7 +328,7 @@ begin
     lTokenItem.FSysUserTable := '';
     lTokenItem.FLastTime := Now;
     FTokenList.Add(lKey, lTokenItem);
-    result := lTokenItem;
+    Result := lTokenItem;
   finally
     TMonitor.exit(self.FLockObj);
   end;
@@ -313,7 +336,7 @@ end;
 
 function TOneTokenManage.AddToken(QTokenItem: TOneTokenItem): boolean;
 begin
-  result := false;
+  Result := false;
   TMonitor.TryEnter(self.FLockObj);
   try
     if self.FTokenList.ContainsKey(QTokenItem.TokenID) then
@@ -321,7 +344,7 @@ begin
       exit;
     end;
     self.FTokenList.Add(QTokenItem.TokenID, QTokenItem);
-    result := true;
+    Result := true;
   finally
     TMonitor.exit(self.FLockObj);
   end;
@@ -331,12 +354,12 @@ function TOneTokenManage.GetToken(QTokenID: string): TOneTokenItem;
 var
   lTokenItem: TOneTokenItem;
 begin
-  result := nil;
+  Result := nil;
   lTokenItem := nil;
   if self.FTokenList.TryGetValue(QTokenID, lTokenItem) then
   begin
     lTokenItem.LastTime := Now;
-    result := lTokenItem;
+    Result := lTokenItem;
   end;
 end;
 
@@ -345,7 +368,7 @@ var
   lKey: string;
   lTokenItem: TOneTokenItem;
 begin
-  result := nil;
+  Result := nil;
   lTokenItem := nil;
   QErrMsg := '';
   lKey := QLoginPlatform + '_' + QLoginCode;
@@ -358,7 +381,7 @@ begin
       if QIsMultiLogin and (lTokenItem <> nil) then
       begin
         lTokenItem.LastTime := Now;
-        result := lTokenItem;
+        Result := lTokenItem;
         exit;
       end;
       if lTokenItem <> nil then
@@ -381,7 +404,7 @@ begin
     lTokenItem.SysUserTable := '';
     lTokenItem.LastTime := Now;
     FTokenList.Add(lKey, lTokenItem);
-    result := lTokenItem;
+    Result := lTokenItem;
   finally
     TMonitor.exit(self.FLockObj);
   end;
@@ -396,8 +419,8 @@ begin
     lTokenItem := nil;
     if FTokenList.TryGetValue(QTokenID, lTokenItem) then
     begin
-      if lTokenItem<>nil then
-       lTokenItem.Free;
+      if lTokenItem <> nil then
+        lTokenItem.Free;
     end;
     FTokenList.Remove(QTokenID);
   finally
@@ -411,7 +434,7 @@ var
   lNow: TDateTime;
   lSub: Double;
 begin
-  result := false;
+  Result := false;
   if FTokenList.TryGetValue(QTokenID, lTokenItem) then
   begin
     //
@@ -431,7 +454,7 @@ begin
     end;
     // 合法刷新最后交互时间,保证TOKEN有效性
     lTokenItem.LastTime := lNow;
-    result := true;
+    Result := true;
   end;
 end;
 
@@ -441,7 +464,7 @@ var
   lNow: TDateTime;
   tempSign: string;
 begin
-  result := false;
+  Result := false;
   lNow := Now;
   if not FTokenList.TryGetValue(QTokenID, lTokenItem) then
     exit;
@@ -450,7 +473,7 @@ begin
   if tempSign.ToLower = QSign.ToLower then
   begin
     lTokenItem.LastTime := lNow;
-    result := true;
+    Result := true;
   end;
 end;
 

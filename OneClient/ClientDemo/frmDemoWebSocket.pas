@@ -5,8 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, OneWebSocketClient,
-  IdIOHandlerStream, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack;
+  OneWebSocketClient;
 
 type
   TfrDemoWebSocket = class(TForm)
@@ -23,8 +22,6 @@ type
     edSendMsg: TEdit;
     tbSendMsg: TButton;
     Label3: TLabel;
-    IdIOHandlerStack1: TIdIOHandlerStack;
-    IdIOHandlerStream1: TIdIOHandlerStream;
     procedure OneWsClientReceiveMessage(const S: string);
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbClientDisConnectClick(Sender: TObject);

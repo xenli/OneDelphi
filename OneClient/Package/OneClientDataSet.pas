@@ -252,6 +252,9 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function RollbackTran(): boolean;
+    //
+    function FindParam(const AValue: string): TFDParam;
+    function ParamByName(const AValue: string): TFDParam;
   published
     { Published declarations }
     /// <param name="SQL">SQL语句，您可以在这里设置您要执行的SQL语句文本，然后通过OpenData方法打开数据集</param>
@@ -1093,6 +1096,18 @@ begin
   finally
     lOneTran.Free;
   end;
+end;
+
+{ ------------------------------------------------------------------------------- }
+function TOneDataSet.FindParam(const AValue: string): TFDParam;
+begin
+  Result := FParams.FindParam(AValue);
+end;
+
+{ ------------------------------------------------------------------------------- }
+function TOneDataSet.ParamByName(const AValue: string): TFDParam;
+begin
+  Result := FParams.ParamByName(AValue);
 end;
 // **********
 

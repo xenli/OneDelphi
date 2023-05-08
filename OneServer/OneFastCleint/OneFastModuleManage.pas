@@ -28,6 +28,8 @@ type
     FIsMulti_: boolean;
     FIsStart_: boolean;
     FModuleScript_: string;
+    //
+    FFileSetCode_: string;
   published
     property FModuleID: string read FModuleID_ write FModuleID_;
     property FModuleCode: string read FModuleCode_ write FModuleCode_;
@@ -39,6 +41,7 @@ type
     property FIsMulti: boolean read FIsMulti_ write FIsMulti_;
     property FIsStart: boolean read FIsStart_ write FIsStart_;
     property FModuleScript: string read FModuleScript_ write FModuleScript_;
+    property FFileSetCode: string read FFileSetCode_ write FFileSetCode_;
   end;
 
   TFastModuleData = class

@@ -180,7 +180,7 @@ object frDemoFastApi: TfrDemoFastApi
         Height = 594
         Align = alClient
         TabOrder = 0
-        Properties.ActivePage = tabSheetParams
+        Properties.ActivePage = tabSheetDataInfo
         Properties.CustomButtons.Buttons = <>
         Properties.Style = 10
         ExplicitWidth = 996
@@ -191,9 +191,6 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetDataInfo: TcxTabSheet
           Caption = #25968#25454#38598#20449#24687
           ImageIndex = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel10: TPanel
             Left = 0
             Top = 0
@@ -440,9 +437,6 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetField: TcxTabSheet
           Caption = #23383#27573#20449#24687
           ImageIndex = 1
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel3: TPanel
             Left = 0
             Top = 0
@@ -991,9 +985,6 @@ object frDemoFastApi: TfrDemoFastApi
     object cxTabSheet1: TcxTabSheet
       Caption = #30456#20851#34920#25968#25454#32467#26500','#35831#20808#21019#24314#22909#34920#32467#26500#22312#26469
       ImageIndex = 1
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object edSQL: TMemo
         Left = 0
         Top = 0
@@ -1082,9 +1073,6 @@ object frDemoFastApi: TfrDemoFastApi
     object cxTabSheet2: TcxTabSheet
       Caption = #35831#27714#25968#25454#30340#26684#24335#21442#32771
       ImageIndex = 2
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Memo1: TMemo
         Left = 249
         Top = 0
