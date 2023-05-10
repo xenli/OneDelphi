@@ -89,18 +89,16 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="vcl.dcp"/>
-        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="designIde.dcp"/>
+        <DCCReference Include="soaprtl.dcp"/>
         <DCCReference Include="dbrtl.dcp"/>
+        <DCCReference Include="IndySystem.dcp"/>
+        <DCCReference Include="IndyProtocols.dcp"/>
+        <DCCReference Include="IndyCore.dcp"/>
         <DCCReference Include="RESTComponents.dcp"/>
         <DCCReference Include="FireDAC.dcp"/>
         <DCCReference Include="FireDACCommonDriver.dcp"/>
         <DCCReference Include="FireDACCommon.dcp"/>
-        <DCCReference Include="soaprtl.dcp"/>
-        <DCCReference Include="DesignIDE.dcp"/>
-        <DCCReference Include="IndySystem.dcp"/>
-        <DCCReference Include="IndyProtocols.dcp"/>
-        <DCCReference Include="IndyCore.dcp"/>
         <DCCReference Include="OneClientConnect.pas"/>
         <DCCReference Include="OneClientConst.pas"/>
         <DCCReference Include="OneClientRegister.pas"/>

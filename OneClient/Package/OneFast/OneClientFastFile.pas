@@ -3,7 +3,7 @@
 interface
 
 uses system.Classes, system.SysUtils, OneClientConnect, system.Generics.Collections,
-  system.json, system.IOUtils, system.NetEncoding;
+  system.json, system.IOUtils, system.NetEncoding, OneClientConst;
 
 const
   // 流水号获取相关功能
@@ -59,6 +59,7 @@ type
   end;
 
   { 升级控件 }
+  [ComponentPlatformsAttribute(OneAllPlatforms)]
   TOneFastFile = class(TComponent)
   private
     FConnection: TOneConnection;

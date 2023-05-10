@@ -28,6 +28,9 @@ type
     FOrderNumber_: integer;
     FIsMenu_: boolean;
     FIsEnabled_: boolean;
+    // Token登陆
+    FApiAuthor_: string; // 权限验证
+    FApiRole_: string; // 用户角色
   published
     property FApiID: string read FApiID_ write FApiID_;
     property FPApiID: string read FPApiID_ write FPApiID_;
@@ -36,6 +39,8 @@ type
     property FOrderNumber: integer read FOrderNumber_ write FOrderNumber_;
     property FIsMenu: boolean read FIsMenu_ write FIsMenu_;
     property FIsEnabled: boolean read FIsEnabled_ write FIsEnabled_;
+    property FApiAuthor: string read FApiAuthor_ write FApiAuthor_;
+    property FApiRole: string read FApiRole_ write FApiRole_;
   end;
 
   TFastApiData = class
@@ -176,7 +181,7 @@ type
     destructor Destroy; override;
     function IsFixSQLParam(): boolean;
     function FieldNames(): TArray<string>;
-    function GetValueSQL(QValue: string; QSQL: string): boolean;
+    function GetValueSQL(QValue: string; var QSQL: string): boolean;
   published
     property FFilterID: string read FFilterID_ write FFilterID_;
     property FDataID: string read FDataID_ write FDataID_;
@@ -373,7 +378,7 @@ begin
   Result := self.FMyFieldNames;
 end;
 
-function TFastApiFilter.GetValueSQL(QValue: string; QSQL: string): boolean;
+function TFastApiFilter.GetValueSQL(QValue: string; var QSQL: string): boolean;
 var
   tempList: TStringList;
   i: integer;

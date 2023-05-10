@@ -112,7 +112,7 @@ procedure TOneWebSocketProtocol.DoIncomingFrame(Sender: TWebSocketProcess; const
 var
   lResultFrame: TWebSocketFrame;
   lJsonObjIn: TJsonObject;
-  lJsonData, lJsonContent: TJsonValue;
+  lJsonValueIn, lJsonData, lJsonContent: TJsonValue;
   lJsonResult: TJsonObject;
   lOneRoot: string;
   lOneMsgID: string;
@@ -158,6 +158,7 @@ begin
         end;
         // 本次交互ID
         lJsonObjIn := nil;
+        lJsonValueIn := nil;
         lOneMsgID := '';
         lOneRoot := '';
         // 消息处理
@@ -169,12 +170,20 @@ begin
         lWSToken := nil;
         lJsonResult := TJsonObject.Create;
         try
-          lJsonObjIn := TJsonObject.ParseJSONValue(Frame.payload) as TJsonObject;
-          if lJsonObjIn = nil then
+          lJsonValueIn := TJsonObject.ParseJSONValue(Frame.payload);
+          if lJsonValueIn = nil then
           begin
-            lJsonResult.AddPair('MsgID', '请输入标准的Json对象[TWsMsg]');
+            lJsonResult.AddPair('MsgData', '请输入标准的Json对象[TWsMsg]');
             exit;
           end;
+          if not(lJsonValueIn is TJsonObject) then
+          begin
+            lJsonValueIn.Free;
+            lJsonResult.AddPair('MsgData', '请输入标准的Json对象[TWsMsg]');
+            exit;
+          end;
+          lJsonObjIn := TJsonObject(lJsonValueIn);
+
           if not OneNeonHelper.JsonToObject(lWsMsg, lJsonObjIn, lErrMsg) then
           begin
             exit;
@@ -465,17 +474,13 @@ function TOneWebSocketServer.SendMsg(QConnectionID: int64; QMsg: string): boolea
 var
   lFrame: TWebSocketFrame;
   lBytes: TBytes;
-  i: integer;
 begin
   Result := false;
   lFrame.opcode := focText;
   lFrame.content := [];
   lFrame.payload := UTF8Encode(QMsg);
   lBytes := TEncoding.UTF8.GetBytes(QMsg);
-  for i := 0 to 9 do
-  begin
-    FWebSocketServer.WebSocketBroadcast(lFrame, [QConnectionID]);
-  end;
+  FWebSocketServer.WebSocketBroadcast(lFrame, [QConnectionID]);
   Result := true;
 end;
 

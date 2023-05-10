@@ -28,18 +28,16 @@ package OneClient;
 {$IMPLICITBUILD ON}
 
 requires
-  vcl,
-  rtl,
+  designIde,
+  soaprtl,
   dbrtl,
+  IndySystem,
+  IndyProtocols,
+  IndyCore,
   RESTComponents,
   FireDAC,
   FireDACCommonDriver,
-  FireDACCommon,
-  soaprtl,
-  DesignIDE,
-  IndySystem,
-  IndyProtocols,
-  IndyCore;
+  FireDACCommon;
 
 contains
   OneClientConnect in 'OneClientConnect.pas',

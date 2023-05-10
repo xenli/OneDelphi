@@ -2,9 +2,12 @@
 
 interface
 
-uses system.Classes, system.SysUtils, OneClientConnect, system.Generics.Collections;
+uses system.Classes, system.SysUtils, OneClientConnect,
+  system.Generics.Collections, OneClientConst;
 
 type
+
+  [ComponentPlatformsAttribute(OneAllPlatforms)]
   TOneUUID = class(TComponent)
   private
     FConnection: TOneConnection;

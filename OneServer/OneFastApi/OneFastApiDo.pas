@@ -63,6 +63,8 @@ type
   end;
 
 function DoFastApi(QToken: TOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
+function DoCheckApiAuthor(QToken: TOneTokenItem; QApiInfo: TFastApiInfo; QApiAll: TApiAll): boolean;
+//
 function DoFastApiStep(QApiDatas: TList<TFastApiData>; QApiAll: TApiAll; QPStepResult: TApiStepResult): boolean;
 function DoFastResultJson(QApiInfo: TFastApiInfo; QApiAll: TApiAll): TJsonValue;
 // openData打开数据
@@ -251,6 +253,11 @@ begin
       lApiAll.errMsg := lApiInfo.errMsg;
       exit;
     end;
+    // 权限把控
+    if not DoCheckApiAuthor(QToken, lApiInfo, lApiAll) then
+    begin
+      exit;
+    end;
     //
     lZTItemDict := TDictionary<string, TOneZTItem>.Create;
     try
@@ -374,6 +381,87 @@ begin
     // 错误返回
     Result := DoFastResultJson(lApiInfo, lApiAll);
     lApiAll.Free;
+  end;
+end;
+
+function DoCheckApiAuthor(QToken: TOneTokenItem; QApiInfo: TFastApiInfo; QApiAll: TApiAll): boolean;
+begin
+  Result := false;
+  if QApiInfo.fastApi.FApiAuthor = '' then
+  begin
+    // 不需要权限
+    Result := true;
+    exit;
+  end;
+  if QApiInfo.fastApi.FApiAuthor = '公开' then
+  begin
+    Result := true;
+    exit;
+  end
+  else if QApiInfo.fastApi.FApiAuthor = 'Token验证' then
+  begin
+    if QToken = nil then
+    begin
+      QApiAll.errMsg := '请先登陆,此接口需要Token验证';
+      exit;
+    end;
+    //
+    if QApiInfo.fastApi.FApiRole <> '' then
+    begin
+      if QApiInfo.fastApi.FApiRole = '超级管理员' then
+      begin
+        if QToken.TokenRole < TOneTokenRole.superRole then
+        begin
+          QApiAll.errMsg := '此接口只有超级管理员可以访问';
+          exit;
+        end
+        else
+        begin
+          Result := true;
+        end;
+      end
+      else if QApiInfo.fastApi.FApiRole = '管理员' then
+      begin
+        if QToken.TokenRole < TOneTokenRole.sysAdminRole then
+        begin
+          QApiAll.errMsg := '此接口只有管理员以上级别可以访问';
+          exit;
+        end
+        else
+        begin
+          Result := true;
+        end;
+      end
+      else if QApiInfo.fastApi.FApiRole = '系统用户' then
+      begin
+        if QToken.TokenRole < TOneTokenRole.sysUserRole then
+        begin
+          QApiAll.errMsg := '此接口只有系统用户以上级别可以访问';
+          exit;
+        end
+        else
+        begin
+          Result := true;
+        end;
+      end
+      else
+      begin
+        QApiAll.errMsg := '未设计的角色权限[' + QApiInfo.fastApi.FApiRole + ']';
+        exit;
+      end;
+    end;
+  end
+  else if QApiInfo.fastApi.FApiAuthor = 'AppID验证' then
+  begin
+    //
+    QApiAll.errMsg := '未设计的验证方式[' + QApiInfo.fastApi.FApiAuthor + ']';
+    exit;
+  end
+  else
+  begin
+    //
+    QApiAll.errMsg := '未设计的验证方式[' + QApiInfo.fastApi.FApiAuthor + ']';
+    exit;
   end;
 end;
 

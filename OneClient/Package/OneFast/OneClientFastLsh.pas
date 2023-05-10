@@ -3,7 +3,7 @@
 interface
 
 uses system.Classes, system.SysUtils, OneClientConnect, system.Generics.Collections,
-  system.json;
+  system.json, OneClientConst;
 
 const
   // 流水号获取相关功能
@@ -12,6 +12,8 @@ const
   URL_HTTP_HTTPServer_LSH_GetLshList = 'OneServer/FastLsh/GetLshList';
 
 type
+
+  [ComponentPlatformsAttribute(OneAllPlatforms)]
   TOneFastLsh = class(TComponent)
   private
     FConnection: TOneConnection;

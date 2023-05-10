@@ -148,6 +148,25 @@ object frDemoFastApi: TfrDemoFastApi
         Options.Filtering = False
         Width = 60
       end
+      object vwMainFApiAuthor: TcxGridDBColumn
+        DataBinding.FieldName = 'FApiAuthor'
+        PropertiesClassName = 'TcxComboBoxProperties'
+        Properties.Items.Strings = (
+          #20844#24320
+          'Token'#39564#35777
+          'AppID'#39564#35777
+          '')
+        Width = 135
+      end
+      object vwMainFApiRole: TcxGridDBColumn
+        DataBinding.FieldName = 'FApiRole'
+        PropertiesClassName = 'TcxComboBoxProperties'
+        Properties.Items.Strings = (
+          #36229#32423#31649#29702#21592
+          #31649#29702#21592
+          #31995#32479#29992#25143)
+        Width = 110
+      end
     end
     object lvMain: TcxGridLevel
       GridView = vwMain
@@ -191,6 +210,8 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetDataInfo: TcxTabSheet
           Caption = #25968#25454#38598#20449#24687
           ImageIndex = 0
+          ExplicitWidth = 996
+          ExplicitHeight = 572
           object Panel10: TPanel
             Left = 0
             Top = 0
@@ -198,6 +219,7 @@ object frDemoFastApi: TfrDemoFastApi
             Height = 137
             Align = alTop
             TabOrder = 0
+            ExplicitWidth = 996
             object cxLabel5: TcxLabel
               Left = 4
               Top = 6
@@ -419,6 +441,8 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alClient
             Caption = 'SQL'#35821#21477#21450'SQL'#21442#25968'--->SQL'#22266#23450#26465#20214#34892' and 101=102'
             TabOrder = 1
+            ExplicitWidth = 996
+            ExplicitHeight = 435
             Height = 436
             Width = 1000
             object dbFDataSQL: TcxDBMemo
@@ -429,6 +453,8 @@ object frDemoFastApi: TfrDemoFastApi
               DataBinding.DataSource = dsData
               Properties.ScrollBars = ssBoth
               TabOrder = 0
+              ExplicitWidth = 992
+              ExplicitHeight = 413
               Height = 414
               Width = 996
             end
@@ -570,8 +596,6 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetParams: TcxTabSheet
           Caption = #26465#20214#21442#25968#35774#32622
           ImageIndex = 2
-          ExplicitWidth = 996
-          ExplicitHeight = 572
           object Panel11: TPanel
             Left = 0
             Top = 0
@@ -580,7 +604,6 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
-            ExplicitWidth = 996
             object tbParamsGet: TcxButton
               Left = 5
               Top = 4
@@ -619,8 +642,6 @@ object frDemoFastApi: TfrDemoFastApi
             Height = 345
             Align = alClient
             TabOrder = 1
-            ExplicitWidth = 996
-            ExplicitHeight = 344
             object vwParam: TcxGridDBBandedTableView
               Navigator.Buttons.CustomButtons = <>
               ScrollbarAnnotations.CustomAnnotations = <>
@@ -852,8 +873,6 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alBottom
             Caption = #36807#28388#27169#24335'->'#22810#23383#27573#25110#20540#36873#25321
             TabOrder = 2
-            ExplicitTop = 379
-            ExplicitWidth = 996
             Height = 193
             Width = 1000
             object dbFFilterFieldItems: TcxDBMemo
@@ -887,7 +906,6 @@ object frDemoFastApi: TfrDemoFastApi
                 '---'#36755#20837'3'#21462#24471'SQL and 1=1 '#32452#35013)
               ScrollBars = ssBoth
               TabOrder = 1
-              ExplicitWidth = 442
             end
           end
         end
@@ -1002,7 +1020,9 @@ object frDemoFastApi: TfrDemoFastApi
           #9'FOrderNumber int NULL,'
           #9'FIsMenu bit NULL,'
           #9'FIsEnabled bit NULL)'
-          ''
+          '----20230508'#33050#26412#22686#21152'---'
+          'alter table onefast_api add FApiAuthor nvarchar(30)'
+          'alter table onefast_api add FApiRole  nvarchar(30)'
           '-------FastApi'#25968#25454#28304#34920'-------------'
           'CREATE TABLE dbo.onefast_api_data('
           #9'FDataID nvarchar(32) primary key ,'
@@ -1760,6 +1780,16 @@ object frDemoFastApi: TfrDemoFastApi
     object qryFastApiFIsEnabled: TBooleanField
       DisplayLabel = #21551#29992
       FieldName = 'FIsEnabled'
+    end
+    object qryFastApiFApiRole: TWideStringField
+      DisplayLabel = #35282#33394#35775#38382
+      FieldName = 'FApiRole'
+      Size = 30
+    end
+    object qryFastApiFApiAuthor: TWideStringField
+      DisplayLabel = #25480#26435#26041#24335
+      FieldName = 'FApiAuthor'
+      Size = 30
     end
   end
   object dsFastApi: TDataSource

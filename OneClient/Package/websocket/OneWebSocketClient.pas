@@ -6,7 +6,7 @@ interface
 uses
   System.Classes, System.SyncObjs, System.SysUtils, System.Math, System.Threading, System.DateUtils,
   IdURI, IdGlobal, IdTCPClient, IdSSLOpenSSL, IdCoderMIME, IdHashSHA, System.JSON,
-  IdIOHandler, IdIOHandlerStream, IdIOHandlerSocket, IdIOHandlerStack, IdStack,
+  IdIOHandler, IdIOHandlerStream, IdIOHandlerSocket, IdIOHandlerStack, IdStack, OneClientConst,
   System.Generics.Collections, OneClientConnect, OneClientResult, System.NetEncoding;
 
 const
@@ -71,6 +71,7 @@ type
     property MsgTime: string read FMsgTime write FMsgTime;
   end;
 
+  [ComponentPlatformsAttribute(OneAllPlatforms)]
   TOneWebSocketClient = class(TComponent)
   private
     FHttpConnection: TOneConnection;
@@ -528,14 +529,19 @@ begin
                   LUInt16 := BytesToUInt16(LSpool, 2);
                   LUInt16 := GStack.NetworkToHost(LUInt16);
                   LSize := LUInt16;
+                  LSpool := copy(LSpool, 4, LSize);
                 end
                 else if LSize = 127 then
                 begin
                   LSize := BytesToUInt64(LSpool, 2);
                   LSize := GStack.NetworkToHost(LSize);
+                  LSpool := copy(LSpool, 4, LSize);
+                end
+                else if LSize < 126 then
+                begin
+                  LSpool := copy(LSpool, 2, LSize);
                 end;
                 // copy长度
-                LSpool := copy(LSpool, 4, LSize);
                 Self.ReceiveMsgHandle(IndyTextEncoding_UTF8.GetString(LSpool));
               end
               else if LOperationCode = TOperationCode.PING.ToByte then

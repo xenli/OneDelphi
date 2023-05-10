@@ -220,6 +220,10 @@ type
     cxTabSheet2: TcxTabSheet;
     Memo1: TMemo;
     Memo2: TMemo;
+    qryFastApiFApiAuthor: TWideStringField;
+    qryFastApiFApiRole: TWideStringField;
+    vwMainFApiAuthor: TcxGridDBColumn;
+    vwMainFApiRole: TcxGridDBColumn;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbClientDisConnectClick(Sender: TObject);
     procedure tbRefshClick(Sender: TObject);
