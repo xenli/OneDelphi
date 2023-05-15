@@ -8,6 +8,7 @@ QQ群：814696487（原来的群被封了，请加新群）
 ---
 >另外我录制了一期oneDelphi对接uniapp的视频，需要的可以看看，大佬请划过,不喜勿喷；
 >第一次录视频，前几集声音有点小，就这样看吧。
+>其中也有叫兽录制的关于OneFastClient的视频，需要的可以看看
 >视频地址：https://space.bilibili.com/344699795
 ---
 
@@ -53,8 +54,8 @@ QQ群：814696487（原来的群被封了，请加新群）
 ### 5.异步打开数据及保存-对应Demo->OneCleintDemoAsync.dproj
 ### 6.虚拟文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
-![]([图片地址](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg) "title")
 
+![](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg "title")
 
 ## 更新日志
 ************2023-05-10***********  
