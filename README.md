@@ -6,10 +6,10 @@
 QQ群：814696487（原来的群被封了，请加新群）
 
 ---
->另外我录制了一期oneDelphi对接uniapp的视频，需要的可以看看，大佬请划过,不喜勿喷；
->第一次录视频，前几集声音有点小，就这样看吧。
->其中也有叫兽录制的关于OneFastClient的视频，需要的可以看看
->视频地址：https://space.bilibili.com/344699795
+>另外我录制了一期oneDelphi对接uniapp的视频，需要的可以看看，大佬请划过,不喜勿喷； 
+>第一次录视频，前几集声音有点小，就这样看吧。  
+>其中也有叫兽录制的关于OneFastClient的视频，需要的可以看看  
+>视频地址：https://space.bilibili.com/344699795  
 ---
 
 ------OneDelphi基于Delphi IDE开发的
