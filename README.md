@@ -4,6 +4,13 @@
 >                                                 QQ:378464060
 点击链接加入群聊【OneDelphi开源群】：https://jq.qq.com/?_wv=1027&k=AGDV4HQi
 QQ群：814696487（原来的群被封了，请加新群）
+
+---
+>另外我录制了一期oneDelphi对接uniapp的视频，需要的可以看看，大佬请划过,不喜勿喷；
+>第一次录视频，前几集声音有点小，就这样看吧。
+>视频地址：https://space.bilibili.com/344699795
+---
+
 ------OneDelphi基于Delphi IDE开发的
 
 ------OneLaz基于Lazarus+fpc相当于D7开发的
@@ -46,6 +53,8 @@ QQ群：814696487（原来的群被封了，请加新群）
 ### 5.异步打开数据及保存-对应Demo->OneCleintDemoAsync.dproj
 ### 6.虚拟文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
+![]([图片地址](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg) "title")
+
 
 ## 更新日志
 ************2023-05-10***********  
