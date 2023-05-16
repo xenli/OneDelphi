@@ -6,18 +6,11 @@
 QQ群：814696487（原来的群被封了，请加新群）
 
 ---
-<<<<<<< HEAD
 >另外我录制了一期oneDelphi对接uniapp的视频，需要的可以看看，大佬请划过,不喜勿喷；  
 >第一次录视频，前几集声音有点小，就这样看吧。  
 >其中也有叫兽录制的关于OneFastClient的视频，需要的可以看看  
 >视频地址：https://space.bilibili.com/344699795  
-视频中用到的DIYGW工具有需要可以找我，有优惠。QQ/微信：630425535  
-=======
->另外我录制了一期oneDelphi对接uniapp的视频，需要的可以看看，大佬请划过,不喜勿喷； 
->第一次录视频，前几集声音有点小，就这样看吧。  
->其中也有叫兽录制的关于OneFastClient的视频，需要的可以看看  
->视频地址：https://space.bilibili.com/344699795  
->>>>>>> a81fab04eace77a9cd72b5e8cd9ad2373f34e7a2
+>视频中用到的DIYGW工具有需要可以找我，有优惠。QQ/微信：630425535  
 ---
 
 ------OneDelphi基于Delphi IDE开发的
@@ -31,7 +24,7 @@ QQ群：814696487（原来的群被封了，请加新群）
 环境是基于 D11的，其它低版本，可能系统库 部份不兼容
 ### 1.控件包mormot2下载，群文件里面也有直接到群下载也行
   https://github.com/synopse/mORMot2
-	*注意：*	static目录里的文件需要单独下载
+	*注意：*	static目录里的文件需要单独下载  
 	https://synopse.info/files/mormot2static.7z   
 ### 2.控件包mormot2源码路径加到Lib
 
