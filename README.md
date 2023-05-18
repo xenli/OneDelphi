@@ -2,7 +2,7 @@
 ## OneDelphi是叫兽(FLM)QQ:378464060基于Delphi IDE开发的三层中间件，开源免费，支持MVC及传统DataSet框架，使用的是Mormot2的HTTP通讯
 >                                                 叫兽(FLM)出品
 >                                                 QQ:378464060
-点击链接加入群聊【OneDelphi开源群】：https://jq.qq.com/?_wv=1027&k=AGDV4HQi
+点击链接加入群聊【OneDelphi开源群】：https://jq.qq.com/?_wv=1027&k=AGDV4HQi  
 QQ群：814696487（原来的群被封了，请加新群）
 
 ---
@@ -63,21 +63,21 @@ QQ群：814696487（原来的群被封了，请加新群）
 ## 更新日志
 
 ************2023-05-17***********
---祝大家五一快乐,给大家一份大礼包吧
-服务端:
-	1.账套增加 TOneZTManage.ExecScript 执行脚本用的,脚本是咱样就是咱样
-	2.一些优化及修正
-客户端:	
-	1.OneClient控件包增加 TOneDataSet.ExecScript 执行脚本用的
-	2.OneClient增加Demo OneClientDemoScript 脚本执行Demo
-	3.修正 TOneDataSet.ActiveDesign方法,只添加不存在的字段，且是添加在Fields不在是Fielddefs
-	4.增加 TOneDataSet.ActiveDesignOpen在设计时打开数据
+--祝大家五一快乐,给大家一份大礼包吧  
+服务端:  
+	1.账套增加 TOneZTManage.ExecScript 执行脚本用的,脚本是咋样就是咋样  
+	2.一些优化及修正  
+客户端:	  
+	1.OneClient控件包增加 TOneDataSet.ExecScript 执行脚本用的    
+	2.OneClient增加Demo OneClientDemoScript 脚本执行Demo   
+	3.修正 TOneDataSet.ActiveDesign方法,只添加不存在的字段，且是添加在Fields不在是Fielddefs  
+	4.增加 TOneDataSet.ActiveDesignOpen在设计时打开数据  
 	
 ************2023-05-10***********  
 --祝大家五一快乐,给大家一份大礼包吧  
 服务端:  
 	1.修正webSocket一些BUG  
-客户端:	
+客户端:	 
 	2.修正webscoket一些BUG  
 	
 ************2023-05-07***********  
@@ -87,7 +87,7 @@ QQ群：814696487（原来的群被封了，请加新群）
 	2.增加WebSocket对外相关controll接口  
 客户端:	  
 	1.为OneWebSocketClient.TOneWebSocketClient增加功能及修正  
-	1.增加Demo OneClientDemoWebSocketChat 发送消息  
+	2.增加Demo OneClientDemoWebSocketChat 发送消息  
 
 
 ************2023-05-01***********  
