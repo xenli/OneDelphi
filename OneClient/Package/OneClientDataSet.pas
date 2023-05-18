@@ -7,7 +7,7 @@ uses
   System.SysUtils, System.StrUtils, System.Classes, Data.DB,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.Stan.Intf,
   FireDAC.Stan.Param, FireDAC.Phys.Intf, System.Threading,
-  System.Generics.Collections, {$IFDEF MSWINDOWS} Vcl.Dialogs, {$ENDIF}
+  System.Generics.Collections, {$IFDEF MSWINDOWS} Vcl.Dialogs, System.UITypes, {$ENDIF}
   OneClientConnect, OneClientDataInfo, OneClientConst;
 
 type
@@ -147,6 +147,7 @@ type
   TOneDataSet = class(TFDMemTable)
   private
     FActiveDesign: boolean;
+    FActiveDesignOpen: boolean;
     // one扩展属性
     FDataInfo: TOneDataInfo;
     // 多个数据集
@@ -163,6 +164,7 @@ type
     procedure SQLListChanged(Sender: TObject);
     procedure SetMultiIndex(value: Integer);
     procedure SetActiveDesign(value: boolean);
+    procedure SetActiveDesignOpen(value: boolean);
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -226,6 +228,11 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function ExecStored: boolean;
+    /// <summary>
+    /// 执行SQL脚本语句,跟据你写的脚本执行,
+    /// </summary>
+    /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
+    function ExecScript: boolean;
     function GetDBMetaInfo: boolean;
     /// <summary>
     /// 事务控制第一步:获取账套连接,标识成事务账套
@@ -268,6 +275,7 @@ type
     property MultiIndex: Integer read FMultiIndex write SetMultiIndex;
     /// <param name="ActiveDesign">设计时获取相关字段,请先设置好连接及SQL</param>
     property ActiveDesign: boolean read FActiveDesign write SetActiveDesign;
+    property ActiveDesignOpen: boolean read FActiveDesignOpen write SetActiveDesignOpen;
   end;
 
 implementation
@@ -439,9 +447,19 @@ end;
 
 procedure TOneDataSet.SetActiveDesign(value: boolean);
 var
+  lTempSQL: string;
   i, iField: Integer;
   tempData: TOneDataSet;
-  lField, lFieldCopy: TField;
+  lField, lFieldNew: TField;
+  lFileName: string;
+  lFieldClass: TFieldClass;
+  function DataSetOwner(ADataSet: TComponent): TComponent;
+  begin
+    Result := ADataSet.Owner;
+    if csSubComponent in ADataSet.ComponentStyle then
+      Result := DataSetOwner(Result);
+  end;
+
 begin
 
   // 关闭数据集
@@ -477,10 +495,20 @@ begin
 {$ENDIF}
       exit;
     end;
+{$IFDEF MSWINDOWS}
+    lTempSQL := inputbox('跟据SQL获取字段', 'SQL提醒', Self.SQL.Text);
+    if lTempSQL = '' then
+      exit;
+    // if MessageDlg('请认真检查SQL,防止打开大数据,确定要跟据以下SQL打开数据:' + Self.SQL.Text,
+    // mtInformation, [mbOK, mbCancel], 0, mbOK) <> mrok then
+    // begin
+    // exit;
+    // end;
+{$ENDIF}
     tempData := TOneDataSet.Create(nil);
     try
       tempData.DataInfo.Connection := Self.DataInfo.Connection;
-      tempData.SQL.Text := Self.SQL.Text;
+      tempData.SQL.Text := lTempSQL;
       tempData.DataInfo.FPageSize := 50;
       for i := 0 to Self.Params.Count - 1 do
       begin
@@ -496,24 +524,106 @@ begin
       end
       else
       begin
-        for iField := Self.Fields.Count - 1 downto 0 do
+        for iField := 0 to tempData.Fields.Count - 1 do
         begin
-          lField := Self.Fields[i];
-          if lField.FieldKind = fkData then
+          lField := tempData.Fields[iField];
+          lFileName := lField.FieldName;
+          if Self.Fields.FindField(lFileName) <> nil then
           begin
-            // 计算字段自定义的字段不删除
-            Self.Fields.Remove(lField);
-            lField.Free;
+            // 存在跳过
+            continue;
+          end;
+          // 不存在创建
+          lFieldClass := TFieldClass(lField.ClassType);
+          lFieldNew := lFieldClass.Create(DataSetOwner(Self));
+          try
+            lFieldNew.Name := Self.Name + lFileName;
+            lFieldNew.FieldName := lFileName;
+            lFieldNew.FieldKind := lField.FieldKind;
+            if lField.Lookup then
+            begin
+              lFieldNew.FieldKind := fkLookup;
+              lFieldNew.LookupDataset := lField.LookupDataset;
+              lFieldNew.KeyFields := lField.KeyFields;
+              lFieldNew.LookupKeyFields := lField.LookupKeyFields;
+              lFieldNew.LookupResultField := lField.LookupResultField;
+            end
+            else if lFieldNew.FieldKind = fkAggregate then
+            begin
+              lFieldNew.Visible := False;
+            end;
+            lFieldNew.Size := lField.Size;
+            lFieldNew.DataSet := Self;
+          except
+            lFieldNew.Free;
+            raise;
           end;
         end;
-        Self.CopyDataSet(tempData, [coStructure]);
-        Self.Close;
+        // 如果喜欢在设计时看数据的,这句打开就行
+        // Self.CopyDataSet(tempData, [coRestart, coAppend]);
 {$IFDEF MSWINDOWS}
         ShowMessage('打开数据成功,请打开字段设计器,获取字段');
 {$ENDIF}
       end;
     finally
       tempData.Free;
+    end;
+  end;
+END;
+
+procedure TOneDataSet.SetActiveDesignOpen(value: boolean);
+var
+  i: Integer;
+begin
+  // 关闭数据集
+  if csDesigning in Self.ComponentState then
+  begin
+    if not value then
+    begin
+      exit;
+    end;
+    if Self.DataInfo.Connection = nil then
+    begin
+{$IFDEF MSWINDOWS}
+      ShowMessage('打开数据失败,Connection=nil');
+{$ENDIF}
+      exit;
+    end;
+
+    // 如果有参数,参数是否赋值
+    for i := 0 to Self.Params.Count - 1 do
+    begin
+      if Self.Params[i].IsNull then
+      begin
+{$IFDEF MSWINDOWS}
+        ShowMessage('打开数据失败,请先给参数赋值');
+{$ENDIF}
+        exit;
+      end;
+    end;
+    if not Self.DataInfo.Connection.DoConnect(true) then
+    begin
+{$IFDEF MSWINDOWS}
+      ShowMessage(Self.DataInfo.Connection.ErrMsg);
+{$ENDIF}
+      exit;
+    end;
+{$IFDEF MSWINDOWS}
+    if MessageDlg('请认真检查SQL,防止打开大数据,确定要跟据以下SQL打开数据:' + Self.SQL.Text,
+      mtInformation, [mbOK, mbCancel], 0, mbOK) <> mrok then
+    begin
+      exit;
+    end;
+{$ENDIF}
+    if not Self.OpenData then
+    begin
+{$IFDEF MSWINDOWS}
+      ShowMessage('打开数据失败,原因:' + Self.DataInfo.ErrMsg);
+{$ENDIF}
+    end
+    else
+    begin
+      ShowMessage('打开数据成功,Active属性默认为true,建议在设计完后关闭该属性');
     end;
   end;
 END;
@@ -895,6 +1005,25 @@ begin
   end;
   Self.FDataInfo.IsReturnData := False;
   Result := Self.FDataInfo.FConnection.ExecStored(Self);
+end;
+
+function TOneDataSet.ExecScript: boolean;
+begin
+  Result := False;
+  if Self.FDataInfo.FConnection = nil then
+    Self.FDataInfo.FConnection := OneClientConnect.Unit_Connection;
+  if Self.FDataInfo.FConnection = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集Connection=nil';
+    exit;
+  end;
+  if Self.SQL.Text = '' then
+  begin
+    Self.FDataInfo.FErrMsg := '无相关脚本';
+    exit;
+  end;
+  Self.FDataInfo.IsReturnData := False;
+  Result := Self.FDataInfo.FConnection.ExecScript(Self);
 end;
 
 function TOneDataSet.GetDBMetaInfo: boolean;

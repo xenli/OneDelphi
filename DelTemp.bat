@@ -12,4 +12,3 @@ Rem ****************************
 @for /r . %%a in (__history) do  @if exist "%%a" rd /s /q "%%a" 
 @for /r . %%a in (__recovery) do  @if exist "%%a" rd /s /q "%%a" 
 @echo successfully delete!
-@pause

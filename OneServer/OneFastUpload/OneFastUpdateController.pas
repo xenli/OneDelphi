@@ -149,7 +149,7 @@ begin
     exit;
   end;
 
-  lFileStream := TFileStream.Create(lFileName, fmOpenRead or fmShareExclusive);
+  lFileStream := TFileStream.Create(lFileName, fmOpenRead);
   try
     if lFileStream.Size <> lUpdateFile.FileSize then
     begin

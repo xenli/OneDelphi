@@ -29,6 +29,7 @@ const
   URL_HTTP_HTTPServer_DATA_OpenDatas = 'OneServer/Data/OpenDatas';
   URL_HTTP_HTTPServer_DATA_SaveDatas = 'OneServer/Data/SaveDatas';
   URL_HTTP_HTTPServer_DATA_ExecStored = 'OneServer/Data/ExecStored';
+  URL_HTTP_HTTPServer_DATA_ExecScript = 'OneServer/Data/ExecScript';
   URL_HTTP_HTTPServer_DATA_DownLoadDataFile = 'OneServer/Data/DownLoadDataFile';
   URL_HTTP_HTTPServer_DATA_DelDataFile = 'OneServer/Data/DelDataFile';
   URL_HTTP_HTTPServer_DATA_GetDBMetaInfo = 'OneServer/Data/GetDBMetaInfo';
@@ -133,6 +134,7 @@ type
     function OpenDatasPost(QDataOpens: TList<TOneDataOpen>): TOneDataResult; overload;
     //
     function ExecStored(Sender: TObject): boolean;
+    function ExecScript(Sender: TObject): boolean;
     function GetDBMetaInfo(Sender: TObject): boolean;
     // 执行存储过程
     function ExecStoredPost(QDataOpen: TOneDataOpen): TOneDataResult;
@@ -608,8 +610,13 @@ begin
         if Assigned(self.FTokenFailCallBack) then
         begin
           self.FTokenFailCallBack(self);
+          abort;
+        end
+        else
+        begin
+          Result.ErrMsg := 'Token验证失败,请重新登陆';
         end;
-        abort;
+        exit;
       end
       else
       begin
@@ -1196,6 +1203,60 @@ begin
     lDataOpen.Free;
     if lDataResult <> nil then
       lDataResult.Free;
+  end;
+end;
+
+function TOneConnection.ExecScript(Sender: TObject): boolean;
+var
+  lDataSet: TOneDataSet;
+  lDataOpen: TOneDataOpen;
+  lPostJsonValue, lResultJsonValue: TJsonValue;
+  lActionResult: TActionResult<string>;
+  lErrMsg: string;
+begin
+  Result := false;
+  if not(Sender is TOneDataSet) then
+    exit;
+  lDataSet := TOneDataSet(Sender);
+  lDataOpen := TOneDataOpen.Create;
+  lPostJsonValue := nil;
+  lResultJsonValue := nil;
+  lActionResult := nil;
+  try
+    self.DataSetToOpenData(Sender, lDataOpen);
+    lPostJsonValue := OneNeonHelper.ObjectToJson(lDataOpen, lErrMsg);
+    if lErrMsg <> '' then
+    begin
+      lDataSet.DataInfo.ErrMsg := lErrMsg;
+      exit;
+    end;
+    lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_DATA_ExecScript, lPostJsonValue.ToJSON(), lErrMsg);
+    if not self.IsErrTrueResult(lErrMsg) then
+    begin
+      lDataSet.DataInfo.ErrMsg := lErrMsg;
+      exit;
+    end;
+    //
+    lActionResult := TActionResult<string>.Create;
+    if not OneNeonHelper.JsonToObject(lActionResult, lResultJsonValue, lErrMsg) then
+    begin
+      lDataSet.DataInfo.ErrMsg := '返回的数据解析成TResult<string>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      exit;
+    end;
+    if not lActionResult.ResultSuccess then
+    begin
+      lDataSet.DataInfo.ErrMsg := '服务端消息:' + lActionResult.ResultMsg;
+      exit;
+    end;
+    Result := true;
+  finally
+    lDataOpen.Free;
+    if lPostJsonValue <> nil then
+      lPostJsonValue.Free;
+    if lResultJsonValue <> nil then
+      lResultJsonValue.Free;
+    if lActionResult <> nil then
+      lActionResult.Free;
   end;
 end;
 

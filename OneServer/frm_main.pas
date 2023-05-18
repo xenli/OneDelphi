@@ -598,7 +598,7 @@ var
   lOneGlobal: TOneGlobal;
 begin
   lOneGlobal := TOneGlobal.GetInstance();
-  if not self.YesNoMsg('HTTP服务', '当前禁止HTTP服务端口' + lOneGlobal.HttpServer.Port.ToString()) then
+  if not self.YesNoMsg('HTTP服务', '当前禁止HTTP服务端口' + lOneGlobal.HttpServer.port.ToString()) then
   begin
     exit;
   end;

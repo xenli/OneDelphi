@@ -61,6 +61,18 @@ QQ群：814696487（原来的群被封了，请加新群）
 ![](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg "title")
 
 ## 更新日志
+
+************2023-05-17***********
+--祝大家五一快乐,给大家一份大礼包吧
+服务端:
+	1.账套增加 TOneZTManage.ExecScript 执行脚本用的,脚本是咱样就是咱样
+	2.一些优化及修正
+客户端:	
+	1.OneClient控件包增加 TOneDataSet.ExecScript 执行脚本用的
+	2.OneClient增加Demo OneClientDemoScript 脚本执行Demo
+	3.修正 TOneDataSet.ActiveDesign方法,只添加不存在的字段，且是添加在Fields不在是Fielddefs
+	4.增加 TOneDataSet.ActiveDesignOpen在设计时打开数据
+	
 ************2023-05-10***********  
 --祝大家五一快乐,给大家一份大礼包吧  
 服务端:  

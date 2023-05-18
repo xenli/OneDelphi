@@ -290,6 +290,7 @@ object Form2: TForm2
     Params = <>
     MultiIndex = 0
     ActiveDesign = False
+    ActiveDesignOpen = False
     Left = 24
     Top = 368
   end
@@ -319,6 +320,7 @@ object Form2: TForm2
     Params = <>
     MultiIndex = 0
     ActiveDesign = False
+    ActiveDesignOpen = False
     Left = 504
     Top = 360
   end

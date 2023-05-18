@@ -102,7 +102,9 @@ uses
   OneFastFileMange in 'OneFastFile\OneFastFileMange.pas',
   OneFastFileController in 'OneFastFile\OneFastFileController.pas',
   OneWsChatController in 'httpServer\Controller\OneWsChatController.pas',
-  OneWebSocketConst in 'httpServer\OneWebSocketConst.pas';
+  OneWebSocketConst in 'httpServer\OneWebSocketConst.pas',
+  OneFastFlowManage in 'OneFastFlow\OneFastFlowManage.pas',
+  OneFastFlowController in 'OneFastFlow\OneFastFlowController.pas';
 
 var
   lpStartupInfo: TStartupInfo;

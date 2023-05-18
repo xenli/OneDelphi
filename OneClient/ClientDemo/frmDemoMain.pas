@@ -81,6 +81,21 @@ type
     tbClientDisConnect: TButton;
     GroupBox1: TGroupBox;
     edNoJoinFields: TMemo;
+    qryOpenDataFAdminID: TWideStringField;
+    qryOpenDataFAdminCode: TWideStringField;
+    qryOpenDataFAdminName: TWideStringField;
+    qryOpenDataFAdminPass: TWideStringField;
+    qryOpenDataFAdminTel: TWideStringField;
+    qryOpenDataFAdminType: TWideStringField;
+    qryOpenDataFGroupID: TWideStringField;
+    qryOpenDataFRoleID: TWideStringField;
+    qryOpenDataFIsEnable: TBooleanField;
+    qryOpenDataFIsMultiLogin: TBooleanField;
+    qryOpenDataFIsLimit: TBooleanField;
+    qryOpenDataFLimtStartTime: TSQLTimeStampField;
+    qryOpenDataFLimtEndTime: TSQLTimeStampField;
+    qryOpenDataFRemark: TWideStringField;
+    qryOpenDataFCreateTime: TSQLTimeStampField;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbOpenDataClick(Sender: TObject);
     procedure tbSaveDataClick(Sender: TObject);
@@ -89,6 +104,7 @@ type
     procedure tbDMLClick(Sender: TObject);
     procedure tbSPClick(Sender: TObject);
     procedure tbClientDisConnectClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -102,6 +118,15 @@ implementation
 
 {$R *.dfm}
 
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  if qryOpenData.active then
+  begin
+  showMessage('123');
+    showMessage(qryOpenData.recordCount.tostring);
+  end;
+end;
 
 procedure TForm1.tbAppendClick(Sender: TObject);
 begin

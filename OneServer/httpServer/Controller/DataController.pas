@@ -18,6 +18,9 @@ type
     function ExecStored(QDataOpen: TOneDataOpen): TOneDataResult;
     // 保存语句或执行DML语句
     function SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>): TOneDataResult;
+
+    { 执行脚本,不返回任何数据集或什么,纯脚本执行 }
+    function ExecScript(QDataOpen: TOneDataOpen): TActionResult<string>;
     // 下载文件
     function DownLoadDataFile(fileID: string): TActionResult<string>;
     // 删除文件
@@ -310,6 +313,33 @@ begin
   if result.ResultOK then
   begin
     result.DoResultitems();
+  end;
+end;
+
+function TOneDataController.ExecScript(QDataOpen: TOneDataOpen): TActionResult<string>;
+var
+  lOneGlobal: TOneGlobal;
+  i: Integer;
+  lErrMsg: string;
+begin
+  result := TActionResult<string>.Create(false, false);
+  try
+    lOneGlobal := TOneGlobal.GetInstance();
+    QDataOpen.OpenSQL := OneSQLCrypto.SwapDecodeCrypto(QDataOpen.OpenSQL);
+    // 打开数据
+    if not lOneGlobal.ZTManage.ExecScript(QDataOpen, lErrMsg) then
+    begin
+      result.ResultMsg := lErrMsg;
+      exit;
+    end;
+    // 解析相关数据
+    result.ResultData := '执行脚本成功';
+    result.SetResultTrue;
+  except
+    on e: Exception do
+    begin
+      result.ResultMsg := e.Message;
+    end;
   end;
 end;
 

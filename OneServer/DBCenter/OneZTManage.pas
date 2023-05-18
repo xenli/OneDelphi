@@ -223,6 +223,9 @@ type
     // 执行存储过程
     function ExecStored(QOpenData: TOneDataOpen; var QOneDataResult: TOneDataResult): Boolean;
 
+    // 执行SQL脚本语句
+    function ExecScript(QOpenData: TOneDataOpen; var QErrMsg: string): Boolean;
+
     // 获取数据库相关信息
     function GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): Boolean;
   public
@@ -322,7 +325,7 @@ begin
   // 错误绑定
   FDQuery.OnError := FDQueryError;
   FDScript := TFDScript.Create(nil);
-  // FDScript.OnError := FDScriptError;
+  FDScript.OnError := FDQueryError;
   FDStoredProc := TFDStoredProc.Create(nil);
   // fiMeta 不保存存储过程结构每次多是重新获取
   // 设成false可以返回多个数据集,但参数返回不了,默认true只能返回一个数据集
@@ -2097,6 +2100,76 @@ begin
     end;
   end;
 
+end;
+
+// 执行SQL脚本语句
+function TOneZTManage.ExecScript(QOpenData: TOneDataOpen; var QErrMsg: string): Boolean;
+var
+  lZTItem: TOneZTItem;
+  lFDScript: TFDScript;
+  lFDSQLScript: TFDSQLScript;
+  lZTCode: string;
+  lRequestMilSec: integer;
+  lwatchTimer: TStopwatch;
+begin
+  Result := false;
+  QErrMsg := '';
+  lZTItem := nil;
+  lwatchTimer := TStopwatch.StartNew;
+  try
+    if QOpenData.ZTCode = '' then
+      QOpenData.ZTCode := self.ZTMain;
+    QOpenData.ZTCode := QOpenData.ZTCode.ToUpper;
+    lZTItem := nil;
+    // 客户端发起事务,像两层一样运作
+    if QOpenData.TranID <> '' then
+    begin
+      lZTItem := self.GetTranItem(QOpenData.TranID, QErrMsg);
+    end
+    else
+    begin
+      lZTItem := self.LockZTItem(QOpenData.ZTCode, QErrMsg);
+    end;
+    if lZTItem = nil then
+    begin
+      if QErrMsg = '' then
+        QErrMsg := '获取账套' + QOpenData.ZTCode + '连接失败,原因未知';
+      exit;
+    end;
+    lFDScript := lZTItem.ADScript;
+    try
+      lFDSQLScript := lFDScript.SQLScripts.Add;
+      lFDSQLScript.SQL.Add(QOpenData.OpenSQL);
+      lFDScript.ValidateAll;
+      Result := lFDScript.ExecuteAll;
+      if not Result then
+      begin
+        if lZTItem.FException <> nil then
+        begin
+          QErrMsg := lZTItem.FException.FErrmsg;
+        end;
+      end;
+    except
+      on e: Exception do
+      begin
+        QErrMsg := e.Message;
+      end;
+    end;
+  finally
+    if lZTItem <> nil then
+    begin
+      lZTItem.UnLockWork;
+    end;
+    lwatchTimer.Stop;
+    lRequestMilSec := lwatchTimer.ElapsedMilliseconds;
+    if (self.FLog <> nil) and (self.FLog.IsSQLLog) then
+    begin
+      self.FLog.WriteSQLLog('账套方法[ExecStored]:');
+      self.FLog.WriteSQLLog('总共用时:[' + lRequestMilSec.ToString + ']毫秒');
+      self.FLog.WriteSQLLog('错误消息:[' + QErrMsg + ']');
+      self.FLog.WriteSQLLog('SQL语句:[' + QOpenData.OpenSQL + ']');
+    end;
+  end;
 end;
 
 function TOneZTManage.GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): Boolean;

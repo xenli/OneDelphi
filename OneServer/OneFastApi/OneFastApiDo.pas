@@ -592,6 +592,24 @@ begin
         end;
 
         lStepJson.AddPair('DataCount', TJsonNumber.Create(lStepResult.FDataSet.RecordCount));
+      end
+      else
+      begin
+        if lStepResult.FApiData.DataOpenMode in [openDataStore, doStore] then
+        begin
+          // 添加输出参数,如果没有返回数据集
+          lParamJson := TJsonObject.Create;
+          lStepJson.AddPair('Params', lParamJson);
+          for iParam := 0 to lStepResult.FBuildParams.Count - 1 do
+          begin
+            lParam := lStepResult.FBuildParams[iParam];
+            if lParam.ParamType in [ptOutput, ptInputOutput] then
+            begin
+              // 输出参数
+              lParamJson.AddPair(lParam.Name, lParam.AsString);
+            end;
+          end;
+        end;
       end;
       if lStepResult.FApiData.DataOpenMode = doDMLSQL then
       begin

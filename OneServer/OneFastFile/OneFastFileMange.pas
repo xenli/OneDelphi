@@ -624,7 +624,7 @@ begin
     exit;
   end;
 
-  lFileStream := TFileStream.Create(lFileTask.FSavePhyPath, fmOpenRead or fmShareExclusive);
+  lFileStream := TFileStream.Create(lFileTask.FSavePhyPath, fmOpenRead);
   try
     if lFileStream.Size <> lFileTask.FFileSize then
     begin
