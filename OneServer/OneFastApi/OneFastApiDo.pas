@@ -1256,28 +1256,32 @@ begin
         tempSQL := tempSQL + ' (' + lFieldName + ' ' + QApiFilter.FFilterExpression + ' :' + lFieldParamName + ' ) ';
         lParam := QStepResult.FBuildParams.AddParameter;
         lParam.Name := lFieldParamName;
-        BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue);
+        if not BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue) then
+          exit;
       end
       else if QApiFilter.FFilterExpression = '相似' then
       begin
         tempSQL := tempSQL + ' (' + lFieldName + ' ' + 'like' + ' :' + lFieldParamName + ' ) ';
         lParam := QStepResult.FBuildParams.AddParameter;
         lParam.Name := lFieldParamName;
-        BuildFilterParamValue(QApiAll, QApiFilter, lParam, '%' + tempValue + '%');
+        if not BuildFilterParamValue(QApiAll, QApiFilter, lParam, '%' + tempValue + '%') then
+          exit;
       end
       else if QApiFilter.FFilterExpression = '左相似' then
       begin
         tempSQL := tempSQL + ' (' + lFieldName + ' ' + 'like' + ' :' + lFieldParamName + ' ) ';
         lParam := QStepResult.FBuildParams.AddParameter;
         lParam.Name := lFieldParamName;
-        BuildFilterParamValue(QApiAll, QApiFilter, lParam, '%' + tempValue);
+        if not BuildFilterParamValue(QApiAll, QApiFilter, lParam, '%' + tempValue) then
+          exit;
       end
       else if QApiFilter.FFilterExpression = '右相似' then
       begin
         tempSQL := tempSQL + ' (' + lFieldName + ' ' + 'like' + ' :' + lFieldParamName + ' ) ';
         lParam := QStepResult.FBuildParams.AddParameter;
         lParam.Name := lFieldParamName;
-        BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue + '%');
+        if not BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue + '%') then
+          exit;
       end
       else if QApiFilter.FFilterExpression = '包含' then
       begin
@@ -1295,7 +1299,8 @@ begin
           tempValue := lArrValues[iValue];
           lParam := QStepResult.FBuildParams.AddParameter;
           lParam.Name := lFieldParamName + iValue.ToString;
-          BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue);
+          if not BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue) then
+            exit;
         end;
       end
       else if QApiFilter.FFilterExpression = '不包含' then
@@ -1314,7 +1319,8 @@ begin
           tempValue := lArrValues[iValue];
           lParam := QStepResult.FBuildParams.AddParameter;
           lParam.Name := lFieldParamName + iValue.ToString;
-          BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue);
+          if not BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue) then
+            exit;
         end;
       end
       else
@@ -1322,7 +1328,8 @@ begin
         tempSQL := tempSQL + ' (' + lFieldName + ' ' + QApiFilter.FFilterExpression + ' :' + lFieldParamName + ' ) ';
         lParam := QStepResult.FBuildParams.AddParameter;
         lParam.Name := lFieldParamName;
-        BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue);
+        if not BuildFilterParamValue(QApiAll, QApiFilter, lParam, tempValue) then
+          exit;
       end;
     end;
     if (tempSQL <> '') and (not QApiFilter.IsFixSQLParam) then
@@ -1382,7 +1389,25 @@ begin
   begin
     if TryStrToDateTime(QValue, tempDataTime) then
     begin
-      QParam.AsDateTime := tempDataTime;
+      if QApiFilter.FFilterFormat <> '' then
+      begin
+        if QApiFilter.FFilterFormat = 'yyyy-mm-dd' then
+        begin
+          QParam.AsDate := tempDataTime;
+        end
+        else if QApiFilter.FFilterFormat = 'hh:nn:ss' then
+        begin
+          QParam.AsTime := tempDataTime;
+        end
+        else
+        begin
+          QParam.AsDateTime := tempDataTime;
+        end;
+      end
+      else
+      begin
+        QParam.AsDateTime := tempDataTime;
+      end;
     end
     else
     begin
@@ -1394,6 +1419,7 @@ begin
   begin
     QParam.AsString := QValue;
   end;
+  Result := true;
 end;
 
 function BuildDataToJsonArray(QApiData: TFastApiData; Query: TDataSet; QApiAll: TApiAll): TJsonArray;
@@ -1477,11 +1503,27 @@ begin
             TFieldType.ftBCD:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonNumber.Create(lField.AsFloat));
             TFieldType.ftDate:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+              if lFieldTemp.FFormat <> '' then
+              begin
+                lJsonObj.AddPair(lFieldTemp.FJsonName,
+                  TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
+              end
+              else
+              begin
+                lJsonObj.AddPair(lFieldTemp.FJsonName,
+                  TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+              end;
             TFieldType.ftTime:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+              if lFieldTemp.FFormat <> '' then
+              begin
+                lJsonObj.AddPair(lFieldTemp.FJsonName,
+                  TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
+              end
+              else
+              begin
+                lJsonObj.AddPair(lFieldTemp.FJsonName,
+                  TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+              end;
             TFieldType.ftDateTime:
               begin
                 if lFieldTemp.FFormat <> '' then
@@ -1537,8 +1579,16 @@ begin
             TFieldType.ftGuid:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(lField.AsString));
             TFieldType.ftTimeStamp:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+              if lFieldTemp.FFormat <> '' then
+              begin
+                lJsonObj.AddPair(lFieldTemp.FJsonName,
+                  TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
+              end
+              else
+              begin
+                lJsonObj.AddPair(lFieldTemp.FJsonName,
+                  TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+              end;
             TFieldType.ftFMTBcd:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonNumber.Create(lField.AsFloat));
             TFieldType.ftFixedWideChar:

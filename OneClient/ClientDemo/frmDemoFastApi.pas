@@ -224,6 +224,8 @@ type
     qryFastApiFApiRole: TWideStringField;
     vwMainFApiAuthor: TcxGridDBColumn;
     vwMainFApiRole: TcxGridDBColumn;
+    qryFieldFFieldFormat: TWideStringField;
+    vwFieldFFieldFormat: TcxGridDBColumn;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbClientDisConnectClick(Sender: TObject);
     procedure tbRefshClick(Sender: TObject);
@@ -515,11 +517,12 @@ end;
 procedure TfrDemoFastApi.tbFieldAddAllClick(Sender: TObject);
 var
   lSQL: string;
-  i: Integer;
+  i, iParam: Integer;
   lField: TField;
-  lFieldName: string;
+  lFieldName, lParamName: string;
   lFieldKind: TFieldKind;
   lFieldType: TFieldType;
+  isFilter: boolean;
 begin
   inherited;
   //
@@ -536,12 +539,49 @@ begin
     qryFieldGet.Close;
     qryFieldGet.Fields.Clear;
   end;
-  qryFieldGet.SQL.Text := lSQL;
+  qryFieldGet.SQL.text := lSQL;
   qryFieldGet.DataInfo.ZTCode := qryDataFDataZTCode.AsString;
   qryFieldGet.DataInfo.PageSize := 1;
   for i := 0 to qryFieldGet.Params.count - 1 do
   begin
-    qryFieldGet.Params[i].AsString := '0';
+    lParamName := qryFieldGet.Params[i].Name;
+    isFilter := false;
+    qryFilter.First;
+    while not qryFilter.Eof do
+    begin
+      if qryFilterFFilterName.AsString.ToLower = lParamName.ToLower then
+      begin
+        // 字符串,整型,数字 ,布尔 ,时间
+        if qryFilterFFilterDataType.AsString = '时间' then
+        begin
+          // yyyy-mm-dd hh:nn:ss,yyyy-mm-dd,yyyy,hh:nn:ss
+          if qryFilterFFilterFormat.AsString = 'yyyy-mm-dd' then
+          begin
+            qryFieldGet.Params[i].AsString := '1985-11-22';
+          end
+          else if qryFilterFFilterFormat.AsString = 'hh:nn:ss' then
+          begin
+            qryFieldGet.Params[i].AsString := '11:22:22';
+          end
+          else
+          begin
+            qryFieldGet.Params[i].AsDateTime := now;
+          end;
+        end
+        else
+        begin
+          qryFieldGet.Params[i].AsString := '0';
+        end;
+        isFilter := True;
+        break;
+      end;
+      qryFilter.Next;
+    end;
+    if not isFilter then
+    begin
+      showMessage('请先设置SQL参数[' + lParamName + ']的条件,且注意参数数据类型');
+      exit;
+    end;
   end;
   if not qryFieldGet.OpenData then
   begin
@@ -603,7 +643,7 @@ begin
       qryField.Edit;
       qryFieldFOrderNumber.AsInteger := i;
       qryField.Post;
-      qryField.next;
+      qryField.Next;
     end;
   finally
     qryFieldGet.EnableControls;

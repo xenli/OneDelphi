@@ -313,7 +313,7 @@ var
   lTokenItem: TOneTokenItem;
 begin
   lKey := OneGUID.GetGUID32;
-  TMonitor.TryEnter(self.FLockObj);
+  TMonitor.Enter(self.FLockObj);
   try
     lTokenItem := TOneTokenItem.Create;
     lTokenItem.FTokenID := lKey;
@@ -337,7 +337,7 @@ end;
 function TOneTokenManage.AddToken(QTokenItem: TOneTokenItem): boolean;
 begin
   Result := false;
-  TMonitor.TryEnter(self.FLockObj);
+  TMonitor.Enter(self.FLockObj);
   try
     if self.FTokenList.ContainsKey(QTokenItem.TokenID) then
     begin
@@ -373,7 +373,7 @@ begin
   QErrMsg := '';
   lKey := QLoginPlatform + '_' + QLoginCode;
   lKey := OneCrypto.MD5Endcode(lKey);
-  TMonitor.TryEnter(self.FLockObj);
+  TMonitor.Enter(self.FLockObj);
   try
     if FTokenList.ContainsKey(lKey) then
     begin
@@ -414,7 +414,7 @@ procedure TOneTokenManage.RemoveToken(QTokenID: string);
 var
   lTokenItem: TOneTokenItem;
 begin
-  TMonitor.TryEnter(self.FLockObj);
+  TMonitor.Enter(self.FLockObj);
   try
     lTokenItem := nil;
     if FTokenList.TryGetValue(QTokenID, lTokenItem) then

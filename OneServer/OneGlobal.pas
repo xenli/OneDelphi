@@ -174,6 +174,7 @@ begin
   // 日志最先工作的
   lOneLog.StarWork;
   self.FLog := lOneLog;
+  self.FLog._AddRef;
   // 加载HTTP配置
   self.LoadServerSet();
   // 加载账套配置
@@ -222,7 +223,11 @@ begin
     FVirtualManage.Free;
   end;
   if FLog <> nil then
+  begin
     FLog.StopWork;
+    FLog._Release;
+    FLog._Release;
+  end;
   inherited Destroy;
 end;
 

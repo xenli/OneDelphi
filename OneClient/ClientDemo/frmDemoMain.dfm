@@ -10,7 +10,6 @@ object Form1: TForm1
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OnCreate = FormCreate
   TextHeight = 15
   object plSet: TPanel
     Left = 0
@@ -549,78 +548,7 @@ object Form1: TForm1
     Top = 40
   end
   object qryOpenData: TOneDataSet
-    Active = True
-    FieldDefs = <
-      item
-        Name = 'FAdminID'
-        Attributes = [faRequired]
-        DataType = ftWideString
-        Size = 32
-      end
-      item
-        Name = 'FAdminCode'
-        DataType = ftWideString
-        Size = 50
-      end
-      item
-        Name = 'FAdminName'
-        DataType = ftWideString
-        Size = 50
-      end
-      item
-        Name = 'FAdminPass'
-        DataType = ftWideString
-        Size = 50
-      end
-      item
-        Name = 'FAdminTel'
-        DataType = ftWideString
-        Size = 20
-      end
-      item
-        Name = 'FAdminType'
-        DataType = ftWideString
-        Size = 10
-      end
-      item
-        Name = 'FGroupID'
-        DataType = ftWideString
-        Size = 32
-      end
-      item
-        Name = 'FRoleID'
-        DataType = ftWideString
-        Size = 32
-      end
-      item
-        Name = 'FIsEnable'
-        DataType = ftBoolean
-      end
-      item
-        Name = 'FIsMultiLogin'
-        DataType = ftBoolean
-      end
-      item
-        Name = 'FIsLimit'
-        DataType = ftBoolean
-      end
-      item
-        Name = 'FLimtStartTime'
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'FLimtEndTime'
-        DataType = ftTimeStamp
-      end
-      item
-        Name = 'FRemark'
-        DataType = ftWideString
-        Size = 100
-      end
-      item
-        Name = 'FCreateTime'
-        DataType = ftTimeStamp
-      end>
+    FieldDefs = <>
     CachedUpdates = True
     IndexDefs = <>
     FetchOptions.AssignedValues = [evMode]
@@ -660,59 +588,6 @@ object Form1: TForm1
     ActiveDesignOpen = False
     Left = 360
     Top = 352
-    object qryOpenDataFAdminID: TWideStringField
-      FieldName = 'FAdminID'
-      Size = 32
-    end
-    object qryOpenDataFAdminCode: TWideStringField
-      FieldName = 'FAdminCode'
-      Size = 50
-    end
-    object qryOpenDataFAdminName: TWideStringField
-      FieldName = 'FAdminName'
-      Size = 50
-    end
-    object qryOpenDataFAdminPass: TWideStringField
-      FieldName = 'FAdminPass'
-      Size = 50
-    end
-    object qryOpenDataFAdminTel: TWideStringField
-      FieldName = 'FAdminTel'
-    end
-    object qryOpenDataFAdminType: TWideStringField
-      FieldName = 'FAdminType'
-      Size = 10
-    end
-    object qryOpenDataFGroupID: TWideStringField
-      FieldName = 'FGroupID'
-      Size = 32
-    end
-    object qryOpenDataFRoleID: TWideStringField
-      FieldName = 'FRoleID'
-      Size = 32
-    end
-    object qryOpenDataFIsEnable: TBooleanField
-      FieldName = 'FIsEnable'
-    end
-    object qryOpenDataFIsMultiLogin: TBooleanField
-      FieldName = 'FIsMultiLogin'
-    end
-    object qryOpenDataFIsLimit: TBooleanField
-      FieldName = 'FIsLimit'
-    end
-    object qryOpenDataFLimtStartTime: TSQLTimeStampField
-      FieldName = 'FLimtStartTime'
-    end
-    object qryOpenDataFLimtEndTime: TSQLTimeStampField
-      FieldName = 'FLimtEndTime'
-    end
-    object qryOpenDataFRemark: TWideStringField
-      FieldName = 'FRemark'
-      Size = 100
-    end
-    object qryOpenDataFCreateTime: TSQLTimeStampField
-      FieldName = 'FCreateTime'
-    end
   end
   object dsOpenData: TDataSource
     DataSet = qryOpenData

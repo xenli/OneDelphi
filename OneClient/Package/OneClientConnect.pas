@@ -1534,7 +1534,7 @@ begin
       lSaveDML.SaveDataUpdateSQL := '';
       lSaveDML.SaveDataDelSQL := '';
       lSaveDML.IsReturnData := lOneDataSet.DataInfo.IsReturnData;
-      lSaveDML.IsAutoID := lOneDataSet.DataInfo.IsReturnData;
+      //lSaveDML.IsAutoID := lOneDataSet.DataInfo.IsAutoID;
       // SQL进行打乱
       lSaveDML.SQL := OneSQLCrypto.SwapCrypto(lOneDataSet.SQL.Text);
       // 增加相关参数
