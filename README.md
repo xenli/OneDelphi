@@ -1,5 +1,6 @@
 # OneDelphi 
 ## OneDelphi是叫兽(FLM)QQ:378464060基于Delphi IDE开发的三层中间件，开源免费，支持MVC及传统DataSet框架，使用的是Mormot2的HTTP通讯
+## One系列相关介绍http://pascal.callbaba.cn/
 >                                                 叫兽(FLM)出品
 >                                                 QQ:378464060
 点击链接加入群聊【OneDelphi开源群】：https://jq.qq.com/?_wv=1027&k=AGDV4HQi  
@@ -12,14 +13,6 @@ QQ群：814696487（原来的群被封了，请加新群）
 >视频地址：https://space.bilibili.com/344699795  
 >视频中用到的DIYGW工具有需要可以找我，有优惠。QQ/微信：630425535  
 ---
-
-------OneDelphi基于Delphi IDE开发的
-
-------OneLaz基于Lazarus+fpc相当于D7开发的
-
-------OneUniApp基于uniApp开发的快速对接OneDelphi与OneLaz    
-  
-------OneFastCleint快速开发框架,或报表或原型快速演示  
                                            
 环境是基于 D11的，其它低版本，可能系统库 部份不兼容
 ### 1.控件包mormot2下载，群文件里面也有直接到群下载也行
@@ -34,13 +27,10 @@ QQ群：814696487（原来的群被封了，请加新群）
 ### 5.目前做好了MVC基础功能看源码单元httpServer->Controller->Demo-> DemoController.pas
    // 注册到路由 DemoController.initialization部份，路由如何注册
    // 注意，路由名称 不要一样，否则会判定已注册过，跳过
-   
   // 多例模式注册
   OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoA',TDemoController, 100, CreateNewDemoController);
-  
   // 单例模式注册
   OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('DemoB',TDemoController, 100, CreateNewDemoController);
-  
   // 方法注册
  OneHttpRouterManage.GetInitRouterManage().AddHTTPEvenWork('DemoEven',HelloWorldEven, 10);
  
