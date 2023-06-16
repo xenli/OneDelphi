@@ -109,6 +109,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <Debugger_DebugSourcePath>D:\devTool\Embarcadero\Studio\22.0\source\vcl\AppAnalytics\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -228,6 +229,7 @@
         <DCCReference Include="httpServer\OneWebSocketConst.pas"/>
         <DCCReference Include="OneFastFlow\OneFastFlowManage.pas"/>
         <DCCReference Include="OneFastFlow\OneFastFlowController.pas"/>
+        <DCCReference Include="httpServer\Controller\Demo\DemoWorkCustErrResult.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

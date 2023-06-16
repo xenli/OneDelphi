@@ -6,7 +6,13 @@
 	基于uniApp开发的快速对接OneDelphi与OneLaz   
 ------OneFastCleint
 	快速开发框架,或报表或原型快速演示
-
+************2023-06-10***********
+服务端:
+	1.增加调用业务层Controrl前置如果出现错误，自定义返回格式，参考Demo
+	DemoWorkCustErrResult->\httpServer\Controller\Demo
+客户端:
+	1.TOneDataSet增加RefreshSingle刷新单条数据功能
+	2.增加Demo-OneClientDemoRefreshSingle
 ************2023-05-27***********
 服务端:
 	1.修正Token进入临界区的一些处理

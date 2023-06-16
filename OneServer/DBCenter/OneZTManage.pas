@@ -475,8 +475,9 @@ begin
   if (AException <> nil) and (AException.Message <> '') then
   begin
     self.FException.FErrmsg := AException.Message;
-    //
     OneGlobal.TOneGlobal.GetInstance().Log.WriteLog('SQLErr', AException.Message);
+    // 有异常直接中断
+    abort;
   end;
 end;
 
@@ -497,7 +498,7 @@ begin
   aTask := TTask.Create(
     procedure
     begin
-
+      self.FDException.FErrmsg := '';
       // 释放时事务没提交,回滚
       if FDConnection.InTransaction then
         FDConnection.Rollback;
@@ -1399,7 +1400,10 @@ begin
         except
           on e: Exception do
           begin
-            lErrMsg := e.Message;
+            if lZTItem.FDException.FErrmsg <> '' then
+              lErrMsg := lZTItem.FDException.FErrmsg
+            else
+              lErrMsg := e.Message;
             exit;
           end;
         end;

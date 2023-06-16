@@ -104,7 +104,8 @@ uses
   OneWsChatController in 'httpServer\Controller\OneWsChatController.pas',
   OneWebSocketConst in 'httpServer\OneWebSocketConst.pas',
   OneFastFlowManage in 'OneFastFlow\OneFastFlowManage.pas',
-  OneFastFlowController in 'OneFastFlow\OneFastFlowController.pas';
+  OneFastFlowController in 'OneFastFlow\OneFastFlowController.pas',
+  DemoWorkCustErrResult in 'httpServer\Controller\Demo\DemoWorkCustErrResult.pas';
 
 var
   lpStartupInfo: TStartupInfo;
@@ -116,8 +117,10 @@ begin
   // debug状态下弹出内存泄漏报告
   if DebugHook <> 0 then
     ReportMemoryLeaksOnShutdown := True;
+
   // 设置软件系统时间格式
   Application.UpdateFormatSettings := false;
+  SetLocaleInfo(LOCALE_SYSTEM_DEFAULT, LOCALE_SSHORTDATE, 'yyyy-MM-dd');
   OneDateTimeHelper.SetSystemDataTimeFormatSettings();
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);

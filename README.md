@@ -51,6 +51,14 @@ QQ群：814696487（原来的群被封了，请加新群）
 ![](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg "title")
 
 ## 更新日志
+************2023-06-10***********  
+服务端:  
+	1.增加调用业务层Controrl前置如果出现错误，自定义返回格式，参考Demo  
+	DemoWorkCustErrResult->\httpServer\Controller\Demo  
+客户端:  
+	1.TOneDataSet增加RefreshSingle刷新单条数据功能  
+	2.增加Demo-OneClientDemoRefreshSingle  
+	
 ************2023-05-27***********  
 服务端:  
 	1.修正Token进入临界区的一些处理  

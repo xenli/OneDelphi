@@ -18,6 +18,7 @@ object frmUUID: TfrmUUID
     Height = 80
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 863
     object Label1: TLabel
       Left = 4
       Top = 17
@@ -97,8 +98,8 @@ object frmUUID: TfrmUUID
     end
   end
   object edUUID: TMemo
-    Left = 0
-    Top = 86
+    Left = 8
+    Top = 81
     Width = 401
     Height = 339
     TabOrder = 1

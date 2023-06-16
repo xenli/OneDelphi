@@ -112,7 +112,7 @@ begin
     // 正确增加Token返回相关的toeknID及私钥
     lOneTokenManage := TOneGlobal.GetInstance().TokenManage;
     // true允许同个账号共用token,测试接口共享下防止踢来踢去
-    lOneTokenItem := lOneTokenManage.AddLoginToken('uniapp', QLogin.loginCode, true, lErrMsg);
+    lOneTokenItem := lOneTokenManage.AddLoginToken('uniapp-' + QLogin.loginZTCode, QLogin.loginCode, true, lErrMsg);
     if lOneTokenItem = nil then
     begin
       result.resultMsg := lErrMsg;
@@ -178,7 +178,7 @@ begin
       lFDQuery.Open;
       if lFDQuery.RecordCount = 0 then
       begin
-        result.resultMsg := '当前用户[' + user+ ']不存在,请检查';
+        result.resultMsg := '当前用户[' + user + ']不存在,请检查';
         exit;
       end;
       if lFDQuery.RecordCount > 1 then

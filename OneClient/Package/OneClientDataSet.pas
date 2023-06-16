@@ -194,6 +194,11 @@ type
     /// <returns>成功失败多调用 QCallEven</returns>
     function CheckRepeat(QSQL: string; QParamValues: array of Variant; QSourceValue: string): boolean;
     /// <summary>
+    /// 刷新单条数据，刷新语句，参数
+    /// </summary>
+    /// <returns>返回boolean</returns>
+    function RefreshSingle(QSQL: string; QParamValues: array of Variant): boolean;
+    /// <summary>
     /// 保存数据
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
@@ -798,6 +803,108 @@ begin
     Result := False;
   finally
     lData.Free;
+  end;
+end;
+
+function TOneDataSet.RefreshSingle(QSQL: string; QParamValues: array of Variant): boolean;
+var
+  lTempData: TOneDataSet;
+  iParam, iField: Integer;
+  lField, lSField: TField;
+  lFieldName: string;
+  isFind, isOldRead: boolean;
+  lFieldDict: TDictionary<string, TField>;
+begin
+  Result := False;
+  if not Self.Active then
+  begin
+    Self.DataInfo.ErrMsg := '数据集未打开,无法刷新.';
+    exit;
+  end;
+  if Self.IsEmpty then
+  begin
+    Self.DataInfo.ErrMsg := '数据集为空数据集,无法刷新指定数据.';
+    exit;
+  end;
+  lTempData := TOneDataSet.Create(nil);
+  lFieldDict := TDictionary<string, TField>.Create;
+  try
+    lTempData.DataInfo.ZTCode := Self.DataInfo.ZTCode;
+    lTempData.SQL.Text := QSQL;
+    if lTempData.Params.Count <> length(QParamValues) then
+    begin
+      Self.DataInfo.ErrMsg := 'SQL产生的参数个数与传进来的参数不相等,请检查';
+      exit;
+    end;
+    for iParam := 0 to lTempData.Params.Count - 1 do
+    begin
+      lTempData.Params[iParam].value := QParamValues[iParam];
+    end;
+    if not lTempData.OpenData then
+    begin
+      Self.DataInfo.ErrMsg := lTempData.DataInfo.ErrMsg;
+      exit;
+    end;
+    if lTempData.RecordCount = 0 then
+    begin
+      Self.DataInfo.ErrMsg := '无相关返回数据。';
+    end;
+    if lTempData.RecordCount <> 1 then
+    begin
+      Self.DataInfo.ErrMsg := '当前返回数据不是唯一的，当前返回条数:' + lTempData.RecordCount.ToString;
+      exit;
+    end;
+    for iField := 0 to lTempData.Fields.Count-1 do
+    begin
+      lField := lTempData.Fields[iField];
+      lFieldDict.Add(lField.FieldName.ToLower, lField);
+    end;
+    // 处理字段是否全部一至
+    for iField := 0 to Self.Fields.Count-1 do
+    begin
+      lField := Self.Fields[iField];
+      if not(lField.FieldKind = TFieldKind.fkData) then
+      begin
+        continue;
+      end;
+      isFind := False;
+      if lFieldDict.ContainsKey(lField.FieldName.ToLower) then
+      begin
+        isFind := true;
+      end;
+      if not isFind then
+      begin
+        Self.DataInfo.ErrMsg := '当前返回数据结构不一至,找不到字段:' + lField.FieldName;
+        exit;
+      end;
+    end;
+    // 字段赋值
+    Self.Edit;
+    for iField := 0 to Self.Fields.Count-1 do
+    begin
+      lField := Self.Fields[iField];
+      if not(lField.FieldKind = TFieldKind.fkData) then
+      begin
+        continue;
+      end;
+      isOldRead := lField.ReadOnly;
+      try
+        lField.ReadOnly := False;
+        if lFieldDict.TryGetValue(lField.FieldName.ToLower, lSField) then
+        begin
+          // 值复制,后面看要不要分数据类型，理论是兼容所有类型
+          lField.value := lSField.value;
+        end;
+      finally
+        lField.ReadOnly := isOldRead;
+      end;
+    end;
+    Self.Post; // 本地提交
+    Result := true;
+  finally
+    lTempData.Free;
+    lFieldDict.Clear;
+    lFieldDict.Free;
   end;
 end;
 

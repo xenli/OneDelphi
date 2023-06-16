@@ -57,6 +57,9 @@
         <Projects Include="ClientDemo\OneClientDemoScript.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="ClientDemo\OneClientDemoRefreshSingle.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -227,14 +230,23 @@
     <Target Name="OneClientDemoScript:Make">
         <MSBuild Projects="ClientDemo\OneClientDemoScript.dproj" Targets="Make"/>
     </Target>
+    <Target Name="OneClientDemoRefreshSingle">
+        <MSBuild Projects="ClientDemo\OneClientDemoRefreshSingle.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoRefreshSingle:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoRefreshSingle.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoRefreshSingle:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoRefreshSingle.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="OneClient;OneCleintDemoDatas;OneClientDemo;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate;OneClientDemoFastFile;OneClientDemoFastApi;OneClientDemoWebSocket;OneClientDemoWebSocketChat;OneClientDemoScript"/>
+        <CallTarget Targets="OneClient;OneCleintDemoDatas;OneClientDemo;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate;OneClientDemoFastFile;OneClientDemoFastApi;OneClientDemoWebSocket;OneClientDemoWebSocketChat;OneClientDemoScript;OneClientDemoRefreshSingle"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="OneClient:Clean;OneCleintDemoDatas:Clean;OneClientDemo:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean;OneClientDemoFastFile:Clean;OneClientDemoFastApi:Clean;OneClientDemoWebSocket:Clean;OneClientDemoWebSocketChat:Clean;OneClientDemoScript:Clean"/>
+        <CallTarget Targets="OneClient:Clean;OneCleintDemoDatas:Clean;OneClientDemo:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean;OneClientDemoFastFile:Clean;OneClientDemoFastApi:Clean;OneClientDemoWebSocket:Clean;OneClientDemoWebSocketChat:Clean;OneClientDemoScript:Clean;OneClientDemoRefreshSingle:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="OneClient:Make;OneCleintDemoDatas:Make;OneClientDemo:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make;OneClientDemoFastFile:Make;OneClientDemoFastApi:Make;OneClientDemoWebSocket:Make;OneClientDemoWebSocketChat:Make;OneClientDemoScript:Make"/>
+        <CallTarget Targets="OneClient:Make;OneCleintDemoDatas:Make;OneClientDemo:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make;OneClientDemoFastFile:Make;OneClientDemoFastApi:Make;OneClientDemoWebSocket:Make;OneClientDemoWebSocketChat:Make;OneClientDemoScript:Make;OneClientDemoRefreshSingle:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

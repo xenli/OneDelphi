@@ -2,7 +2,7 @@
 
 uses
   Vcl.Forms,
-  frmDemoMain in 'frmDemoMain.pas' {Form1};
+  frmDemoMain in 'frmDemoMain.pas' {frDemoMain};
 
 {$R *.res}
 
@@ -11,7 +11,7 @@ begin
   if DebugHook <> 0 then
     ReportMemoryLeaksOnShutdown := true;
   Application.MainFormOnTaskbar := true;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TfrDemoMain, frDemoMain);
   Application.Run;
 
 end.

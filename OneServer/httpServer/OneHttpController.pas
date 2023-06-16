@@ -49,13 +49,16 @@ type
       Var QErrMsg: string): TArray<TValue>;
     { 执行相关方法 }
     procedure DoMethodFreeParams(QParamObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>);
-    procedure DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>); virtual;
+    function DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult;
+      QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>): Boolean; virtual;
     { 结果输出编码设置 }
     procedure EndCodeResultOut(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult); virtual;
     //
     function CheckCureentToken(var QErrMsg: string): Boolean;
     function GetCureentToken(var QErrMsg: string): TOneTokenItem;
     function GetCureentHTTPCtxt(var QErrMsg: string): THTTPCtxt;
+    // 自定义输出错误格式
+    procedure DoWorkCustErrResult(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult); virtual;
   protected
     // QCompact JSON是否紧密型的，默认是，减少传输量
     function JSONToObject(Instance: TObject; const JSON: string): Boolean;
@@ -352,9 +355,12 @@ var
   LParamNewObjList: TList<TObject>;
   LParamObjRttiList: TList<TRttiType>;
   lThreadID: TThreadID;
+  isInvokeOK: Boolean;
 begin
   self.FHTTPCtxt := nil;
   self.FHTTPResult := nil;
+  // 是否正确执行了Invoke事件
+  isInvokeOK := False;
   if self.FRouterItem = nil then
   begin
     // 挂载RTTI信息
@@ -411,7 +417,14 @@ begin
             exit;
           end;
           // 调用自已的业务方法
-          DoMethod(QHTTPCtxt, QHTTPResult, LParamNewObjList, LParamObjRttiList);
+          if not DoMethod(QHTTPCtxt, QHTTPResult, LParamNewObjList, LParamObjRttiList) then
+          begin
+            exit;
+          end
+          else
+          begin
+            isInvokeOK := true;
+          end;
         end;
       end;
     except
@@ -425,10 +438,14 @@ begin
     end;
   finally
     self.RemoveCurrentThreadLock(lThreadID);
-
     // 返回的code
     { 结果进行编码,目标没有明确说明编码时,采用utf8编码 }
     EndCodeResultOut(QHTTPCtxt, QHTTPResult);
+    if not isInvokeOK then
+    begin
+      self.DoWorkCustErrResult(QHTTPCtxt, QHTTPResult)
+    end;
+
     Result := QHTTPResult.ResultStatus;
     { 是否支持跨域访问 }
     if bAllowOrigin then
@@ -609,6 +626,11 @@ begin
           begin
             lJSonValue := TJsonObject.ParseJSONValue(string(QHTTPCtxt.RequestInContent));
             if lJSonValue = nil then
+            begin
+              QErrMsg := '提交的数据不是合法JSON格式';
+              exit;
+            end;
+            if not((lJSonValue is TJsonObject) or (lJSonValue is TJSONArray)) then
             begin
               QErrMsg := '提交的数据不是合法JSON格式';
               exit;
@@ -1097,7 +1119,8 @@ begin
   end;
 end;
 
-procedure TOneControllerBase.DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>);
+function TOneControllerBase.DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult;
+  QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>): Boolean;
 var
   lOneMethodRtti: TOneMethodRtti;
   lArgs: TArray<TValue>;
@@ -1107,6 +1130,7 @@ var
   isInvoke: Boolean;
 begin
   // 根据rtti来反射方法
+  Result := False;
   LValue := nil;
   isInvoke := False;
   if FRouterItem = nil then
@@ -1238,10 +1262,16 @@ begin
     setLength(lArgs, 0);
     lArgs := nil;
   end;
+  Result := true;
 end;
 
 function TOneControllerBase.JSONToObject(Instance: TObject; const JSON: string): Boolean;
 begin
+end;
+
+procedure TOneControllerBase.DoWorkCustErrResult(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
+begin
+
 end;
 
 end.

@@ -47,6 +47,8 @@ object frmMain: TfrmMain
           '                                                 '#21483#20861'(FLM)'#20986#21697
           '                                                 QQ:378464060')
         TabOrder = 0
+        ExplicitWidth = 870
+        ExplicitHeight = 480
       end
     end
     object TabSheet1: TTabSheet
@@ -171,7 +173,6 @@ object frmMain: TfrmMain
         ParentColor = False
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 870
         object Label1: TLabel
           Left = 3
           Top = 56
@@ -407,8 +408,6 @@ object frmMain: TfrmMain
         Align = alClient
         Caption = #20854#23427#37197#32622
         TabOrder = 1
-        ExplicitWidth = 870
-        ExplicitHeight = 158
         object chWinTaskStart: TCheckBox
           Left = 15
           Top = 30
@@ -442,7 +441,6 @@ object frmMain: TfrmMain
         Align = alTop
         Caption = 'WebSocket(WS)'#37197#32622
         TabOrder = 2
-        ExplicitWidth = 870
         object Label18: TLabel
           Left = 246
           Top = 35

@@ -96,7 +96,6 @@ var
 begin
   result := TActionResult<TFastLogin>.Create(true, false);
   lOneGlobal := TOneGlobal.GetInstance();
-  lOneGlobal.Log.WriteLog('Login', '0');
   lErrMsg := '';
   if QLogin.loginCode = '' then
   begin
@@ -115,7 +114,6 @@ begin
   // exit;
   // end;
   // 判断是不是超级管理员
-  lOneGlobal.Log.WriteLog('Login', '1');
   if QLogin.loginCode = 'SuperAdmin' then
   begin
     // 超级管理员
@@ -152,7 +150,6 @@ begin
     end;
     //
   end;
-  lOneGlobal.Log.WriteLog('Login', '2');
   // 验证账号密码,比如数据库
   lOneZTMange := TOneGlobal.GetInstance().ZTManage;
   // 账套为空时,默认取主账套,多账套的话可以固定一个账套代码
@@ -162,7 +159,6 @@ begin
     result.resultMsg := lErrMsg;
     exit;
   end;
-  lOneGlobal.Log.WriteLog('Login', '3');
   try
     // 从账套获取现成的FDQuery,已绑定好 connetion,也无需释放
     lFDQuery := lZTItem.ADQuery;
@@ -171,7 +167,6 @@ begin
       ' from onefast_admin where FAdminCode=:FAdminCode';
     lFDQuery.Params[0].AsString := QLogin.loginCode;
     lFDQuery.Open;
-    lOneGlobal.Log.WriteLog('Login', '4');
     if lFDQuery.RecordCount = 0 then
     begin
       result.resultMsg := '当前用户[' + QLogin.loginCode + ']不存在,请检查';
@@ -205,7 +200,6 @@ begin
       result.resultMsg := '当前用户[' + QLogin.loginCode + ']未启用,请联系管理员启用';
       exit;
     end;
-    lOneGlobal.Log.WriteLog('Login', '5');
     // 为一条时要验证密码,前端一般是MD5加密的,后端也是保存MD5加密的
     if QLogin.loginPass.ToLower <> lFDQuery.FieldByName('FAdminPass').AsString.ToLower then
     begin
@@ -222,7 +216,6 @@ begin
       result.resultMsg := lErrMsg;
       exit;
     end;
-    lOneGlobal.Log.WriteLog('Login', '6');
     // 为Token设置相关信息
     lOneTokenItem.LoginUserCode := QLogin.loginCode;
     lOneTokenItem.ZTCode := QLogin.loginZTCode; // 指定账套
@@ -240,11 +233,9 @@ begin
     result.resultData.adminName := lFDQuery.FieldByName('FAdminName').AsString;
     //
     result.SetResultTrue;
-    lOneGlobal.Log.WriteLog('Login', '7');
   finally
     // 解锁,归还池很重要
     lZTItem.UnLockWork;
-    lOneGlobal.Log.WriteLog('Login', '8');
   end;
 end;
 

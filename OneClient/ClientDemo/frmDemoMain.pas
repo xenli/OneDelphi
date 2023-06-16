@@ -12,7 +12,7 @@ uses
   OneClientDataSet, Vcl.ComCtrls, Vcl.Grids, Vcl.DBGrids, OneClientHelper;
 
 type
-  TForm1 = class(TForm)
+  TfrDemoMain = class(TForm)
     plSet: TPanel;
     Label1: TLabel;
     edHTTPHost: TEdit;
@@ -96,14 +96,14 @@ type
   end;
 
 var
-  Form1: TForm1;
+  frDemoMain: TfrDemoMain;
 
 implementation
 
 {$R *.dfm}
 
 
-procedure TForm1.tbAppendClick(Sender: TObject);
+procedure TfrDemoMain.tbAppendClick(Sender: TObject);
 begin
   if not qryOpenData.Active then
   begin
@@ -113,7 +113,7 @@ begin
   qryOpenData.Append;
 end;
 
-procedure TForm1.tbClientConnectClick(Sender: TObject);
+procedure TfrDemoMain.tbClientConnectClick(Sender: TObject);
 begin
   if OneConnection.Connected then
   begin
@@ -136,12 +136,12 @@ begin
   end;
 end;
 
-procedure TForm1.tbClientDisConnectClick(Sender: TObject);
+procedure TfrDemoMain.tbClientDisConnectClick(Sender: TObject);
 begin
   OneConnection.DisConnect;
 end;
 
-procedure TForm1.tbDelClick(Sender: TObject);
+procedure TfrDemoMain.tbDelClick(Sender: TObject);
 begin
   if not qryOpenData.Active then
   begin
@@ -156,7 +156,7 @@ begin
   qryOpenData.Delete;
 end;
 
-procedure TForm1.tbDMLClick(Sender: TObject);
+procedure TfrDemoMain.tbDMLClick(Sender: TObject);
 var
   i: integer;
 begin
@@ -206,7 +206,7 @@ begin
   end;
 end;
 
-procedure TForm1.tbOpenDataClick(Sender: TObject);
+procedure TfrDemoMain.tbOpenDataClick(Sender: TObject);
 var
   vUrl: string;
   i: integer;
@@ -262,7 +262,7 @@ begin
   showMessage('打开数据成功');
 end;
 
-procedure TForm1.tbSaveDataClick(Sender: TObject);
+procedure TfrDemoMain.tbSaveDataClick(Sender: TObject);
 var
   i: integer;
   lFieldName: string;
@@ -299,7 +299,7 @@ begin
   end;
 end;
 
-procedure TForm1.tbSPClick(Sender: TObject);
+procedure TfrDemoMain.tbSPClick(Sender: TObject);
 var
   i: integer;
   lColumn: TColumn;

@@ -1,7 +1,7 @@
-object Form1: TForm1
+object frDemoMain: TfrDemoMain
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = #22522#26412#25968#25454'Demo'
   ClientHeight = 559
   ClientWidth = 899
   Color = clBtnFace
@@ -534,7 +534,7 @@ object Form1: TForm1
     end
   end
   object OneConnection: TOneConnection
-    Connected = True
+    Connected = False
     IsHttps = False
     HTTPHost = '127.0.0.1'
     HTTPPort = 9090
