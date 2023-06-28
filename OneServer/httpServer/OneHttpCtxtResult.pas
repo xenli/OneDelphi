@@ -8,7 +8,7 @@ uses
   Rest.JsonReflect, Neon.Core.Persistence.JSON, Neon.Core.Persistence,
   System.Contnrs, OneHttpControllerRtti, Neon.Core.Serializers.DB,
   Neon.Core.Serializers.RTL, Neon.Core.Serializers.Nullables, OneNeonHelper,
-  System.Rtti, OneRttiHelper, OneHttpConst, OneControllerResult, OneMultipart;
+  System.Rtti, OneRttiHelper, OneHttpConst, OneControllerResult, OneMultipart, System.IOUtils;
 
 type
   THTTPCtxt = class;
@@ -198,6 +198,8 @@ var
   i: integer;
   lNeonConfiguration: INeonConfiguration;
   lResultStr: TActionResult<string>;
+  fs: TStringStream;
+  lFileName: string;
 begin
   if QHTTPResult.ResultRedirect <> '' then
   begin
@@ -243,7 +245,26 @@ begin
           if (lResultStr.IsResultFile) and (lResultStr.ResultSuccess) then
           begin
             QHTTPResult.ResultOutMode := THTTPResultMode.OUTFILE;
-            QHTTPCtxt.OutContent := TActionResult<string>(lSerializerObj).ResultData;
+            lFileName := TActionResult<string>(lSerializerObj).ResultData;
+            // 如果是html文件，打开html
+            if Extractfileext(lFileName).ToLower = '.html' then
+            begin
+              QHTTPResult.ResultOutMode := THTTPResultMode.HTML;
+              fs := TStringStream.Create('', TEncoding.UTF8);
+              try
+                fs.LoadFromFile(lFileName);
+                QHTTPCtxt.OutContent := UTF8Encode(fs.DataString);
+              finally
+                fs.Free;
+              end;
+            end
+            else
+            begin
+              QHTTPCtxt.OutContent := lFileName;
+              // 附加文件名称
+              QHTTPCtxt.AddCustomerHead('Content-Disposition',
+                'attachment;filename=' + TPath.GetFileName(lFileName));
+            end;
           end
           else
           begin
@@ -613,7 +634,7 @@ end;
 
 procedure THTTPCtxt.AddCustomerHead(QHead: string; QConnect: string);
 begin
-  FResponCustHeaderList := FResponCustHeaderList + #13#10 + QHead + ':' + QConnect;
+  FResponCustHeaderList := FResponCustHeaderList + #13#10 + QHead + ':' + UTF8Encode(QConnect);
 end;
 
 destructor THTTPCtxt.Destroy;

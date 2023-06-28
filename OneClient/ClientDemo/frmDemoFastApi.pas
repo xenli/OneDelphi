@@ -226,6 +226,7 @@ type
     vwMainFApiRole: TcxGridDBColumn;
     qryFieldFFieldFormat: TWideStringField;
     vwFieldFFieldFormat: TcxGridDBColumn;
+    tbReportDesign: TdxBarLargeButton;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbClientDisConnectClick(Sender: TObject);
     procedure tbRefshClick(Sender: TObject);
@@ -251,6 +252,7 @@ type
     procedure tbSaveClick(Sender: TObject);
     procedure tbSaveSetClick(Sender: TObject);
     procedure tbRefreshApiClick(Sender: TObject);
+    procedure tbReportDesignClick(Sender: TObject);
   private
     { Private declarations }
     FDataSetList: TList<TOneDataSet>;
@@ -268,6 +270,7 @@ implementation
 
 {$R *.dfm}
 
+uses frm_fastApiReport;
 
 function GetGUID(IsOrder: Boolean = false): string;
 var
@@ -522,7 +525,7 @@ var
   lFieldName, lParamName: string;
   lFieldKind: TFieldKind;
   lFieldType: TFieldType;
-  isFilter: boolean;
+  isFilter: Boolean;
 begin
   inherited;
   //
@@ -539,7 +542,7 @@ begin
     qryFieldGet.Close;
     qryFieldGet.Fields.Clear;
   end;
-  qryFieldGet.SQL.text := lSQL;
+  qryFieldGet.SQL.Text := lSQL;
   qryFieldGet.DataInfo.ZTCode := qryDataFDataZTCode.AsString;
   qryFieldGet.DataInfo.PageSize := 1;
   for i := 0 to qryFieldGet.Params.count - 1 do
@@ -691,7 +694,7 @@ begin
       qryField.Edit;
       qryFieldFOrderNumber.AsInteger := i;
       qryField.Post;
-      qryField.next;
+      qryField.Next;
     end;
   finally
     qryField.EnableControls;
@@ -730,7 +733,7 @@ begin
     qryFilter.Edit;
     qryFilterFOrderNumber.AsInteger := i;
     qryFilter.Post;
-    qryFilter.next;
+    qryFilter.Next;
   end;
 end;
 
@@ -753,11 +756,11 @@ begin
     for iParam := 0 to tempData.Params.count - 1 do
     begin
       lParam := tempData.Params[iParam];
-      if not qryFilter.Locate('FFilterField', lParam.name, []) then
+      if not qryFilter.Locate('FFilterField', lParam.Name, []) then
       begin
         qryFilter.Append;
-        qryFilterFFilterName.AsString := lParam.name;
-        qryFilterFFilterField.AsString := lParam.name;
+        qryFilterFFilterName.AsString := lParam.Name;
+        qryFilterFFilterField.AsString := lParam.Name;
         qryFilter.Post;
       end;
     end;
@@ -773,7 +776,7 @@ begin
     qryFilter.Edit;
     qryFilterFOrderNumber.AsInteger := i;
     qryFilter.Post;
-    qryFilter.next;
+    qryFilter.Next;
   end;
 end;
 
@@ -859,6 +862,11 @@ begin
   end;
 end;
 
+procedure TfrDemoFastApi.tbReportDesignClick(Sender: TObject);
+begin
+  frm_fastApiReport.ShowFastApiReport(qryFastApiFApiID.AsString, qryFastApiFApiCode.AsString);
+end;
+
 procedure TfrDemoFastApi.tbSaveClick(Sender: TObject);
 begin
   if qryFastApi.SaveData then
@@ -918,7 +926,7 @@ begin
           begin
             lNames.Add(qryDataFDataName.AsString.ToLower, True);
           end;
-          qryData.next;
+          qryData.Next;
         end;
 
         //
@@ -940,7 +948,7 @@ begin
           qryField.Edit;
           qryFieldFOrderNumber.AsInteger := i;
           qryField.Post;
-          qryField.next;
+          qryField.Next;
         end;
 
         i := 0;
@@ -951,9 +959,9 @@ begin
           qryFilter.Edit;
           qryFilterFOrderNumber.AsInteger := i;
           qryFilter.Post;
-          qryFilter.next;
+          qryFilter.Next;
         end;
-        qryData.next;
+        qryData.Next;
       end;
     finally
       lNames.Clear;

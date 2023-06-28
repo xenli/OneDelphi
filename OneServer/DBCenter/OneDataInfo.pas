@@ -157,6 +157,7 @@ type
   //
   TOneDataResultItem = class
   private
+    FResultDataName: string;
     FResultPage: Boolean; // 分页
     FResultDataCount: Integer; // 多个数据集一个SQL语句
     FResultTotal: Integer; // 第一个数据集总记录数,分页下取总条数
@@ -170,6 +171,7 @@ type
     destructor Destroy; override;
     procedure SetStream(QStream: TMemoryStream);
   public
+    property ResultDataName: string read FResultDataName write FResultDataName;
     property ResultPage: Boolean read FResultPage write FResultPage;
     property ResultDataCount: Integer read FResultDataCount
       write FResultDataCount;
@@ -316,22 +318,27 @@ var
   i: Integer;
   lDataResultItem: TOneDataResultItem;
 begin
-  for i := 0 to self.ResultItems.Count - 1 do
+  Result := false;
+  if self.ResultItems <> nil then
   begin
-    lDataResultItem := self.ResultItems[i];
-    if lDataResultItem.ResultDataMode = const_DataReturnMode_Stream then
+    for i := 0 to self.ResultItems.Count - 1 do
     begin
-      if lDataResultItem.FTempStream <> nil then
+      lDataResultItem := self.ResultItems[i];
+      if lDataResultItem.ResultDataMode = const_DataReturnMode_Stream then
       begin
-        lDataResultItem.ResultContext := OneStreamString.StreamToBase64Str
-          (lDataResultItem.FTempStream);
-        // 即时释放内存
-        lDataResultItem.FTempStream.Clear;
-        lDataResultItem.FTempStream.Free;
-        lDataResultItem.FTempStream := nil;
+        if lDataResultItem.FTempStream <> nil then
+        begin
+          lDataResultItem.ResultContext := OneStreamString.StreamToBase64Str
+            (lDataResultItem.FTempStream);
+          // 即时释放内存
+          lDataResultItem.FTempStream.Clear;
+          lDataResultItem.FTempStream.Free;
+          lDataResultItem.FTempStream := nil;
+        end;
       end;
     end;
   end;
+  Result := true;
 end;
 
 initialization

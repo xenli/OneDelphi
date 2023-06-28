@@ -1163,6 +1163,7 @@ begin
     if not OneNeonHelper.JsonToObject(Result, lResultJsonValue, lErrMsg) then
     begin
       Result.ResultMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      exit;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -1534,7 +1535,7 @@ begin
       lSaveDML.SaveDataUpdateSQL := '';
       lSaveDML.SaveDataDelSQL := '';
       lSaveDML.IsReturnData := lOneDataSet.DataInfo.IsReturnData;
-      //lSaveDML.IsAutoID := lOneDataSet.DataInfo.IsAutoID;
+      // lSaveDML.IsAutoID := lOneDataSet.DataInfo.IsAutoID;
       // SQL进行打乱
       lSaveDML.SQL := OneSQLCrypto.SwapCrypto(lOneDataSet.SQL.Text);
       // 增加相关参数

@@ -84,6 +84,7 @@ begin
   result.SetResultTrue;
 end;
 
+
 initialization
 
 // 单例模式注册

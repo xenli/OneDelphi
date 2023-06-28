@@ -73,6 +73,7 @@ contains
   OneClientFastUpdate in 'OneFast\OneClientFastUpdate.pas',
   OneClientFastFile in 'OneFast\OneClientFastFile.pas',
   OneWebSocketClient in 'websocket\OneWebSocketClient.pas',
-  OneFunc in 'baseLib\OneFunc.pas';
+  OneFunc in 'baseLib\OneFunc.pas',
+  OneClientFastReport in 'OneFast\OneClientFastReport.pas';
 
 end.

@@ -51,6 +51,16 @@ QQ群：814696487（原来的群被封了，请加新群）
 ![](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg "title")
 
 ## 更新日志
+************2023-06-24***********
+服务端:  
+	1.增加服务端报表单元，需要装FR如果没装FR同学，请屏B此单元  
+	  OneFastApi目录下 OneFastReportController  
+	2.优化文件输出功能和HTML输出功能  
+
+客户端:  
+	1.增加控件 TOneServerFastReport设计服务端报表交互控件  
+	2. 增加Demo-OneClientDemoFastApi.dproj 报表设计单元  
+	
 ************2023-06-10***********  
 服务端:  
 	1.增加调用业务层Controrl前置如果出现错误，自定义返回格式，参考Demo  

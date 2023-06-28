@@ -176,7 +176,7 @@ begin
     result.ResultMsg := '服务端文件不存在请检查';
     exit;
   end;
-  lFileStream := TFileStream.Create(lFileName, fmopenRead and fmShareDenyRead);
+  lFileStream := TFileStream.Create(lFileName, fmopenRead, fmShareDenyRead);
   try
     // 大于10M文件,请用分块下载
     if lFileStream.Size > 1024 * 1024 * 10 then

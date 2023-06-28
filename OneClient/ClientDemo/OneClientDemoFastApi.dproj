@@ -102,6 +102,10 @@
             <Form>frDemoFastApi</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="frm_fastApiReport.pas">
+            <Form>frmFastApiReport</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

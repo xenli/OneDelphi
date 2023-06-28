@@ -269,6 +269,9 @@ begin
     lListPath.Add('OneWeb');
     // 更新目录
     lListPath.Add('OneFastUpload');
+    // 服务端报表保存目录
+    lListPath.Add('OneFastReport');
+    lListPath.Add('OneFastReportExport');
     // 以下多是驱动的目录
     lListPath.Add(const_OraOciDll32);
     lListPath.Add(const_OraOciDll64);

@@ -6,10 +6,10 @@
         <Projects Include="Package\OneClient.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ClientDemo\OneCleintDemoDatas.dproj">
+        <Projects Include="ClientDemo\OneClientDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ClientDemo\OneClientDemo.dproj">
+        <Projects Include="ClientDemo\OneCleintDemoDatas.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ClientDemo\OneCleintDemoCustTran.dproj">
@@ -77,15 +77,6 @@
     <Target Name="OneClient:Make">
         <MSBuild Projects="Package\OneClient.dproj" Targets="Make"/>
     </Target>
-    <Target Name="OneCleintDemoDatas">
-        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj"/>
-    </Target>
-    <Target Name="OneCleintDemoDatas:Clean">
-        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="OneCleintDemoDatas:Make">
-        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj" Targets="Make"/>
-    </Target>
     <Target Name="OneClientDemo">
         <MSBuild Projects="ClientDemo\OneClientDemo.dproj"/>
     </Target>
@@ -94,6 +85,15 @@
     </Target>
     <Target Name="OneClientDemo:Make">
         <MSBuild Projects="ClientDemo\OneClientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneCleintDemoDatas">
+        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj"/>
+    </Target>
+    <Target Name="OneCleintDemoDatas:Clean">
+        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneCleintDemoDatas:Make">
+        <MSBuild Projects="ClientDemo\OneCleintDemoDatas.dproj" Targets="Make"/>
     </Target>
     <Target Name="OneCleintDemoCustTran">
         <MSBuild Projects="ClientDemo\OneCleintDemoCustTran.dproj"/>
@@ -240,13 +240,13 @@
         <MSBuild Projects="ClientDemo\OneClientDemoRefreshSingle.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="OneClient;OneCleintDemoDatas;OneClientDemo;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate;OneClientDemoFastFile;OneClientDemoFastApi;OneClientDemoWebSocket;OneClientDemoWebSocketChat;OneClientDemoScript;OneClientDemoRefreshSingle"/>
+        <CallTarget Targets="OneClient;OneClientDemo;OneCleintDemoDatas;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate;OneClientDemoFastFile;OneClientDemoFastApi;OneClientDemoWebSocket;OneClientDemoWebSocketChat;OneClientDemoScript;OneClientDemoRefreshSingle"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="OneClient:Clean;OneCleintDemoDatas:Clean;OneClientDemo:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean;OneClientDemoFastFile:Clean;OneClientDemoFastApi:Clean;OneClientDemoWebSocket:Clean;OneClientDemoWebSocketChat:Clean;OneClientDemoScript:Clean;OneClientDemoRefreshSingle:Clean"/>
+        <CallTarget Targets="OneClient:Clean;OneClientDemo:Clean;OneCleintDemoDatas:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean;OneClientDemoFastFile:Clean;OneClientDemoFastApi:Clean;OneClientDemoWebSocket:Clean;OneClientDemoWebSocketChat:Clean;OneClientDemoScript:Clean;OneClientDemoRefreshSingle:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="OneClient:Make;OneCleintDemoDatas:Make;OneClientDemo:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make;OneClientDemoFastFile:Make;OneClientDemoFastApi:Make;OneClientDemoWebSocket:Make;OneClientDemoWebSocketChat:Make;OneClientDemoScript:Make;OneClientDemoRefreshSingle:Make"/>
+        <CallTarget Targets="OneClient:Make;OneClientDemo:Make;OneCleintDemoDatas:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make;OneClientDemoFastFile:Make;OneClientDemoFastApi:Make;OneClientDemoWebSocket:Make;OneClientDemoWebSocketChat:Make;OneClientDemoScript:Make;OneClientDemoRefreshSingle:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -37,6 +37,10 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+  public
+    property DataSet: TDataSet read FDataSet;
+    property ApiData: TFastApiData read FApiData;
+    property Childs: TList<TApiStepResult> read FChilds;
   end;
 
   TApiAll = class
@@ -45,23 +49,29 @@ type
     // 传进来的参数
     token: TOneTokenItem;
     postDataJson: TJsonObject;
-    paramJson: TJsonObject;
+
     pageJson: TJsonObject;
     //
     ClientZT: TOneZTItem;
     ZTDict: TDictionary<string, TOneZTItem>;
-    //
-    StepResultList: TList<TApiStepResult>;
+
     //
     isDoOK: boolean;
     resultCode: string;
+
+  public
+    paramJson: TJsonObject;
+    //
+    StepResultList: TList<TApiStepResult>;
     errMsg: string;
   public
     constructor Create;
     destructor Destroy; override;
     function GetZTItem(QZTCode: string): TOneZTItem;
+    function IsErr(): boolean;
   end;
 
+function DoFastApiResultApiAll(QToken: TOneTokenItem; QPostDataJson: TJsonObject; var QApiInfo: TFastApiInfo): TApiAll;
 function DoFastApi(QToken: TOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
 function DoCheckApiAuthor(QToken: TOneTokenItem; QApiInfo: TFastApiInfo; QApiAll: TApiAll): boolean;
 //
@@ -175,7 +185,12 @@ begin
   Result := lZTItem;
 end;
 
-function DoFastApi(QToken: TOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
+function TApiAll.IsErr(): boolean;
+begin
+  Result := not self.isDoOK;
+end;
+
+function DoFastApiResultApiAll(QToken: TOneTokenItem; QPostDataJson: TJsonObject; var QApiInfo: TFastApiInfo): TApiAll;
 var
   lFastApiManage: TOneFastApiManage;
   lApiInfo: TFastApiInfo;
@@ -247,6 +262,7 @@ begin
     lApiInfo := lFastApiManage.GetApiInfo(lApiCode, lApiAll.errMsg);
     if lApiInfo = nil then
       exit;
+    QApiInfo := lApiInfo;
     // 开始分析
     if not lApiInfo.CheckApiInfo() then
     begin
@@ -379,8 +395,27 @@ begin
     end;
   finally
     // 错误返回
-    Result := DoFastResultJson(lApiInfo, lApiAll);
-    lApiAll.Free;
+    Result := lApiAll;
+  end;
+end;
+
+function DoFastApi(QToken: TOneTokenItem; QPostDataJson: TJsonObject): TJsonValue;
+var
+  lApiAll: TApiAll;
+  lApiInfo: TFastApiInfo;
+begin
+  Result := nil;
+  lApiInfo := nil;
+  lApiAll := nil;
+  try
+    lApiAll := DoFastApiResultApiAll(QToken, QPostDataJson, lApiInfo);
+  finally
+    // 错误返回
+    if lApiAll <> nil then
+    begin
+      Result := DoFastResultJson(lApiInfo, lApiAll);
+      lApiAll.Free;
+    end;
   end;
 end;
 

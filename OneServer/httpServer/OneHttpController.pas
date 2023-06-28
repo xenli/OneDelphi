@@ -502,6 +502,7 @@ var
   lCreateTValue: TValue;
   // 表单提交
   lMultipartDecode: TOneMultipartDecode;
+  isOnlyHttpParam: Boolean;
 begin
   lArgs := nil;
   Result := nil;
@@ -605,37 +606,72 @@ begin
       emOneHttpMethodMode.OnePost, emOneHttpMethodMode.OneAll:
         begin
 {$REGION}
-          // 判断是不是JSON格式
-          if QHTTPCtxt.RequestInContent = '' then
+          isOnlyHttpParam := False;
+          if iParamLen > 0 then
           begin
-            QErrMsg := '此接口需提供相关参数,当前POST提交的数据为空';
-            exit;
-          end;
-          // 转成JSON参数
-          lJSonValue := nil;
-          // 判断是不是表单
-          if OneMultipart.IsMultipartForm(QHTTPCtxt.RequestContentType) then
-          begin
-            if iParamLen > 1 then
+            // 如果参数只有  THTTPCtxt,THTTPResult不需要判断上传内容格式
+            // 自由把控
+            isOnlyHttpParam := true;
+            for iParam := Low(lParameters) to High(lParameters) do
             begin
-              QErrMsg := '表单提交,只能有一个参数且类型TOneMultipartDecode';
-              exit;
-            end;
-          end
-          else
-          begin
-            lJSonValue := TJsonObject.ParseJSONValue(string(QHTTPCtxt.RequestInContent));
-            if lJSonValue = nil then
-            begin
-              QErrMsg := '提交的数据不是合法JSON格式';
-              exit;
-            end;
-            if not((lJSonValue is TJsonObject) or (lJSonValue is TJSONArray)) then
-            begin
-              QErrMsg := '提交的数据不是合法JSON格式';
-              exit;
+              lParam := lParameters[iParam];
+              case lParam.ParamType.TypeKind of
+                tkClass:
+                  begin
+                    lParamTClass := QOneMethodRtti.ParamClassList[iParam];
+                    if lParamTClass.InheritsFrom(THTTPCtxt) then
+                    begin
+                    end
+                    else if lParamTClass.InheritsFrom(THTTPResult) then
+                    begin
+                    end
+                    else
+                    begin
+                      isOnlyHttpParam := False;
+                    end;
+                  end
+              else
+                isOnlyHttpParam := False;
+              end;
             end;
           end;
+
+          if not isOnlyHttpParam then
+          begin
+            // 判断是不是JSON格式
+            if QHTTPCtxt.RequestInContent = '' then
+            begin
+              QErrMsg := '此接口需提供相关参数,当前POST提交的数据为空';
+              exit;
+            end;
+            // 转成JSON参数
+            lJSonValue := nil;
+            // 判断是不是表单
+            if OneMultipart.IsMultipartForm(QHTTPCtxt.RequestContentType) then
+            begin
+              if iParamLen > 1 then
+              begin
+                QErrMsg := '表单提交,只能有一个参数且类型TOneMultipartDecode';
+                exit;
+              end;
+            end
+            else
+            begin
+
+              lJSonValue := TJsonObject.ParseJSONValue(string(QHTTPCtxt.RequestInContent));
+              if lJSonValue = nil then
+              begin
+                QErrMsg := '提交的数据不是合法JSON格式';
+                exit;
+              end;
+              if not((lJSonValue is TJsonObject) or (lJSonValue is TJSONArray)) then
+              begin
+                QErrMsg := '提交的数据不是合法JSON格式';
+                exit;
+              end;
+            end;
+          end;
+
           //
           for iParam := Low(lParameters) to High(lParameters) do
           begin

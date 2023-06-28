@@ -2,7 +2,8 @@
 
 uses
   Vcl.Forms,
-  frmDemoFastApi in 'frmDemoFastApi.pas' {frDemoFastApi};
+  frmDemoFastApi in 'frmDemoFastApi.pas' {frDemoFastApi},
+  frm_fastApiReport in 'frm_fastApiReport.pas' {frmFastApiReport};
 
 {$R *.res}
 

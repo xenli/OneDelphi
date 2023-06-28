@@ -133,6 +133,7 @@
         <DCCReference Include="OneFast\OneClientFastFile.pas"/>
         <DCCReference Include="websocket\OneWebSocketClient.pas"/>
         <DCCReference Include="baseLib\OneFunc.pas"/>
+        <DCCReference Include="OneFast\OneClientFastReport.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

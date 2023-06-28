@@ -28,7 +28,7 @@ implementation
 
 uses
   OneClientConnect, OneClientDataSet, OneClientVirtualFile, OneClientUUID, OneClientFastLsh,
-  OneClientFastUpdate, OneClientFastFile, OneWebSocketClient;
+  OneClientFastUpdate, OneClientFastFile, OneWebSocketClient, OneClientFastReport;
 
 procedure TOneUnitSelector.RequiresUnits(Proc: TGetStrProc);
 begin
@@ -51,7 +51,7 @@ procedure Register;
 begin
   RegisterComponents('OneClient', [TOneConnection, TOneDataSet, TOneVirtualFile,
     TOneUUID, TOneWebSocketClient]);
-  RegisterComponents('OneClientFast', [TOneFastLsh, TOneFastUpdate, TOneFastFile]);
+  RegisterComponents('OneClientFast', [TOneFastLsh, TOneFastUpdate, TOneFastFile, TOneServerFastReport]);
   RegisterSelectionEditor(TOneConnection, TOneUnitSelector);
   RegisterSelectionEditor(TOneDataSet, TOneUnitSelector);
   // RegisterPropertyEditor(TypeInfo(TFDParams), TOneDataInfo, 'Params',

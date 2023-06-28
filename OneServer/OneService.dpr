@@ -105,7 +105,10 @@ uses
   OneWebSocketConst in 'httpServer\OneWebSocketConst.pas',
   OneFastFlowManage in 'OneFastFlow\OneFastFlowManage.pas',
   OneFastFlowController in 'OneFastFlow\OneFastFlowController.pas',
-  DemoWorkCustErrResult in 'httpServer\Controller\Demo\DemoWorkCustErrResult.pas';
+  DemoWorkCustErrResult in 'httpServer\Controller\Demo\DemoWorkCustErrResult.pas',
+  OneFastPlatManage in 'OneFastCleint\OneFastPlatManage.pas',
+  TestApiController in 'httpServer\Controller\TestApiController.pas',
+  OneFastReportController in 'OneFastApi\OneFastReportController.pas';
 
 var
   lpStartupInfo: TStartupInfo;

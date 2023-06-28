@@ -1004,8 +1004,6 @@ object frDemoFastApi: TfrDemoFastApi
     object cxTabSheet1: TcxTabSheet
       Caption = #30456#20851#34920#25968#25454#32467#26500','#35831#20808#21019#24314#22909#34920#32467#26500#22312#26469
       ImageIndex = 1
-      ExplicitWidth = 1226
-      ExplicitHeight = 593
       object edSQL: TMemo
         Left = 0
         Top = 0
@@ -1099,13 +1097,13 @@ object frDemoFastApi: TfrDemoFastApi
           #9'FbOutParam bit NULL,'
           #9'FOutParamTag nvarchar(30) NULL)')
         TabOrder = 0
-        ExplicitWidth = 1226
-        ExplicitHeight = 593
       end
     end
     object cxTabSheet2: TcxTabSheet
       Caption = #35831#27714#25968#25454#30340#26684#24335#21442#32771
       ImageIndex = 2
+      ExplicitWidth = 1226
+      ExplicitHeight = 593
       object Memo1: TMemo
         Left = 249
         Top = 0
@@ -1121,6 +1119,7 @@ object frDemoFastApi: TfrDemoFastApi
           '    "apiZTCode":""  //'#25351#23450#26597#35810#21738#20010#36134#22871','#21487#20197#25918#31354#65292#25918#31354#23601#26159#20027#36134#22871
           '}')
         TabOrder = 0
+        ExplicitHeight = 593
       end
       object Memo2: TMemo
         Left = 0
@@ -1137,6 +1136,7 @@ object frDemoFastApi: TfrDemoFastApi
           '    "apiZTCode":""'
           '}')
         TabOrder = 1
+        ExplicitHeight = 593
       end
     end
   end
@@ -1219,6 +1219,10 @@ object frDemoFastApi: TfrDemoFastApi
         end
         item
           Visible = True
+          ItemName = 'tbReportDesign'
+        end
+        item
+          Visible = True
           ItemName = 'tbRefreshApi'
         end
         item
@@ -1298,6 +1302,15 @@ object frDemoFastApi: TfrDemoFastApi
       OnClick = tbRefreshApiClick
       AutoGrayScale = False
       LargeImageIndex = 3
+    end
+    object tbReportDesign: TdxBarLargeButton
+      Caption = #25509#21475#25253#34920#35774#35745
+      Category = 0
+      Hint = #25509#21475#25253#34920#35774#35745
+      Visible = ivAlways
+      OnClick = tbReportDesignClick
+      AutoGrayScale = False
+      LargeImageIndex = 2
     end
   end
   object cxImageList1: TcxImageList

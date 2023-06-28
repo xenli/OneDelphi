@@ -726,6 +726,8 @@ var
   //
   lFileName, lFileID: string;
   lFileDateTime: TDateTime;
+  tempList: TList<string>;
+  iTemp: integer;
 begin
   TMonitor.Enter(FLockObject);
   try
@@ -753,18 +755,29 @@ begin
         FTranZTItemList.Remove(lZTItem.FCreateID);
       end;
     end;
-
-    for lFileID in FFileDataDict.Keys do
-    begin
-      if FFileDataDict.TryGetValue(lFileID, lFileDateTime) then
+    tempList := TList<string>.Create;
+    try
+      for lFileID in FFileDataDict.Keys do
       begin
-        // 临时保存文件的地方,10分钟后自动删除,保持硬盘健康
-        if SecondsBetween(lNow, lFileDateTime) >= 600 then
+        if FFileDataDict.TryGetValue(lFileID, lFileDateTime) then
         begin
-          lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' + lFileID + '.data');
-          TFile.Delete(lFileName);
+          // 临时保存文件的地方,10分钟后自动删除,保持硬盘健康
+          if SecondsBetween(lNow, lFileDateTime) >= 600 then
+          begin
+            lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' + lFileID + '.data');
+            TFile.Delete(lFileName);
+            tempList.Add(lFileID);
+          end;
         end;
       end;
+      for iTemp := 0 to tempList.Count - 1 do
+      begin
+        // 删除
+        FFileDataDict.Remove(tempList[iTemp]);
+      end;
+    finally
+      tempList.Clear;
+      tempList.Free;
     end;
 
   finally

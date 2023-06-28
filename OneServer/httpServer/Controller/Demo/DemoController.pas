@@ -51,6 +51,8 @@ type
     procedure person(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
     // 无参数方法调用,如果要用到控制层 HTTPCtxt,HTTPResult必需是多例模式
     procedure TestNoParam();
+    //
+    function TestStr(): string;
     // 代函数返回值
     function GetStr(): string;
     function GetInt(): integer;
@@ -345,6 +347,11 @@ begin
   lUrl := self.HTTPCtxt.URL;
   self.HTTPResult.ResultOut := lUrl;
   self.HTTPResult.SetHTTPResultTrue();
+end;
+
+function TDemoController.TestStr(): string;
+begin
+  result := 'TestStr';
 end;
 
 function TDemoController.OneGetName(name: string): string;

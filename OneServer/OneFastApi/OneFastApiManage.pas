@@ -230,6 +230,7 @@ type
     FLockObj: TObject;
     FZTCode: string;
     FApiInfos: TDictionary<string, TFastApiInfo>;
+    FLshNo: integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -237,6 +238,7 @@ type
     function GetApiInfo(QApiCode: string; var QErrMsg: string): TFastApiInfo;
     function RefreshApiInfo(QApiCode: string; var QErrMsg: string): boolean;
     function RefreshApiInfoAll(var QErrMsg: string): boolean;
+    function GetFileLsh(): string;
   published
     property ZTCode: string read FZTCode write FZTCode;
     property ApiInfos: TDictionary<string, TFastApiInfo> read FApiInfos write FApiInfos;
@@ -647,6 +649,7 @@ constructor TOneFastApiManage.Create;
 begin
   FLockObj := TObject.Create;
   FApiInfos := TDictionary<string, TFastApiInfo>.Create;
+  FLshNo := 0;
 end;
 
 destructor TOneFastApiManage.Destroy;
@@ -1184,6 +1187,24 @@ begin
     lIntList.Free;
     lIntDataList.clear;
     lIntDataList.Free;
+  end;
+end;
+
+function TOneFastApiManage.GetFileLsh(): string;
+var
+  lLsh: string;
+begin
+  TMonitor.Enter(self.FLockObj);
+  try
+    self.FLshNo := self.FLshNo + 1;
+    lLsh := self.FLshNo.ToString();
+    while lLsh.Length < 4 do
+    begin
+      lLsh := '0' + lLsh;
+    end;
+    Result := FormatDateTime('yyyymmddhhmmss', now) + lLsh;
+  finally
+    TMonitor.exit(self.FLockObj);
   end;
 end;
 

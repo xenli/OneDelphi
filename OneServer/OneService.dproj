@@ -230,6 +230,9 @@
         <DCCReference Include="OneFastFlow\OneFastFlowManage.pas"/>
         <DCCReference Include="OneFastFlow\OneFastFlowController.pas"/>
         <DCCReference Include="httpServer\Controller\Demo\DemoWorkCustErrResult.pas"/>
+        <DCCReference Include="OneFastCleint\OneFastPlatManage.pas"/>
+        <DCCReference Include="httpServer\Controller\TestApiController.pas"/>
+        <DCCReference Include="OneFastApi\OneFastReportController.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
