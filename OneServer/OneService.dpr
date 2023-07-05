@@ -108,7 +108,9 @@ uses
   DemoWorkCustErrResult in 'httpServer\Controller\Demo\DemoWorkCustErrResult.pas',
   OneFastPlatManage in 'OneFastCleint\OneFastPlatManage.pas',
   TestApiController in 'httpServer\Controller\TestApiController.pas',
-  OneFastReportController in 'OneFastApi\OneFastReportController.pas';
+  OneFastReportController in 'OneFastApi\OneFastReportController.pas',
+  Vcl.Themes,
+  Vcl.Styles;
 
 var
   lpStartupInfo: TStartupInfo;
@@ -126,6 +128,7 @@ begin
   SetLocaleInfo(LOCALE_SYSTEM_DEFAULT, LOCALE_SSHORTDATE, 'yyyy-MM-dd');
   OneDateTimeHelper.SetSystemDataTimeFormatSettings();
   Application.MainFormOnTaskbar := True;
+  TStyleManager.TrySetStyle('Sky');
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
   // 添加重启代码 ，win特有的，如果移值到其它平台请剁掉

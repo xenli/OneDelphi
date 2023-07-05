@@ -52,30 +52,32 @@ type
     FZTCaption: string; // 账套标签
     FInitPoolCount: integer; // 初始化账套池数量
     FMaxPoolCount: integer; // 最大账套池数量
+    FPoolAuto: boolean;
     FPhyDriver: string; // 驱动类型
     FConnectionStr: string; // 连接字符串
-    FIsEnable: Boolean; // 是否启用
-    FIsMain: Boolean; // 默认主账套
+    FIsEnable: boolean; // 是否启用
+    FIsMain: boolean; // 默认主账套
   public
     property ZTCode: string read FZTCode write FZTCode;
     property ZTCaption: string read FZTCaption write FZTCaption;
     property InitPoolCount: integer read FInitPoolCount write FInitPoolCount;
     property MaxPoolCount: integer read FMaxPoolCount write FMaxPoolCount;
+    property PoolAuto: boolean read FPoolAuto write FPoolAuto;
     property PhyDriver: string read FPhyDriver write FPhyDriver;
     property ConnectionStr: string read FConnectionStr write FConnectionStr;
-    property IsEnable: Boolean read FIsEnable write FIsEnable;
-    property IsMain: Boolean read FIsMain write FIsMain;
+    property IsEnable: boolean read FIsEnable write FIsEnable;
+    property IsMain: boolean read FIsMain write FIsMain;
   end;
 
   TOneZTMangeSet = class
   private
-    FAutoWork: Boolean;
+    FAutoWork: boolean;
     FZTSetList: TList<TOneZTSet>;
   public
     constructor Create();
     destructor Destroy; override;
   public
-    property AutoWork: Boolean read FAutoWork write FAutoWork;
+    property AutoWork: boolean read FAutoWork write FAutoWork;
     property ZTSetList: TList<TOneZTSet> read FZTSetList write FZTSetList;
   end;
 
@@ -85,7 +87,7 @@ type
     FCreateID: string; // 每个一个编号
     //
     FOwnerZTPool: TOneZTPool;
-    FIsWorking: Boolean; // 正在工作中
+    FIsWorking: boolean; // 正在工作中
     // FD套件,每个连接创建多有这几个，拿来就用，省去创建的过程
     FDConnection: TFDConnection;
     FDTransaction: TFDTransaction;
@@ -98,7 +100,7 @@ type
     //
     FCharacterSet: String;
     // 二层一样控由客户端控制事务
-    FCustTran: Boolean;
+    FCustTran: boolean;
     // 锁定最长时间,毫秒为单位
     // -1无限长,客户端调起释放才释放，如果事务还在执行中
     // 0 代表事务不得超过30分钟，如果30分钟还没事务完成,服务端回滚事务
@@ -106,6 +108,8 @@ type
     FCustTranMaxSpanSec: integer;
     // 最后交互时间
     FLastTime: TDateTime;
+    // 不工作时释放
+    FUnLockFree: boolean;
   private
     // 单纯获取一个连接 FDConnection
     function GetADConnection: TFDConnection;
@@ -124,14 +128,14 @@ type
     constructor Create(AOwner: TOneZTPool; QPhyDriver: string; QConnectionString: string); overload;
     destructor Destroy; override;
     procedure UnLockWork();
-    function CreateNewQuery(QIsOpenData: Boolean = false): TFDQuery;
+    function CreateNewQuery(QIsOpenData: boolean = false): TFDQuery;
   Public
     property ADConnection: TFDConnection read FDConnection;
     property ADTransaction: TFDTransaction read GetADTransaction;
     property ADQuery: TFDQuery read GetQuery;
     Property ADScript: TFDScript read GetScript;
     Property ADStoredProc: TFDStoredProc read GetStoredProc;
-    Property IsWorking: Boolean read FIsWorking write FIsWorking;
+    Property IsWorking: boolean read FIsWorking write FIsWorking;
     property DataStream: TMemoryStream read GetTempStream;
     property FDException: TOneFDException read FException;
   end;
@@ -144,17 +148,17 @@ type
     FMaxPoolCount: integer; // 最大池数量
     FPoolCreateCount: integer; // 已创建池数量
     FPoolWorkCount: integer; // 正在工作的数量
-
+    FPoolAuto: boolean;
     FPhyDriver: string; // 数据库驱动
     FConnectionStr: string; // 数据库连接
-    FStop: Boolean; // 停止运作
+    FStop: boolean; // 停止运作
     FLockObj: TObject; // 锁
     FZTItems: TList<TOneZTItem>; // 账套池
   private
 
   public
     // 创建一个池
-    constructor Create(QZTCode: string; QPhyDriver: string; QConnectionStr: string; QInitCount: integer; QMaxInitCount: integer); overload;
+    constructor Create(QZTSet: TOneZTSet); overload;
     destructor Destroy; override;
     // 从池中锁定一个账套出来
     function LockZTItem(var QErrMsg: string): TOneZTItem;
@@ -162,7 +166,7 @@ type
   public
 
   public
-    property Stop: Boolean read FStop write FStop;
+    property Stop: boolean read FStop write FStop;
     property ZTCode: string read FZTCode write FZTCode;
     property InitPoolCount: integer read FInitPoolCount; // 初如化池数量
     property MaxPoolCount: integer read FMaxPoolCount; // 最大池数量
@@ -175,7 +179,7 @@ type
   TOneZTManage = class(TObject)
   private
     FZTMain: string;
-    FStop: Boolean;
+    FStop: boolean;
     FZTPools: TDictionary<String, TOneZTPool>;
     FTranZTItemList: TDictionary<String, TOneZTItem>;
     FFileDataDict: TDictionary<String, TDateTime>;
@@ -189,45 +193,45 @@ type
   public
     constructor Create(QOneLog: IOneLog); overload;
     destructor Destroy; override;
-    function StarWork(QZTSetList: TList<TOneZTSet>; var QErrMsg: string): Boolean;
+    function StarWork(QZTSetList: TList<TOneZTSet>; var QErrMsg: string): boolean;
   public
     // 某个账套停止工作
-    function StopZT(QZTCode: string; QStop: Boolean; Var QErrMsg: string): Boolean;
+    function StopZT(QZTCode: string; QStop: boolean; Var QErrMsg: string): boolean;
     // 获取一个账套
     function LockZTItem(QZTCode: string; var QErrMsg: string): TOneZTItem;
     // ************ 对接客户端的事务,有点像二层事务,一般很少用,额外福利***********//
     // 锁定一个账套,由客户端自由控制
     function LockTranItem(QZTCode: string; QMaxSpanSec: integer; var QErrMsg: string): string;
     // 归还一个账套,由客户端自由控制
-    function UnLockTranItem(QTranID: string; var QErrMsg: string): Boolean;
+    function UnLockTranItem(QTranID: string; var QErrMsg: string): boolean;
     // 账套开启事务,由客户端自由控制
-    function StartTranItem(QTranID: string; var QErrMsg: string): Boolean;
+    function StartTranItem(QTranID: string; var QErrMsg: string): boolean;
     // 账套提交事务,由客户端自由控制
-    function CommitTranItem(QTranID: string; var QErrMsg: string): Boolean;
+    function CommitTranItem(QTranID: string; var QErrMsg: string): boolean;
     // 账套回滚事务,由客户端自由控制
-    function RollbackTranItem(QTranID: string; var QErrMsg: string): Boolean;
+    function RollbackTranItem(QTranID: string; var QErrMsg: string): boolean;
     // 获取客户自由管理的账套
     function GetTranItem(QTranID: string; var QErrMsg: string): TOneZTItem;
     // 跟据账套代码创建账套池
     // **********************************************//
-    function InitZTPool(QZTCode: string; QPhyDriver: string; QConnectionStr: string; QInitCount: integer; QMaxInitCount: integer; var QErrMsg: string): Boolean;
-    function HaveZT(QZTCode: string): Boolean;
+    function InitZTPool(QZTSet: TOneZTSet; var QErrMsg: string): boolean;
+    function HaveZT(QZTCode: string): boolean;
   public
     function GetZTMain: string;
     // 打开数据
-    function OpenData(QOpenData: TOneDataOpen; QOneDataResult: TOneDataResult): Boolean; overload;
+    function OpenData(QOpenData: TOneDataOpen; QOneDataResult: TOneDataResult): boolean; overload;
     // IsServer是不是服务端自已发起的请求
-    function OpenDatas(QOpenDatas: TList<TOneDataOpen>; var QOneDataResult: TOneDataResult): Boolean;
+    function OpenDatas(QOpenDatas: TList<TOneDataOpen>; var QOneDataResult: TOneDataResult): boolean;
     // 保存数据
-    function SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>; var QOneDataResult: TOneDataResult): Boolean;
+    function SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>; var QOneDataResult: TOneDataResult): boolean;
     // 执行存储过程
-    function ExecStored(QOpenData: TOneDataOpen; var QOneDataResult: TOneDataResult): Boolean;
+    function ExecStored(QOpenData: TOneDataOpen; var QOneDataResult: TOneDataResult): boolean;
 
     // 执行SQL脚本语句
-    function ExecScript(QOpenData: TOneDataOpen; var QErrMsg: string): Boolean;
+    function ExecScript(QOpenData: TOneDataOpen; var QErrMsg: string): boolean;
 
     // 获取数据库相关信息
-    function GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): Boolean;
+    function GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): boolean;
   public
     // 主要提供给Orm用的
     function OpenData(QOpenData: TOneDataOpen; QParams: array of Variant; var QErrMsg: string): TFDMemtable; overload;
@@ -293,6 +297,7 @@ begin
   self.FCustTran := false;
   self.FLastTime := Now;
   self.FOwnerZTPool := AOwner;
+  self.FUnLockFree := false;
   { 数据库才有这些 }
   FDConnection := TFDConnection.Create(nil);
   FDConnection.LoginPrompt := false;
@@ -402,7 +407,7 @@ begin
   FDQuery.Connection := FDConnection;
 end;
 
-function TOneZTItem.CreateNewQuery(QIsOpenData: Boolean = false): TFDQuery;
+function TOneZTItem.CreateNewQuery(QIsOpenData: boolean = false): TFDQuery;
 begin
   Result := TFDQuery.Create(nil);
   Result.CachedUpdates := true;
@@ -470,11 +475,19 @@ begin
   Result := FTempStream;
 end;
 
+function IsUTF8(const S: string): boolean;
+begin
+  Result := TEncoding.UTF8.GetByteCount(S) = Length(S);
+end;
+
 procedure TOneZTItem.FDQueryError(ASender, AInitiator: TObject; var AException: Exception);
 begin
   if (AException <> nil) and (AException.Message <> '') then
   begin
-    self.FException.FErrmsg := AException.Message;
+    if IsUTF8(AException.Message) then
+      self.FException.FErrmsg := UTF8DeCode(AException.Message)
+    else
+      self.FException.FErrmsg := AException.Message;
     OneGlobal.TOneGlobal.GetInstance().Log.WriteLog('SQLErr', AException.Message);
     // 有异常直接中断
     abort;
@@ -494,51 +507,62 @@ begin
   // UnLockTranItem没进行解锁是不释放的
   if self.FCustTran then
     exit;
-  // 放在任务理
-  aTask := TTask.Create(
-    procedure
-    begin
-      self.FDException.FErrmsg := '';
-      // 释放时事务没提交,回滚
-      if FDConnection.InTransaction then
-        FDConnection.Rollback;
-      FDTransaction.Connection := nil;
-      // 大数据时 FDQuery.Close 是非常久的
-      // FDQuery.EmptyDataSet
-      if FDQuery.Active then
+  if self.FUnLockFree then
+  begin
+    // 未事务提交,回滚
+    if FDConnection.InTransaction then
+      FDConnection.Rollback;
+    self.FOwnerZTPool.UnLockWorkCount();
+    self.Free;
+  end
+  else
+  begin
+    // 放在任务里面,大数据时close就非常慢的，比如取了100万条数据
+    aTask := TTask.Create(
+      procedure
       begin
-        FDQuery.Close;
-      end;
-      FDQuery.SQL.Clear;
-      FDQuery.Params.Clear;
+        self.FDException.FErrmsg := '';
+        // 释放时事务没提交,回滚
+        if FDConnection.InTransaction then
+          FDConnection.Rollback;
+        FDTransaction.Connection := nil;
+        // 大数据时 FDQuery.Close 是非常久的
+        // FDQuery.EmptyDataSet
+        if FDQuery.Active then
+        begin
+          FDQuery.Close;
+        end;
+        FDQuery.SQL.Clear;
+        FDQuery.Params.Clear;
 
-      FDQuery.Connection := nil;
-      FDScript.Connection := nil;
-      //
-      // 自增清空
-      FDQuery.UpdateOptions.AutoIncFields := '';
-      FDConnection.UpdateOptions.EnableDelete := true;
-      FDConnection.UpdateOptions.EnableInsert := true;
-      FDConnection.UpdateOptions.EnableUpdate := true;
-      //
-      if FDStoredProc.Active then
-      begin
-        FDStoredProc.Close;
-      end;
-      if FDStoredProc.Params.Count > 0 then
-        FDStoredProc.Params.Clear;
-      FDStoredProc.Connection := nil;
-      if FTempStream <> nil then
-      begin
-        FTempStream.Position := 0;
-        FTempStream.Clear;
-      end;
-      // 默认1800秒事务锁
-      FCustTranMaxSpanSec := 30 * 60;
-      FIsWorking := false;
-      self.FOwnerZTPool.UnLockWorkCount();
-    end);
-  aTask.Start;
+        FDQuery.Connection := nil;
+        FDScript.Connection := nil;
+        //
+        // 自增清空
+        FDQuery.UpdateOptions.AutoIncFields := '';
+        FDConnection.UpdateOptions.EnableDelete := true;
+        FDConnection.UpdateOptions.EnableInsert := true;
+        FDConnection.UpdateOptions.EnableUpdate := true;
+        //
+        if FDStoredProc.Active then
+        begin
+          FDStoredProc.Close;
+        end;
+        if FDStoredProc.Params.Count > 0 then
+          FDStoredProc.Params.Clear;
+        FDStoredProc.Connection := nil;
+        if FTempStream <> nil then
+        begin
+          FTempStream.Position := 0;
+          FTempStream.Clear;
+        end;
+        // 默认1800秒事务锁
+        FCustTranMaxSpanSec := 30 * 60;
+        FIsWorking := false;
+        self.FOwnerZTPool.UnLockWorkCount();
+      end);
+    aTask.Start;
+  end;
 end;
 
 {$ENDREGION}
@@ -546,31 +570,33 @@ end;
 {$REGION 'TOneZTPool'}
 
 
-constructor TOneZTPool.Create(QZTCode: string; QPhyDriver: string; QConnectionStr: string; QInitCount: integer; QMaxInitCount: integer);
+constructor TOneZTPool.Create(QZTSet: TOneZTSet);
 var
   i: integer;
   lZTItem: TOneZTItem;
 begin
   inherited Create;
-  if QInitCount <= 0 then
-    QInitCount := 5;
-  if QMaxInitCount <= 0 then
-    QMaxInitCount := 10;
-
-  FZTCode := QZTCode;
-  FInitPoolCount := QInitCount;
-  FMaxPoolCount := QMaxInitCount;
+  if QZTSet.InitPoolCount <= 0 then
+    QZTSet.InitPoolCount := 5;
+  if QZTSet.MaxPoolCount <= 0 then
+    QZTSet.MaxPoolCount := 10;
+  // self.InitZTPool(lZTSet.ZTCode, lZTSet.PhyDriver,
+  // lZTSet.ConnectionStr, lZTSet.InitPoolCount, lZTSet.MaxPoolCount, QErrMsg);
+  FZTCode := QZTSet.ZTCode;
+  FInitPoolCount := QZTSet.InitPoolCount;
+  FMaxPoolCount := QZTSet.MaxPoolCount;
+  FPoolAuto := QZTSet.PoolAuto;
   FPoolCreateCount := 0; // 已创建池数量
   FPoolWorkCount := 0;; // 正在工作的数量
-  FPhyDriver := QPhyDriver;
-  FConnectionStr := QConnectionStr;
+  FPhyDriver := QZTSet.PhyDriver;
+  FConnectionStr := QZTSet.ConnectionStr;
   self.FZTItems := TList<TOneZTItem>.Create();
   FLockObj := TObject.Create;
-  if QConnectionStr <> '' then
+  if FConnectionStr <> '' then
   begin
-    for i := 0 to QInitCount - 1 do
+    for i := 0 to FInitPoolCount - 1 do
     begin
-      lZTItem := TOneZTItem.Create(self, QPhyDriver, QConnectionStr);
+      lZTItem := TOneZTItem.Create(self, FPhyDriver, FConnectionStr);
       lZTItem.FLastTime := Now;
       self.FZTItems.Add(lZTItem);
       self.FPoolCreateCount := self.FPoolCreateCount + 1;
@@ -600,6 +626,7 @@ function TOneZTPool.LockZTItem(var QErrMsg: string): TOneZTItem;
 var
   i: integer;
   lZTItem: TOneZTItem;
+  isCreateNew: boolean;
 begin
   Result := nil;
   lZTItem := nil;
@@ -609,28 +636,48 @@ begin
     QErrMsg := '账套池[' + self.FZTCode + ']获取锁失败!!!';
     exit;
   end;
+  isCreateNew := false;
   try
     if self.FPoolWorkCount >= self.FMaxPoolCount then
     begin
-      QErrMsg := '账套池[' + self.FZTCode + ']已达到最大工作量[' + FPoolWorkCount.ToString() + ']';
-      exit;
+      if not self.FPoolAuto then
+      begin
+        QErrMsg := '账套池[' + self.FZTCode + ']已达到最大工作量[' + FPoolWorkCount.ToString() + ']';
+        exit;
+      end
+      else
+      begin
+        isCreateNew := true;
+      end;
     end;
-    // 遍历看哪个是空闲的
-    for i := 0 to self.FZTItems.Count - 1 do
+    if isCreateNew then
+    else
     begin
-      if self.FZTItems[i].IsWorking then
-        continue;
-      lZTItem := self.FZTItems[i];
-      // 找到一个中断
-      break;
+      // 遍历看哪个是空闲的
+      for i := 0 to self.FZTItems.Count - 1 do
+      begin
+        if self.FZTItems[i].IsWorking then
+          continue;
+        lZTItem := self.FZTItems[i];
+        // 找到一个中断
+        break;
+      end;
     end;
     if lZTItem = nil then
     begin
       // 没找到就开始创建一个新的
       lZTItem := TOneZTItem.Create(self, FPhyDriver, FConnectionStr);
-      // 加入到池中
-      self.FZTItems.Add(lZTItem);
-      self.FPoolCreateCount := self.FPoolCreateCount + 1;
+      if isCreateNew then
+      begin
+        // 不加入池中，新建的服完就释放
+        lZTItem.FUnLockFree := true;
+      end
+      else
+      begin
+        // 加入到池中
+        self.FZTItems.Add(lZTItem);
+        self.FPoolCreateCount := self.FPoolCreateCount + 1;
+      end;
     end;
     lZTItem.FLastTime := Now;
     // 工作量加1
@@ -868,7 +915,7 @@ begin
   end;
 end;
 
-function TOneZTManage.UnLockTranItem(QTranID: string; var QErrMsg: string): Boolean;
+function TOneZTManage.UnLockTranItem(QTranID: string; var QErrMsg: string): boolean;
 var
   lZTItem: TOneZTItem;
 BEGIN
@@ -922,7 +969,7 @@ BEGIN
 END;
 
 // 此种模式用在客户端开启事务,相当于两层写事务
-function TOneZTManage.StartTranItem(QTranID: string; var QErrMsg: string): Boolean;
+function TOneZTManage.StartTranItem(QTranID: string; var QErrMsg: string): boolean;
 var
   lZTItem: TOneZTItem;
 BEGIN
@@ -946,7 +993,7 @@ BEGIN
   end;
 END;
 
-function TOneZTManage.CommitTranItem(QTranID: string; var QErrMsg: string): Boolean;
+function TOneZTManage.CommitTranItem(QTranID: string; var QErrMsg: string): boolean;
 var
   lZTItem: TOneZTItem;
 begin
@@ -978,7 +1025,7 @@ begin
   end;
 end;
 
-function TOneZTManage.RollbackTranItem(QTranID: string; var QErrMsg: string): Boolean;
+function TOneZTManage.RollbackTranItem(QTranID: string; var QErrMsg: string): boolean;
 var
   lZTItem: TOneZTItem;
 begin
@@ -1010,7 +1057,7 @@ begin
   end;
 end;
 
-function TOneZTManage.StopZT(QZTCode: string; QStop: Boolean; Var QErrMsg: string): Boolean;
+function TOneZTManage.StopZT(QZTCode: string; QStop: boolean; Var QErrMsg: string): boolean;
 var
   lZTPool: TOneZTPool;
 begin
@@ -1028,16 +1075,17 @@ begin
   end;
 end;
 
-function TOneZTManage.InitZTPool(QZTCode: string; QPhyDriver: string; QConnectionStr: string; QInitCount: integer; QMaxInitCount: integer; var QErrMsg: string): Boolean;
+function TOneZTManage.InitZTPool(QZTSet: TOneZTSet; var QErrMsg: string): boolean;
 var
   lZTPool: TOneZTPool;
   lZTCode: String;
 begin
   Result := false;
   QErrMsg := '';
-  if QZTCode.Trim = '' then
+  if QZTSet.ZTCode.Trim = '' then
     exit;
-  lZTCode := QZTCode.ToUpper;
+  QZTSet.ZTCode := QZTSet.ZTCode.ToUpper;
+  lZTCode := QZTSet.ZTCode.ToUpper;
   TMonitor.Enter(FLockObject);
   try
     if FZTPools.TryGetValue(lZTCode, lZTPool) then
@@ -1045,7 +1093,7 @@ begin
       lZTPool.Free;
       FZTPools.Remove(lZTCode);
     end;
-    lZTPool := TOneZTPool.Create(lZTCode, QPhyDriver, QConnectionStr, QInitCount, QMaxInitCount);
+    lZTPool := TOneZTPool.Create(QZTSet);
     FZTPools.Add(lZTCode, lZTPool);
     Result := true;
   finally
@@ -1053,7 +1101,7 @@ begin
   end;
 end;
 
-function TOneZTManage.HaveZT(QZTCode: string): Boolean;
+function TOneZTManage.HaveZT(QZTCode: string): boolean;
 begin
   QZTCode := QZTCode.ToUpper;
   Result := FZTPools.ContainsKey(QZTCode);
@@ -1061,7 +1109,7 @@ end;
 {$ENDREGION}
 
 
-function TOneZTManage.StarWork(QZTSetList: TList<TOneZTSet>; var QErrMsg: string): Boolean;
+function TOneZTManage.StarWork(QZTSetList: TList<TOneZTSet>; var QErrMsg: string): boolean;
 var
   i: integer;
   lZTSet: TOneZTSet;
@@ -1104,7 +1152,7 @@ begin
         continue;
       if self.HaveZT(lZTSet.ZTCode) then
         continue;
-      self.InitZTPool(lZTSet.ZTCode, lZTSet.PhyDriver, lZTSet.ConnectionStr, lZTSet.InitPoolCount, lZTSet.MaxPoolCount, QErrMsg);
+      self.InitZTPool(lZTSet, QErrMsg);
       if lZTSet.IsMain then
       BEGIN
         self.FZTMain := lZTSet.FZTCode.ToUpper;
@@ -1120,7 +1168,7 @@ begin
   end;
 end;
 
-function TOneZTManage.OpenData(QOpenData: TOneDataOpen; QOneDataResult: TOneDataResult): Boolean;
+function TOneZTManage.OpenData(QOpenData: TOneDataOpen; QOneDataResult: TOneDataResult): boolean;
 var
   lOpenDatas: TList<TOneDataOpen>;
 begin
@@ -1172,12 +1220,12 @@ begin
     end;
     LZTQuery.SQL.Text := QOpenData.OpenSQL;
     // 参数赋值
-    if LZTQuery.Params.Count <> length(QParams) then
+    if LZTQuery.Params.Count <> Length(QParams) then
     begin
       QErrMsg := 'SQL最终参数个数和传进的参数个数不一至';
       exit;
     end;
-    for iParam := 0 to length(QParams) - 1 do
+    for iParam := 0 to Length(QParams) - 1 do
     begin
       LZTQuery.Params[iParam].Value := QParams[iParam];
     end;
@@ -1203,7 +1251,7 @@ begin
   end;
 end;
 
-function TOneZTManage.OpenDatas(QOpenDatas: TList<TOneDataOpen>; var QOneDataResult: TOneDataResult): Boolean;
+function TOneZTManage.OpenDatas(QOpenDatas: TList<TOneDataOpen>; var QOneDataResult: TOneDataResult): boolean;
 var
   i, iParam, iErr: integer;
   lOpenData: TOneDataOpen;
@@ -1459,7 +1507,7 @@ begin
 end;
 
 // 保存数据
-function TOneZTManage.SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>; var QOneDataResult: TOneDataResult): Boolean;
+function TOneZTManage.SaveDatas(QSaveDMLDatas: TList<TOneDataSaveDML>; var QOneDataResult: TOneDataResult): boolean;
 var
   lDataResultItem: TOneDataResultItem;
   //
@@ -1477,7 +1525,7 @@ var
   iKey: integer;
   iUpdateErrCount, iParamCount, iParam: integer;
   lFieldType: TFieldType;
-  isCommit: Boolean;
+  isCommit: boolean;
   //
   lRequestMilSec: integer;
   lwatchTimer: TStopwatch;
@@ -1820,7 +1868,7 @@ var
   lZTItem: TOneZTItem;
   LZTQuery: TFDQuery;
   iParam: integer;
-  isCommit: Boolean;
+  isCommit: boolean;
 begin
   Result := -1;
   QErrMsg := '';
@@ -1839,12 +1887,12 @@ begin
     LZTQuery := lZTItem.GetQuery;
     LZTQuery.SQL.Text := QDataSaveDML.SQL;
     // 参数赋值
-    if LZTQuery.Params.Count <> length(QParams) then
+    if LZTQuery.Params.Count <> Length(QParams) then
     begin
       QErrMsg := 'SQL最终参数个数和传进的参数个数不一至';
       exit;
     end;
-    for iParam := 0 to length(QParams) - 1 do
+    for iParam := 0 to Length(QParams) - 1 do
     begin
       LZTQuery.Params[iParam].Value := QParams[iParam];
     end;
@@ -1887,7 +1935,7 @@ begin
   end;
 end;
 
-function TOneZTManage.ExecStored(QOpenData: TOneDataOpen; var QOneDataResult: TOneDataResult): Boolean;
+function TOneZTManage.ExecStored(QOpenData: TOneDataOpen; var QOneDataResult: TOneDataResult): boolean;
 var
   lZTItem: TOneZTItem;
   lErrMsg: string;
@@ -2120,7 +2168,7 @@ begin
 end;
 
 // 执行SQL脚本语句
-function TOneZTManage.ExecScript(QOpenData: TOneDataOpen; var QErrMsg: string): Boolean;
+function TOneZTManage.ExecScript(QOpenData: TOneDataOpen; var QErrMsg: string): boolean;
 var
   lZTItem: TOneZTItem;
   lFDScript: TFDScript;
@@ -2189,7 +2237,7 @@ begin
   end;
 end;
 
-function TOneZTManage.GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): Boolean;
+function TOneZTManage.GetDBMetaInfo(QDBMetaInfo: TOneDBMetaInfo; var QOneDataResult: TOneDataResult): boolean;
 var
   lZTItem: TOneZTItem;
   lErrMsg: string;
@@ -2487,7 +2535,7 @@ begin
               lByIndex := -1;
             end;
           end
-          else if (lByIndex = -1) and (length(lTempStr) > 0) then
+          else if (lByIndex = -1) and (Length(lTempStr) > 0) then
           begin
             lOrderIndex := -1;
           end;

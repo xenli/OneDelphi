@@ -190,6 +190,8 @@ object frDemoFastApi: TfrDemoFastApi
     object tabSheetData: TcxTabSheet
       Caption = #25968#25454#35774#35745
       ImageIndex = 0
+      ExplicitWidth = 1226
+      ExplicitHeight = 593
       object pgData: TcxPageControl
         Left = 230
         Top = 0
@@ -197,9 +199,11 @@ object frDemoFastApi: TfrDemoFastApi
         Height = 594
         Align = alClient
         TabOrder = 0
-        Properties.ActivePage = tabSheetParams
+        Properties.ActivePage = tabSheetDataInfo
         Properties.CustomButtons.Buttons = <>
         Properties.Style = 10
+        ExplicitWidth = 996
+        ExplicitHeight = 593
         ClientRectBottom = 594
         ClientRectRight = 1000
         ClientRectTop = 21
@@ -597,6 +601,8 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetParams: TcxTabSheet
           Caption = #26465#20214#21442#25968#35774#32622
           ImageIndex = 2
+          ExplicitWidth = 996
+          ExplicitHeight = 572
           object Panel11: TPanel
             Left = 0
             Top = 0
@@ -605,6 +611,7 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
+            ExplicitWidth = 996
             object tbParamsGet: TcxButton
               Left = 5
               Top = 4
@@ -643,6 +650,8 @@ object frDemoFastApi: TfrDemoFastApi
             Height = 345
             Align = alClient
             TabOrder = 1
+            ExplicitWidth = 996
+            ExplicitHeight = 344
             object vwParam: TcxGridDBBandedTableView
               Navigator.Buttons.CustomButtons = <>
               ScrollbarAnnotations.CustomAnnotations = <>
@@ -876,6 +885,8 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alBottom
             Caption = #36807#28388#27169#24335'->'#22810#23383#27573#25110#20540#36873#25321
             TabOrder = 2
+            ExplicitTop = 379
+            ExplicitWidth = 996
             Height = 193
             Width = 1000
             object dbFFilterFieldItems: TcxDBMemo
@@ -909,6 +920,7 @@ object frDemoFastApi: TfrDemoFastApi
                 '---'#36755#20837'3'#21462#24471'SQL and 1=1 '#32452#35013)
               ScrollBars = ssBoth
               TabOrder = 1
+              ExplicitWidth = 442
             end
           end
         end
@@ -921,6 +933,7 @@ object frDemoFastApi: TfrDemoFastApi
         Align = alLeft
         Caption = 'Panel1'
         TabOrder = 1
+        ExplicitHeight = 593
         object Panel2: TPanel
           Left = 1
           Top = 1
@@ -978,6 +991,7 @@ object frDemoFastApi: TfrDemoFastApi
           RootValue = -1
           ScrollbarAnnotations.CustomAnnotations = <>
           TabOrder = 1
+          ExplicitHeight = 556
           object colFMenuTreeCode: TcxDBTreeListColumn
             Caption.Text = #33410#28857
             DataBinding.FieldName = 'FTreeCode'
@@ -1102,8 +1116,6 @@ object frDemoFastApi: TfrDemoFastApi
     object cxTabSheet2: TcxTabSheet
       Caption = #35831#27714#25968#25454#30340#26684#24335#21442#32771
       ImageIndex = 2
-      ExplicitWidth = 1226
-      ExplicitHeight = 593
       object Memo1: TMemo
         Left = 249
         Top = 0
@@ -1119,7 +1131,6 @@ object frDemoFastApi: TfrDemoFastApi
           '    "apiZTCode":""  //'#25351#23450#26597#35810#21738#20010#36134#22871','#21487#20197#25918#31354#65292#25918#31354#23601#26159#20027#36134#22871
           '}')
         TabOrder = 0
-        ExplicitHeight = 593
       end
       object Memo2: TMemo
         Left = 0
@@ -1136,7 +1147,6 @@ object frDemoFastApi: TfrDemoFastApi
           '    "apiZTCode":""'
           '}')
         TabOrder = 1
-        ExplicitHeight = 593
       end
     end
   end

@@ -1,14 +1,14 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{796E3752-6C5B-4DA0-9007-AA0BD4AE7E14}</ProjectGuid>
+        <ProjectGuid>{95751C70-9340-42E9-8979-7C2512254C71}</ProjectGuid>
         <ProjectVersion>19.5</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
-        <TargetedPlatforms>3</TargetedPlatforms>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
-        <MainSource>OneService.dpr</MainSource>
+        <MainSource>OneClientDemoHttpWaitHint.dpr</MainSource>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -34,12 +34,6 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
-        <Cfg_1_Win64>true</Cfg_1_Win64>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
@@ -47,12 +41,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
         <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
-        <Cfg_2_Win64>true</Cfg_2_Win64>
         <CfgParent>Cfg_2</CfgParent>
         <Cfg_2>true</Cfg_2>
         <Base>true</Base>
@@ -69,28 +57,19 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <SanitizedProjectName>OneService</SanitizedProjectName>
-        <Custom_Styles>Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf</Custom_Styles>
+        <SanitizedProjectName>OneClientDemoHttpWaitHint</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>vclwinx;DataSnapServer;fmx;emshosting;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;emsedge;bindcompfmx;DBXFirebirdDriver;StyleControls_d11Alexandria;inetdb;FireDACSqliteDriver;DbxClientDriver;FireDACASADriver;soapmidas;vclactnband;fmxFireDAC;dbexpress;FireDACInfxDriver;DBXMySQLDriver;VclSmp;inet;DataSnapCommon;vcltouch;fmxase;DBXOdbcDriver;dbrtl;FireDACDBXDriver;FireDACOracleDriver;fmxdae;FireDACMSAccDriver;CustomIPTransport;FireDACMSSQLDriver;DataSnapIndy10ServerTransport;DataSnapConnectors;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;IndySystem;FireDACTDataDriver;vcldb;vclFireDAC;bindcomp;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;IndyCore;RESTBackendComponents;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;DataSnapClient;DataSnapProviderClient;adortl;DBXSybaseASEDriver;DBXDb2Driver;vclimg;DataSnapFireDAC;emsclientfiredac;FireDACPgDriver;FireDAC;FireDACDSDriver;inetdbxpress;xmlrtl;tethering;bindcompvcl;dsnap;CloudService;DBXSybaseASADriver;DBXOracleDriver;FireDACDb2Driver;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;FirePackage;DatasnapConnectorsFreePascal;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>dxPSdxSpreadSheetLnkRS28;vclwinx;DataSnapServer;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;cxExportRS28;dxHttpIndyRequestRS28;appanalytics;IndyProtocols;vclx;dxPSPrVwRibbonRS28;frxe28;dbxcds;vcledge;dxTileControlRS28;dxPSdxDBOCLnkRS28;cxPivotGridOLAPRS28;FmxTeeUI;frxFD28;dxGDIPlusRS28;DBXFirebirdDriver;SynEdit_R;dxCoreRS28;cxPivotGridRS28;StyleControls_d11Alexandria;fsDB28;frxADO28;dxPSCoreRS28;FireDACSqliteDriver;DbxClientDriver;dxSpreadSheetRS28;dxSkinsCoreRS28;soapmidas;dxBarRS28;TeeUI;dxADOServerModeRS28;dxWizardControlRS28;dbexpress;frxDBX28;inet;dxServerModeRS28;vcltouch;cxTreeListRS28;dxBarDBNavRS28;FireDACDBXDriver;fmxdae;dxPScxCommonRS28;dxNavBarRS28;CustomIPTransport;FireDACMSSQLDriver;dxSpreadSheetReportDesignerRS28;dxFireDACEMFRS28;dxComnRS28;dxFlowChartDesignerRS28;IndySystem;cxVerticalGridRS28;frxIntIOIndy28;dxPSDBTeeChartRS28;dxmdsRS28;dxRichEditControlRS28;cxSchedulerGridRS28;dxPsPrVwAdvRS28;dxPScxSchedulerLnkRS28;dxPSdxOCLnkRS28;vclFireDAC;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;dxADOEMFRS28;dxRibbonCustomizationFormRS28;dxPSdxDBTVLnkRS28;bindcompdbx;dxGaugeControlRS28;frxHTML28;rtl;FireDACMySQLDriver;dxDockingRS28;dxPDFViewerRS28;DBXSqliteDriver;dxBarExtItemsRS28;dxPSdxFCLnkRS28;dxorgcRS28;DBXSybaseASEDriver;dxSpreadSheetCoreConditionalFormattingDialogsRS28;dxPSRichEditControlLnkRS28;vclimg;DataSnapFireDAC;inetdbxpress;FireDAC;xmlrtl;frxPDF28;dsnap;fsADO28;FireDACDb2Driver;cxSchedulerRibbonStyleEventEditorRS28;DBXOracleDriver;dxPScxTLLnkRS28;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;dxFlowChartRS28;dxPScxPCProdRS28;DatasnapConnectorsFreePascal;dxRichEditDocumentModelRS28;dxPSdxMapControlLnkRS28;emshosting;cxGridEMFRS28;dxGanttControlRS28;dxPScxVGridLnkRS28;dxPScxPivotGridLnkRS28;FireDACCommonDriver;IndyIPClient;frxTee28;dxCloudServiceLibraryRS28;cxLibraryRS28;bindcompvclwinx;emsedge;bindcompfmx;dxPSdxPDFViewerLnkRS28;inetdb;dxSpreadSheetCoreRS28;cxSchedulerTreeBrowserRS28;FireDACASADriver;dxTabbedMDIRS28;Tee;vclactnband;frxIntIO28;fmxFireDAC;dxFireDACServerModeRS28;FireDACInfxDriver;DBXMySQLDriver;VclSmp;dxPSdxLCLnkRS28;DataSnapCommon;WWF_1033;fmxase;dxdbtrRS28;frx28;DBXOdbcDriver;fsFD28;dbrtl;FireDACOracleDriver;dxPSLnksRS28;TeeDB;FireDACMSAccDriver;DataSnapIndy10ServerTransport;DataSnapConnectors;dxChartControlRS28;vcldsnap;DBXInterBaseDriver;frxDB28;FireDACMongoDBDriver;dxSpreadSheetConditionalFormattingDialogsRS28;FireDACTDataDriver;dxOrgChartAdvancedCustomizeFormRS28;vcldb;dxDBXServerModeRS28;cxSchedulerRS28;dxRibbonRS28;dxFlowChartLayoutsRS28;dxPScxExtCommonRS28;dxdborRS28;fs28;dxRichEditControlCoreRS28;bindcomp;FormDesigner.Package;dxPScxGridLnkRS28;IndyCore;RESTBackendComponents;fsTee28;cxPivotGridChartRS28;dxBarExtDBItemsRS28;dxRichEditCoreRS28;cxTreeListdxBarPopupMenuRS28;dxFlowChartAdvancedCustomizeFormRS28;FireDACADSDriver;RESTComponents;dxPSTeeChartRS28;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;cxSchedulerWebServiceStorageRS28;dxtrmdRS28;DBXDb2Driver;dxPSdxGaugeControlLnkRS28;frxcs28;cxGridRS28;dxSpellCheckerRS28;OneClient;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;tethering;dxMapControlRS28;bindcompvcl;dxEMFRS28;CloudService;DBXSybaseASADriver;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>vclwinx;DataSnapServer;fmx;emshosting;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;emsedge;bindcompfmx;DBXFirebirdDriver;StyleControls_d11Alexandria;inetdb;FireDACSqliteDriver;DbxClientDriver;FireDACASADriver;soapmidas;vclactnband;fmxFireDAC;dbexpress;FireDACInfxDriver;DBXMySQLDriver;VclSmp;inet;DataSnapCommon;vcltouch;fmxase;DBXOdbcDriver;dbrtl;FireDACDBXDriver;FireDACOracleDriver;fmxdae;FireDACMSAccDriver;CustomIPTransport;FireDACMSSQLDriver;DataSnapIndy10ServerTransport;DataSnapConnectors;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;IndySystem;FireDACTDataDriver;vcldb;vclFireDAC;bindcomp;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;IndyCore;RESTBackendComponents;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;DataSnapClient;DataSnapProviderClient;adortl;DBXSybaseASEDriver;DBXDb2Driver;vclimg;DataSnapFireDAC;emsclientfiredac;FireDACPgDriver;FireDAC;FireDACDSDriver;inetdbxpress;xmlrtl;tethering;bindcompvcl;dsnap;CloudService;DBXSybaseASADriver;DBXOracleDriver;FireDACDb2Driver;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;DatasnapConnectorsFreePascal;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
-        <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <DCC_UsePackage>dxPSdxSpreadSheetLnkRS28;vclwinx;DataSnapServer;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;DBXMSSQLDriver;FireDACCommonODBC;emsclient;cxExportRS28;dxHttpIndyRequestRS28;appanalytics;IndyProtocols;vclx;dxPSPrVwRibbonRS28;dbxcds;vcledge;dxTileControlRS28;dxPSdxDBOCLnkRS28;cxPivotGridOLAPRS28;FmxTeeUI;dxGDIPlusRS28;DBXFirebirdDriver;SynEdit_R;dxCoreRS28;cxPivotGridRS28;StyleControls_d11Alexandria;dxPSCoreRS28;FireDACSqliteDriver;DbxClientDriver;dxSpreadSheetRS28;dxSkinsCoreRS28;soapmidas;dxBarRS28;TeeUI;dxADOServerModeRS28;dxWizardControlRS28;dbexpress;inet;dxServerModeRS28;vcltouch;cxTreeListRS28;dxBarDBNavRS28;FireDACDBXDriver;fmxdae;dxPScxCommonRS28;dxNavBarRS28;CustomIPTransport;FireDACMSSQLDriver;dxSpreadSheetReportDesignerRS28;dxFireDACEMFRS28;dxComnRS28;dxFlowChartDesignerRS28;IndySystem;cxVerticalGridRS28;dxPSDBTeeChartRS28;dxmdsRS28;dxRichEditControlRS28;cxSchedulerGridRS28;dxPsPrVwAdvRS28;dxPScxSchedulerLnkRS28;dxPSdxOCLnkRS28;vclFireDAC;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;dxADOEMFRS28;dxRibbonCustomizationFormRS28;dxPSdxDBTVLnkRS28;bindcompdbx;dxGaugeControlRS28;rtl;FireDACMySQLDriver;dxDockingRS28;dxPDFViewerRS28;DBXSqliteDriver;dxBarExtItemsRS28;dxPSdxFCLnkRS28;dxorgcRS28;DBXSybaseASEDriver;dxSpreadSheetCoreConditionalFormattingDialogsRS28;dxPSRichEditControlLnkRS28;vclimg;DataSnapFireDAC;inetdbxpress;FireDAC;xmlrtl;dsnap;FireDACDb2Driver;cxSchedulerRibbonStyleEventEditorRS28;DBXOracleDriver;dxPScxTLLnkRS28;DBXInformixDriver;fmxobj;bindcompvclsmp;DataSnapNativeClient;dxFlowChartRS28;dxPScxPCProdRS28;DatasnapConnectorsFreePascal;dxRichEditDocumentModelRS28;dxPSdxMapControlLnkRS28;emshosting;cxGridEMFRS28;dxGanttControlRS28;dxPScxVGridLnkRS28;dxPScxPivotGridLnkRS28;FireDACCommonDriver;IndyIPClient;dxCloudServiceLibraryRS28;cxLibraryRS28;bindcompvclwinx;emsedge;bindcompfmx;dxPSdxPDFViewerLnkRS28;inetdb;dxSpreadSheetCoreRS28;cxSchedulerTreeBrowserRS28;FireDACASADriver;dxTabbedMDIRS28;Tee;vclactnband;fmxFireDAC;dxFireDACServerModeRS28;FireDACInfxDriver;DBXMySQLDriver;VclSmp;dxPSdxLCLnkRS28;DataSnapCommon;WWF_1033;fmxase;dxdbtrRS28;DBXOdbcDriver;dbrtl;FireDACOracleDriver;dxPSLnksRS28;TeeDB;FireDACMSAccDriver;DataSnapIndy10ServerTransport;DataSnapConnectors;dxChartControlRS28;vcldsnap;DBXInterBaseDriver;FireDACMongoDBDriver;dxSpreadSheetConditionalFormattingDialogsRS28;FireDACTDataDriver;dxOrgChartAdvancedCustomizeFormRS28;vcldb;dxDBXServerModeRS28;cxSchedulerRS28;dxRibbonRS28;dxFlowChartLayoutsRS28;dxPScxExtCommonRS28;dxdborRS28;dxRichEditControlCoreRS28;bindcomp;dxPScxGridLnkRS28;IndyCore;RESTBackendComponents;cxPivotGridChartRS28;dxBarExtDBItemsRS28;dxRichEditCoreRS28;cxTreeListdxBarPopupMenuRS28;dxFlowChartAdvancedCustomizeFormRS28;FireDACADSDriver;RESTComponents;dxPSTeeChartRS28;IndyIPServer;vcl;dsnapxml;adortl;dsnapcon;DataSnapClient;DataSnapProviderClient;cxSchedulerWebServiceStorageRS28;dxtrmdRS28;DBXDb2Driver;dxPSdxGaugeControlLnkRS28;cxGridRS28;dxSpellCheckerRS28;emsclientfiredac;FireDACPgDriver;FireDACDSDriver;tethering;dxMapControlRS28;bindcompvcl;dxEMFRS28;CloudService;DBXSybaseASADriver;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -104,14 +83,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <Debugger_DebugSourcePath>D:\devTool\Embarcadero\Studio\22.0\source\vcl\AppAnalytics\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -120,121 +92,20 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="frm_main.pas">
-            <Form>frmMain</Form>
+        <DCCReference Include="frmDemoHttpWaitHint.pas">
+            <Form>frDemoHttpWaitHint</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="basLib\token\OneTokenManage.pas"/>
-        <DCCReference Include="httpServer\OneHttpServer.pas"/>
-        <DCCReference Include="httpServer\OneHttpController.pas"/>
-        <DCCReference Include="httpServer\Controller\TokenController.pas"/>
-        <DCCReference Include="httpServer\Controller\DataController.pas"/>
-        <DCCReference Include="httpServer\Controller\VirtualFileController.pas"/>
-        <DCCReference Include="httpServer\OneHttpControllerRtti.pas"/>
-        <DCCReference Include="httpServer\OneHttpRouterManage.pas"/>
-        <DCCReference Include="httpServer\OneHttpCtxtResult.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoController.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Attributes.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.DynamicTypes.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Nullables.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Persistence.JSON.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Persistence.JSON.Schema.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Persistence.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Serializers.DB.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Serializers.Nullables.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Serializers.RTL.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.TypeInfo.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Types.pas"/>
-        <DCCReference Include="NeonSerialization\Neon.Core.Utils.pas"/>
-        <DCCReference Include="DBCenter\OneZTManage.pas"/>
-        <DCCReference Include="basLib\logger\OneILog.pas"/>
-        <DCCReference Include="basLib\logger\OneLog.pas"/>
-        <DCCReference Include="basLib\thread\OneThread.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoOneWorkThread.pas"/>
-        <DCCReference Include="DBCenter\OneDataInfo.pas"/>
-        <DCCReference Include="basLib\crypto\OneSQLCrypto.pas"/>
-        <DCCReference Include="basLib\crypto\OneStreamString.pas"/>
-        <DCCReference Include="basLib\func\OneGUID.pas"/>
-        <DCCReference Include="basLib\func\OneFileHelper.pas"/>
-        <DCCReference Include="OneGlobal.pas"/>
-        <DCCReference Include="basLib\func\OneDateTimeHelper.pas"/>
-        <DCCReference Include="NeonSerialization\OneNeonHelper.pas"/>
-        <DCCReference Include="httpServer\OneWebSocketServer.pas"/>
-        <DCCReference Include="basLib\crypto\OneCrypto.pas"/>
-        <DCCReference Include="basLib\rtti\OneRttiHelper.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoCustResult.pas"/>
-        <DCCReference Include="OneCompilerVersion.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoJsonController.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoDataController.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoZTController.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoTestController.pas"/>
-        <DCCReference Include="httpServer\OneControllerResult.pas"/>
-        <DCCReference Include="httpServer\OneHttpConst.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoLogController.pas"/>
-        <DCCReference Include="basLib\virtualFile\OneVirtualFile.pas"/>
-        <DCCReference Include="DBCenter\OneOrm.pas"/>
-        <DCCReference Include="DBCenter\OneOrmRtti.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoOrmController.pas"/>
-        <DCCReference Include="basLib\attribute\OneAttribute.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoMyController.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoWebFileController.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoVersionController.pas"/>
-        <DCCReference Include="basLib\winRegister\OneWinReg.pas"/>
-        <DCCReference Include="basLib\multipart\OneMultipart.pas"/>
-        <DCCReference Include="OneUniDemo\UniLoginController.pas"/>
-        <DCCReference Include="OneFastCleint\OneFastLoginController.pas"/>
-        <DCCReference Include="OneFastCleint\OneFastAdminController.pas"/>
-        <DCCReference Include="OneUniDemo\UniGoodsController.pas"/>
-        <DCCReference Include="OneUniDemo\UniBillSendController.pas"/>
-        <DCCReference Include="OneUniDemo\UniClass.pas"/>
-        <DCCReference Include="OneUniDemo\UniSendReceivController.pas"/>
-        <DCCReference Include="OneFastCleint\OneFastModuleManage.pas"/>
-        <DCCReference Include="OneFastCleint\OneFastModuleController.pas"/>
-        <DCCReference Include="httpServer\Controller\ZTManageController.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoUrlPathController.pas"/>
-        <DCCReference Include="OneFastApi\OneFastApiManage.pas"/>
-        <DCCReference Include="OneFastApi\OneFastApiController.pas"/>
-        <DCCReference Include="OneFastApi\OneFastApiDo.pas"/>
-        <DCCReference Include="OneFastWeiXin\WeiXinManage.pas"/>
-        <DCCReference Include="OneFastWeiXin\WeixinApi.pas"/>
-        <DCCReference Include="OneFastWeiXin\WeixinAuthController.pas"/>
-        <DCCReference Include="OneFastWeiXin\WeixinAdminController.pas"/>
-        <DCCReference Include="OneFastWeiXin\WeiXinMinApi.pas"/>
-        <DCCReference Include="OneFastWeiXin\WeixinApiPublic.pas"/>
-        <DCCReference Include="basLib\uuid\uDefaultIdGenerator.pas"/>
-        <DCCReference Include="basLib\uuid\uYitIdHelper.pas"/>
-        <DCCReference Include="basLib\uuid\Contract\uIdGeneratorOptions.pas"/>
-        <DCCReference Include="basLib\uuid\Contract\uIIdGenerator.pas"/>
-        <DCCReference Include="basLib\uuid\Contract\uISnowWorker.pas"/>
-        <DCCReference Include="basLib\uuid\Contract\uTOverCostActionArg.pas"/>
-        <DCCReference Include="basLib\uuid\Core\uSnowWorkerM1.pas"/>
-        <DCCReference Include="basLib\uuid\Core\uSnowWorkerM2.pas"/>
-        <DCCReference Include="basLib\uuid\Core\uSnowWorkerM3.pas"/>
-        <DCCReference Include="basLib\uuid\OneUUID.pas"/>
-        <DCCReference Include="OneFastLsh\OneFastLshManage.pas"/>
-        <DCCReference Include="OneFastLsh\OneFastLshController.pas"/>
-        <DCCReference Include="OneFastUpload\OneFastUpdateManage.pas"/>
-        <DCCReference Include="OneFastUpload\OneFastUpdateController.pas"/>
-        <DCCReference Include="OneFastFile\OneFastFileMange.pas"/>
-        <DCCReference Include="OneFastFile\OneFastFileController.pas"/>
-        <DCCReference Include="httpServer\Controller\OneWsChatController.pas"/>
-        <DCCReference Include="httpServer\OneWebSocketConst.pas"/>
-        <DCCReference Include="OneFastFlow\OneFastFlowManage.pas"/>
-        <DCCReference Include="OneFastFlow\OneFastFlowController.pas"/>
-        <DCCReference Include="httpServer\Controller\Demo\DemoWorkCustErrResult.pas"/>
-        <DCCReference Include="OneFastCleint\OneFastPlatManage.pas"/>
-        <DCCReference Include="httpServer\Controller\TestApiController.pas"/>
-        <DCCReference Include="OneFastApi\OneFastReportController.pas"/>
+        <DCCReference Include="frmWait.pas">
+            <Form>frWaitHint</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -253,26 +124,13 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">OneService.dpr</Source>
+                    <Source Name="MainSource">OneClientDemoHttpWaitHint.dpr</Source>
                 </Source>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
-                <DeployFile LocalName="Win32\Debug\OneService.exe" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="Win64\Debug\OneService.exe" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="Win64\Debug\OneService.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win64">
-                        <RemoteName>OneService.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Win64\Debug\OneService.rsm" Configuration="Debug" Class="DebugSymbols"/>
-                <DeployFile LocalName="Win64\Debug\OneService.rsm" Configuration="Debug" Class="DebugSymbols">
-                    <Platform Name="Win64">
-                        <RemoteName>OneService.rsm</RemoteName>
+                <DeployFile LocalName="Win32\Debug\OneClientDemoHttpWaitHint.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>OneClientDemoHttpWaitHint.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1092,7 +950,6 @@
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSSimARM64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
@@ -1102,7 +959,7 @@
             </Deployment>
             <Platforms>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">True</Platform>
+                <Platform value="Win64">False</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

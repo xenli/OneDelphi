@@ -51,7 +51,10 @@ const
   URL_HTTP_HTTPServer_DATA_DeleteFile = 'OneServer/VirtualFile/DeleteFile';
 
 type
-  OneContentType = (ContentTypeText, ContentTypeHtml, ContentTypeStream, ContentTypeZip);
+  TOneConnection = class;
+
+  OneContentType = (ContentTypeText, ContentTypeHtml, ContentTypeStream,
+    ContentTypeZip);
 
   TOneResultBytes = class
   private
@@ -95,6 +98,10 @@ type
     FZTCode: string;
     FErrMsg: string;
     FTokenFailCallBack: TNotifyEvent;
+    // HTTP请求等待窗体事件挂载，参考Demo
+    FOnShowWaitHint: TNotifyEvent;
+    FOnShowWaitHintProcess: TNotifyEvent;
+    FOnShowWaitHintClose: TNotifyEvent;
   private
     // 组装URL
     function MakeUrl(var QUrl: string; var QErrMsg: string): boolean;
@@ -104,19 +111,26 @@ type
     procedure SetErrTrueResult(var QErrMsg: string);
     function IsErrTrueResult(QErrMsg: string): boolean;
     //
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent);
+      override;
     function DoConnect(qForceConnect: boolean = false): boolean;
     function DoConnectPing(): boolean;
     function DoPing(): boolean;
-    procedure DisConnect; overload;
+    procedure DisConnect;
+      overload;
     // 提交bytes返回Bytes
-    function PostResultBytes(const QUrl: string; QPostDataBtye: TBytes): TOneResultBytes; overload;
-    function PostResultBytes(const QUrl: string; QPostData: RawByteString): TOneResultBytes; overload;
+    function PostResultBytes(const QUrl: string; QPostDataBtye: TBytes): TOneResultBytes;
+      overload;
+    function PostResultBytes(const QUrl: string; QPostData: RawByteString): TOneResultBytes;
+      overload;
     // 提交字符串，返回JSONValue
-    function PostResultJsonValue(const QUrl: string; QPostData: RawByteString; var QErrMsg: string): TJsonValue; overload;
-    function PostResultJsonValue(const QUrl: string; QObject: TObject; var QErrMsg: string): TJsonValue; overload;
+    function PostResultJsonValue(const QUrl: string; QPostData: RawByteString; var QErrMsg: string): TJsonValue;
+      overload;
+    function PostResultJsonValue(const QUrl: string; QObject: TObject; var QErrMsg: string): TJsonValue;
+      overload;
     // 提交Bytes，返回JSONValue
-    function PostResultJsonValue(const QUrl: string; QPostData: TBytes; var QErrMsg: string): TJsonValue; overload;
+    function PostResultJsonValue(const QUrl: string; QPostData: TBytes; var QErrMsg: string): TJsonValue;
+      overload;
     function PostResultContent(const QUrl: string; QPostData: string; var QResultData: string): boolean;
     // Get相关事件
     function GetResultBytes(const QUrl: string): TOneResultBytes;
@@ -127,11 +141,13 @@ type
     // 跟据OneDataSet打开数据集
     function OpenData(Sender: TObject): boolean;
     // 跟据List<OneDataSet>打开数据集
-    function OpenDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean; overload;
+    function OpenDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean;
+      overload;
     // 以文件流方式打开数据
     function DownLoadDataFile(QFileID: string; var QErrMsg: string): TMemoryStream;
     // 跟据List<TOneDataOpen(数据集信息收集)>打开数据集
-    function OpenDatasPost(QDataOpens: TList<TOneDataOpen>): TOneDataResult; overload;
+    function OpenDatasPost(QDataOpens: TList<TOneDataOpen>): TOneDataResult;
+      overload;
     //
     function ExecStored(Sender: TObject): boolean;
     function ExecScript(Sender: TObject): boolean;
@@ -139,12 +155,17 @@ type
     // 执行存储过程
     function ExecStoredPost(QDataOpen: TOneDataOpen): TOneDataResult;
     // 跟据dataSet保存数据
-    function SaveData(Sender: TObject): boolean; overload;
-    function ExecDML(QSQL: string; QParamValues: array of Variant; Var QErrMsg: string): boolean; overload;
-    function ExecDML(QSQL: string; QParamValues: array of Variant; QZTCode: string; Var QErrMsg: string): boolean; overload;
+    function SaveData(Sender: TObject): boolean;
+      overload;
+    function ExecDML(QSQL: string; QParamValues: array of Variant; Var QErrMsg: string): boolean;
+      overload;
+    function ExecDML(QSQL: string; QParamValues: array of Variant; QZTCode: string; Var QErrMsg: string): boolean;
+      overload;
     // 跟据List<OneDataSet>打开数据集
-    function SaveDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean; overload;
-    function SaveDatasPost(QSaveDMLDatas: TList<TOneDataSaveDML>): TOneDataResult; overload;
+    function SaveDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean;
+      overload;
+    function SaveDatasPost(QSaveDMLDatas: TList<TOneDataSaveDML>): TOneDataResult;
+      overload;
     // 把返回的结构转化成dataset
     function DataResultToDataSets(DataResult: TOneDataResult; QObjectList: TList<TObject>; QIsSave: boolean; Var QErrMsg: string): boolean;
     function DataResultToDataSet(QDataResult: TOneDataResult; QObject: TObject; Var QErrMsg: string): boolean;
@@ -208,6 +229,18 @@ type
     property ZTCode: string read FZTCode write FZTCode;
     /// <param name="ErrMsg">错误信息存放</param>
     property ErrMsg: string read FErrMsg write FErrMsg;
+    /// <summary>
+    /// 一般用来挂载请求前等待窗体
+    /// </summary>
+    property OnShowWaitHint: TNotifyEvent read FOnShowWaitHint write FOnShowWaitHint;
+    /// <summary>
+    /// 消息处理
+    /// </summary>
+    property OnShowWaitHintProcess: TNotifyEvent read FOnShowWaitHintProcess write FOnShowWaitHintProcess;
+    /// <summary>
+    /// 一般用来挂载请求前等待窗体,关闭
+    /// </summary>
+    property OnShowWaitHintClose: TNotifyEvent read FOnShowWaitHintClose write FOnShowWaitHintClose;
   end;
 
 var
@@ -216,6 +249,11 @@ var
 implementation
 
 uses OneClientDataSet, OneFileHelper, OneCrypto;
+
+function IsMainThread(): boolean;
+begin
+  result := TThread.CurrentThread.ThreadID = MainThreadID;
+end;
 
 constructor TOneResultBytes.Create();
 begin
@@ -245,7 +283,7 @@ var
   lClientConnect: TClientConnect;
   lServerResult: TActionResult<TClientConnect>;
 begin
-  Result := false;
+  result := false;
   if (not qForceConnect) then
   begin
     if self.FConnected then
@@ -254,7 +292,7 @@ begin
       // 除非主动断掉
       self.FErrMsg := '已连接,无需在连接,如需重新连接请执行DisConnect或者强制重新连接DoConnect(true)';
       // 这边还是返回true
-      Result := true;
+      result := true;
       exit;
     end;
   end;
@@ -290,7 +328,7 @@ begin
       exit;
     end;
     self.FConnected := true;
-    Result := true;
+    result := true;
   finally
     lJsonObj.Free;
     if lResultJsonValue <> nil then
@@ -309,7 +347,7 @@ var
   lClientConnect: TClientConnect;
   lServerResult: TActionResult<string>;
 begin
-  Result := false;
+  result := false;
   lResultJsonValue := nil;
   lServerResult := TActionResult<string>.Create;
   lJsonObj := TJsonObject.Create;
@@ -333,7 +371,7 @@ begin
       exit;
     end;
     self.FConnected := true;
-    Result := true;
+    result := true;
   finally
     lJsonObj.Free;
     if lResultJsonValue <> nil then
@@ -351,7 +389,7 @@ var
   lClientConnect: TClientConnect;
   lServerResult: TActionResult<string>;
 begin
-  Result := false;
+  result := false;
   lResultJsonValue := nil;
   lServerResult := TActionResult<string>.Create;
   try
@@ -372,9 +410,9 @@ begin
       self.FErrMsg := '服务端消息:' + lServerResult.ResultMsg;
       exit;
     end;
-    Result := true;
+    result := true;
   finally
-    self.FConnected := Result;
+    self.FConnected := result;
     if lResultJsonValue <> nil then
     begin
       lResultJsonValue.Free;
@@ -420,7 +458,7 @@ var
   lTimeStr: string;
   lSign: string;
 begin
-  Result := false;
+  result := false;
   QErrMsg := '';
   tempStr := '';
   if not QUrl.StartsWith('http') then
@@ -479,7 +517,7 @@ begin
     end;
     // 转换回来
     QUrl := lURI.ToString;
-    Result := true;
+    result := true;
   except
     on e: Exception do
     begin
@@ -496,25 +534,25 @@ end;
 
 function TOneConnection.IsErrTrueResult(QErrMsg: string): boolean;
 begin
-  Result := QErrMsg = 'true';
+  result := QErrMsg = 'true';
 end;
 
 // 获取账套 ，如果数据集有取数据集的,没有取全局的
 function TOneConnection.GetZTCode(QDataSetZTCode: string): string;
 begin
   if QDataSetZTCode.Trim = '' then
-    Result := self.ZTCode
+    result := self.ZTCode
   else
-    Result := QDataSetZTCode.Trim;
+    result := QDataSetZTCode.Trim;
 end;
 
 function TOneConnection.PostResultBytes(const QUrl: string; QPostData: RawByteString): TOneResultBytes;
 var
   lPostBytes, lResultBytes: TBytes;
 begin
-  Result := nil;
+  result := nil;
   lPostBytes := TEncoding.UTF8.GetBytes(QPostData);
-  Result := self.PostResultBytes(QUrl, lPostBytes);
+  result := self.PostResultBytes(QUrl, lPostBytes);
 end;
 
 // 提交bytes返回Bytes
@@ -528,19 +566,29 @@ var
   tempA: TArray<string>;
   lErrMsg: string;
   lContentType: string;
+  //
+  lIsWait: boolean;
+  lIsPostEnd: boolean;
 begin
-  Result := TOneResultBytes.Create;
+  result := TOneResultBytes.Create;
   lErrMsg := '';
   LResponse := nil;
   lUrl := QUrl;
   if not self.MakeUrl(lUrl, lErrMsg) then
   begin
-    Result.ErrMsg := lErrMsg;
+    result.ErrMsg := lErrMsg;
     exit;
   end;
   LNetHttp := TNetHTTPClient.Create(nil);
   LRequestStream := TMemoryStream.Create;
   LResponseStream := TMemoryStream.Create;
+  lIsWait := false;
+  lIsPostEnd := false;
+  if Assigned(self.FOnShowWaitHint) then
+  begin
+    self.FOnShowWaitHint(self);
+    lIsWait := true;
+  end;
   try
     try
 {$IF CompilerVersion >=31}
@@ -562,48 +610,80 @@ begin
         LRequestStream.Write(QPostDataBtye, length(QPostDataBtye));
       end;
       LRequestStream.Position := 0;
-      LResponse := LNetHttp.Post(lUrl, LRequestStream, LResponseStream);
+      if IsMainThread() then
+      begin
+        // 主线程中，等待过程需要消息处理
+        if Assigned(self.FOnShowWaitHintProcess) then
+        begin
+          TThread.CreateAnonymousThread(
+            procedure()
+            begin
+              try
+                LResponse := LNetHttp.Post(lUrl, LRequestStream, LResponseStream);
+              finally
+                lIsPostEnd := true;
+              end;
+            end
+            ).Start;
+          while not lIsPostEnd do
+          begin
+            sleep(200);
+            // win下用 application.ProcessMessages;归还消息，否则什么造成错误
+            // FMX下需引用相关单元 FMX.Forms 然后调用 Tapplication.ProcessMessages
+            self.FOnShowWaitHintProcess(self);
+          end;
+        end
+        else
+        begin
+          LResponse := LNetHttp.Post(lUrl, LRequestStream, LResponseStream);
+        end;
+      end
+      else
+      begin
+        // 本身就是在子线程，不需要处理消息处理归还到主线程
+        LResponse := LNetHttp.Post(lUrl, LRequestStream, LResponseStream);
+      end;
       if LResponse = nil then
       begin
-        Result.ErrMsg := '返回结果错误,结果为nil';
+        result.ErrMsg := '返回结果错误,结果为nil';
         exit;
       end;
       if LResponse.StatusCode = 200 then
       begin
         // LResponse.Headers
         // 'text/plain;charset=UTF-8'
-        Result.ContentType := LResponse.MimeType;
-        tempA := Result.ContentType.Split([';']);
+        result.ContentType := LResponse.MimeType;
+        tempA := result.ContentType.Split([';']);
         if length(tempA) = 2 then
         begin
           if not tempA[0].StartsWith('charset') then
-            Result.ContentType := tempA[0]
+            result.ContentType := tempA[0]
           else
-            Result.ContentType := tempA[1];
+            result.ContentType := tempA[1];
         end;
-        Result.IsFile := (LResponse.HeaderValue['OneOutMode'] = 'OUTFILE');
-        if not Result.IsFile then
+        result.IsFile := (LResponse.HeaderValue['OneOutMode'] = 'OUTFILE');
+        if not result.IsFile then
         begin
-          if (Result.ContentType.ToLower <> 'application/json') and (Result.ContentType.ToLower <> 'text/plain') then
+          if (result.ContentType.ToLower <> 'application/json') and (result.ContentType.ToLower <> 'text/plain') then
           begin
-            Result.IsFile := true;
+            result.IsFile := true;
           end;
         end;
         // 判断是文件还是不是
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        if (LResponse.ContentEncoding = 'zlib') and (not Result.IsFile) then
+        if (LResponse.ContentEncoding = 'zlib') and (not result.IsFile) then
         begin
           setLength(lZlibBytes, 0);
           ZDecompress(lBytes, lZlibBytes);
-          Result.Bytes := lZlibBytes;
+          result.Bytes := lZlibBytes;
         end
         else
         begin
-          Result.Bytes := lBytes;
+          result.Bytes := lBytes;
         end;
-        Result.IsOK := true;
+        result.IsOK := true;
       end
       else if LResponse.StatusCode = HTTP_Status_TokenFail then
       begin
@@ -614,7 +694,7 @@ begin
         end
         else
         begin
-          Result.ErrMsg := 'Token验证失败,请重新登陆';
+          result.ErrMsg := 'Token验证失败,请重新登陆';
         end;
         exit;
       end
@@ -623,12 +703,12 @@ begin
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        Result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' + TEncoding.UTF8.GetString(lBytes);;
+        result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' + TEncoding.UTF8.GetString(lBytes);;
       end;
     except
       on e: Exception do
       begin
-        Result.ErrMsg := '请求发生异常:' + e.Message;
+        result.ErrMsg := '请求发生异常:' + e.Message;
       end;
     end;
   finally
@@ -638,6 +718,13 @@ begin
     LResponseStream.Clear;
     LResponseStream.Free;
     LNetHttp.Free;
+    if lIsWait then
+    begin
+      if Assigned(self.FOnShowWaitHintClose) then
+      begin
+        self.FOnShowWaitHintClose(self);
+      end;
+    end;
   end;
 end;
 
@@ -649,7 +736,7 @@ var
   lJsonValue: TJsonValue;
   QContentType: string;
 begin
-  Result := nil;
+  result := nil;
   lJsonValue := nil;
   lResultBytes := nil;
   QErrMsg := '';
@@ -670,7 +757,7 @@ begin
         exit;
       end;
       self.SetErrTrueResult(QErrMsg);
-      Result := lJsonValue;
+      result := lJsonValue;
     except
       on e: Exception do
       begin
@@ -692,7 +779,7 @@ var
   lPostBytes: TBytes;
   lResultBytes: TOneResultBytes;
 begin
-  Result := nil;
+  result := nil;
   QErrMsg := '';
   lTempJson := OneNeonHelper.ObjectToJson(QObject, QErrMsg);
   if lTempJson = nil then
@@ -719,7 +806,7 @@ begin
         exit;
       end;
       self.SetErrTrueResult(QErrMsg);
-      Result := lTempJson;
+      result := lTempJson;
     except
       on e: Exception do
       begin
@@ -741,7 +828,7 @@ var
   lResultBytes: TOneResultBytes;
   lJsonValue: TJsonValue;
 begin
-  Result := nil;
+  result := nil;
   lJsonValue := nil;
   lResultBytes := nil;
   QErrMsg := '';
@@ -760,7 +847,7 @@ begin
         exit;
       end;
       self.SetErrTrueResult(QErrMsg);
-      Result := lJsonValue;
+      result := lJsonValue;
     except
       on e: Exception do
       begin
@@ -780,7 +867,7 @@ var
   lPostBytes: TBytes;
   lResultBytes: TOneResultBytes;
 begin
-  Result := false;
+  result := false;
   lResultBytes := nil;
   QResultData := '';
   lPostBytes := TEncoding.UTF8.GetBytes(QPostData);
@@ -792,7 +879,7 @@ begin
       exit;
     end;
     QResultData := TEncoding.UTF8.GetString(lResultBytes.Bytes);
-    Result := true;
+    result := true;
   finally
     if lResultBytes <> nil then
     begin
@@ -812,13 +899,13 @@ var
   lErrMsg: string;
   lContentType: string;
 begin
-  Result := TOneResultBytes.Create;
+  result := TOneResultBytes.Create;
   lErrMsg := '';
   LResponse := nil;
   lUrl := QUrl;
   if not self.MakeUrl(lUrl, lErrMsg) then
   begin
-    Result.ErrMsg := lErrMsg;
+    result.ErrMsg := lErrMsg;
     exit;
   end;
   LNetHttp := TNetHTTPClient.Create(nil);
@@ -835,36 +922,36 @@ begin
       LResponse := LNetHttp.Get(lUrl, LResponseStream);
       if LResponse = nil then
       begin
-        Result.ErrMsg := '返回结果错误,结果为nil';
+        result.ErrMsg := '返回结果错误,结果为nil';
         exit;
       end;
       if LResponse.StatusCode = 200 then
       begin
         // LResponse.Headers
         // 'text/plain;charset=UTF-8'
-        Result.ContentType := LResponse.MimeType;
-        tempA := Result.ContentType.Split([';']);
+        result.ContentType := LResponse.MimeType;
+        tempA := result.ContentType.Split([';']);
         if length(tempA) = 2 then
         begin
           if not tempA[0].StartsWith('charset') then
-            Result.ContentType := tempA[0]
+            result.ContentType := tempA[0]
           else
-            Result.ContentType := tempA[1];
+            result.ContentType := tempA[1];
         end;
-        Result.IsFile := (LResponse.HeaderValue['OneOutMode'] = 'OUTFILE');
-        if not Result.IsFile then
+        result.IsFile := (LResponse.HeaderValue['OneOutMode'] = 'OUTFILE');
+        if not result.IsFile then
         begin
-          if (Result.ContentType.ToLower <> 'application/json') and (Result.ContentType.ToLower <> 'text/plain') then
+          if (result.ContentType.ToLower <> 'application/json') and (result.ContentType.ToLower <> 'text/plain') then
           begin
-            Result.IsFile := true;
+            result.IsFile := true;
           end;
         end;
         // 判断是文件还是不是
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        Result.Bytes := lBytes;
-        Result.IsOK := true;
+        result.Bytes := lBytes;
+        result.IsOK := true;
       end
       else if LResponse.StatusCode = HTTP_Status_TokenFail then
       begin
@@ -879,12 +966,12 @@ begin
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        Result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' + TEncoding.UTF8.GetString(lBytes);;
+        result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' + TEncoding.UTF8.GetString(lBytes);;
       end;
     except
       on e: Exception do
       begin
-        Result.ErrMsg := '请求发生异常:' + e.Message;
+        result.ErrMsg := '请求发生异常:' + e.Message;
       end;
     end;
   finally
@@ -902,7 +989,7 @@ var
   QContentType: string;
   lOneResultBytes: TOneResultBytes;
 begin
-  Result := nil;
+  result := nil;
   lJsonValue := nil;
   QErrMsg := '';
   lOneResultBytes := self.GetResultBytes(QUrl);
@@ -921,7 +1008,7 @@ begin
         exit;
       end;
       self.SetErrTrueResult(QErrMsg);
-      Result := lJsonValue;
+      result := lJsonValue;
     except
       on e: Exception do
       begin
@@ -938,7 +1025,7 @@ function TOneConnection.GetResultContent(const QUrl: string; var QResultData: st
 var
   lOneResultBytes: TOneResultBytes;
 begin
-  Result := false;
+  result := false;
   lOneResultBytes := self.GetResultBytes(QUrl);
   try
     if not lOneResultBytes.IsOK then
@@ -947,7 +1034,7 @@ begin
       exit;
     end;
     QResultData := TEncoding.UTF8.GetString(lOneResultBytes.Bytes);
-    Result := true;
+    result := true;
   finally
     lOneResultBytes.Free;
   end;
@@ -1017,14 +1104,14 @@ var
   lErrMsg: String;
   lDataSet: TOneDataSet;
 begin
-  Result := false;
+  result := false;
   if not(Sender is TOneDataSet) then
     exit;
   lDataSet := TOneDataSet(Sender);
   QObjectList := TList<TObject>.Create;
   try
     QObjectList.Add(lDataSet);
-    Result := self.OpenDatas(QObjectList, lErrMsg);
+    result := self.OpenDatas(QObjectList, lErrMsg);
     lDataSet.DataInfo.ErrMsg := lErrMsg;
   finally
     QObjectList.Clear;
@@ -1044,7 +1131,7 @@ var
   lOneParam: TOneParam;
   lDataResult: TOneDataResult;
 begin
-  Result := false;
+  result := false;
   QErrMsg := '';
   if not FConnected then
   begin
@@ -1106,7 +1193,7 @@ begin
     begin
       exit;
     end;
-    Result := true;
+    result := true;
   finally
     for i := 0 to lDataOpens.Count - 1 do
     begin
@@ -1127,22 +1214,22 @@ var
   lPostJsonValue, lResultJsonValue: TJsonValue;
   lErrMsg: string;
 begin
-  Result := TOneDataResult.Create;
+  result := TOneDataResult.Create;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
     // 除非主动断掉
-    Result.ResultMsg := '未连接,请先执行DoConnect事件.';
+    result.ResultMsg := '未连接,请先执行DoConnect事件.';
     exit;
   end;
   if QDataOpens = nil then
   begin
-    Result.ResultMsg := '传入的请求数据的信息为nil';
+    result.ResultMsg := '传入的请求数据的信息为nil';
     exit;
   end;
   if QDataOpens.Count = 0 then
   begin
-    Result.ResultMsg := '传入的请求数据的信息为0个信息';
+    result.ResultMsg := '传入的请求数据的信息为0个信息';
     exit;
   end;
   lResultJsonValue := nil;
@@ -1151,18 +1238,18 @@ begin
     lPostJsonValue := OneNeonHelper.ObjectToJson(QDataOpens, lErrMsg);
     if lErrMsg <> '' then
     begin
-      Result.ResultMsg := lErrMsg;
+      result.ResultMsg := lErrMsg;
       exit;
     end;
     lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_DATA_OpenDatas, lPostJsonValue.ToJSON(), lErrMsg);
     if not self.IsErrTrueResult(lErrMsg) then
     begin
-      Result.ResultMsg := lErrMsg;
+      result.ResultMsg := lErrMsg;
       exit;
     end;
-    if not OneNeonHelper.JsonToObject(Result, lResultJsonValue, lErrMsg) then
+    if not OneNeonHelper.JsonToObject(result, lResultJsonValue, lErrMsg) then
     begin
-      Result.ResultMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      result.ResultMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
       exit;
     end;
   finally
@@ -1181,7 +1268,7 @@ var
   lDataResult: TOneDataResult;
   lErrMsg: string;
 begin
-  Result := false;
+  result := false;
   if not(Sender is TOneDataSet) then
     exit;
   lDataOpen := TOneDataOpen.Create;
@@ -1199,7 +1286,7 @@ begin
       TOneDataSet(Sender).DataInfo.ErrMsg := lErrMsg;
       exit;
     end;
-    Result := true;
+    result := true;
   finally
     lDataOpen.Free;
     if lDataResult <> nil then
@@ -1215,7 +1302,7 @@ var
   lActionResult: TActionResult<string>;
   lErrMsg: string;
 begin
-  Result := false;
+  result := false;
   if not(Sender is TOneDataSet) then
     exit;
   lDataSet := TOneDataSet(Sender);
@@ -1249,7 +1336,7 @@ begin
       lDataSet.DataInfo.ErrMsg := '服务端消息:' + lActionResult.ResultMsg;
       exit;
     end;
-    Result := true;
+    result := true;
   finally
     lDataOpen.Free;
     if lPostJsonValue <> nil then
@@ -1269,7 +1356,7 @@ var
   lOneDataSet: TOneDataSet;
   lErrMsg: string;
 begin
-  Result := false;
+  result := false;
   if not(Sender is TOneDataSet) then
     exit;
   lOneDataSet := TOneDataSet(Sender);
@@ -1304,7 +1391,7 @@ begin
       lOneDataSet.DataInfo.ErrMsg := lErrMsg;
       exit;
     end;
-    Result := true;
+    result := true;
   finally
     lDBMetaInfo.Free;
     if lPostJsonValue <> nil then
@@ -1321,17 +1408,17 @@ var
   lPostJsonValue, lResultJsonValue: TJsonValue;
   lErrMsg: string;
 begin
-  Result := TOneDataResult.Create;
+  result := TOneDataResult.Create;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
     // 除非主动断掉
-    Result.ResultMsg := '未连接,请先执行DoConnect事件.';
+    result.ResultMsg := '未连接,请先执行DoConnect事件.';
     exit;
   end;
   if QDataOpen = nil then
   begin
-    Result.ResultMsg := '传入的请求数据的信息为nil';
+    result.ResultMsg := '传入的请求数据的信息为nil';
     exit;
   end;
   lResultJsonValue := nil;
@@ -1340,7 +1427,7 @@ begin
     lPostJsonValue := OneNeonHelper.ObjectToJson(QDataOpen, lErrMsg);
     if lErrMsg <> '' then
     begin
-      Result.ResultMsg := lErrMsg;
+      result.ResultMsg := lErrMsg;
       exit;
     end;
     lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_DATA_ExecStored, lPostJsonValue.ToJSON(), lErrMsg);
@@ -1349,14 +1436,14 @@ begin
       self.FErrMsg := lErrMsg;
       exit;
     end;
-    if not OneNeonHelper.JsonToObject(Result, lResultJsonValue, lErrMsg) then
+    if not OneNeonHelper.JsonToObject(result, lResultJsonValue, lErrMsg) then
     begin
-      Result.ResultMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;;
+      result.ResultMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;;
       exit;
     end;
-    if Result.ResultMsg <> '' then
+    if result.ResultMsg <> '' then
     begin
-      Result.ResultMsg := '服务端消息:' + Result.ResultMsg;
+      result.ResultMsg := '服务端消息:' + result.ResultMsg;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -1375,14 +1462,14 @@ var
   lErrMsg: String;
   lDataSet: TOneDataSet;
 begin
-  Result := false;
+  result := false;
   if not(Sender is TOneDataSet) then
     exit;
   lDataSet := TOneDataSet(Sender);
   QObjectList := TList<TObject>.Create;
   try
     QObjectList.Add(lDataSet);
-    Result := self.SaveDatas(QObjectList, lErrMsg);
+    result := self.SaveDatas(QObjectList, lErrMsg);
     lDataSet.DataInfo.ErrMsg := lErrMsg;
   finally
     QObjectList.Clear;
@@ -1392,7 +1479,7 @@ end;
 
 function TOneConnection.ExecDML(QSQL: string; QParamValues: array of Variant; Var QErrMsg: string): boolean;
 begin
-  Result := self.ExecDML(QSQL, QParamValues, '', QErrMsg);
+  result := self.ExecDML(QSQL, QParamValues, '', QErrMsg);
 end;
 
 function TOneConnection.ExecDML(QSQL: string; QParamValues: array of Variant; QZTCode: string; Var QErrMsg: string): boolean;
@@ -1401,7 +1488,7 @@ var
   lList: TList<TObject>;
   i: Integer;
 begin
-  Result := false;
+  result := false;
   QErrMsg := '';
   lList := TList<TObject>.Create;
   lData := TOneDataSet.Create(nil);
@@ -1418,7 +1505,7 @@ begin
       lData.Params[i].Value := QParamValues[i];
     end;
     lList.Add(lData);
-    Result := self.SaveDatas(lList, QErrMsg);
+    result := self.SaveDatas(lList, QErrMsg);
   finally
     lData.Free;
     lList.Clear;
@@ -1438,7 +1525,7 @@ var
   lDataResult: TOneDataResult;
   lTemStream: TMemoryStream;
 begin
-  Result := false;
+  result := false;
   QErrMsg := '';
   if not FConnected then
   begin
@@ -1588,7 +1675,7 @@ begin
     // 解析数据到dataSet
     if not self.DataResultToDataSets(lDataResult, QObjectList, true, QErrMsg) then
       exit;
-    Result := true;
+    result := true;
   finally
     for i := 0 to lSaveDMLs.Count - 1 do
     begin
@@ -1609,22 +1696,22 @@ var
   lPostJsonValue, lResultJsonValue: TJsonValue;
   lErrMsg: string;
 begin
-  Result := TOneDataResult.Create;
+  result := TOneDataResult.Create;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
     // 除非主动断掉
-    Result.ResultMsg := '未连接,请先执行DoConnect事件.';
+    result.ResultMsg := '未连接,请先执行DoConnect事件.';
     exit;
   end;
   if QSaveDMLDatas = nil then
   begin
-    Result.ResultMsg := '传入的保存的数据为nil';
+    result.ResultMsg := '传入的保存的数据为nil';
     exit;
   end;
   if QSaveDMLDatas.Count = 0 then
   begin
-    Result.ResultMsg := '传入的保存的数据的个数为0';
+    result.ResultMsg := '传入的保存的数据的个数为0';
     exit;
   end;
   lResultJsonValue := nil;
@@ -1633,7 +1720,7 @@ begin
     lPostJsonValue := OneNeonHelper.ObjectToJson(QSaveDMLDatas, lErrMsg);
     if lErrMsg <> '' then
     begin
-      Result.ResultMsg := lErrMsg;
+      result.ResultMsg := lErrMsg;
       exit;
     end;
     lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_DATA_SaveDatas, lPostJsonValue.ToJSON(), lErrMsg);
@@ -1642,14 +1729,14 @@ begin
       self.FErrMsg := lErrMsg;
       exit;
     end;
-    if not OneNeonHelper.JsonToObject(Result, lResultJsonValue, lErrMsg) then
+    if not OneNeonHelper.JsonToObject(result, lResultJsonValue, lErrMsg) then
     begin
-      Result.ResultMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      result.ResultMsg := '返回的数据解析成TOneDataResult出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
       exit;
     end;
-    if Result.ResultMsg <> '' then
+    if result.ResultMsg <> '' then
     begin
-      Result.ResultMsg := '服务端消息:' + Result.ResultMsg;
+      result.ResultMsg := '服务端消息:' + result.ResultMsg;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -1672,7 +1759,7 @@ var
   lCacleList: TList<boolean>;
   lTemStream: TMemoryStream;
 begin
-  Result := false;
+  result := false;
   QErrMsg := '';
   lTemStream := nil;
   if DataResult.ResultItems.Count <> QObjectList.Count then
@@ -1703,7 +1790,7 @@ begin
         if lOneDataSet.Fields[iField].FieldKind in [fkInternalCalc] then
         begin
           bCacle := true;
-          break;
+          Break;
         end;
       end;
       lCacleList.Add(bCacle);
@@ -1801,7 +1888,7 @@ begin
       end
     end;
 
-    Result := true;
+    result := true;
   finally
     for i := 0 to lOneDataSets.Count - 1 do
     begin
@@ -1832,7 +1919,7 @@ var
   lOneParam: TOneParam;
   lParamName: string;
 begin
-  Result := false;
+  result := false;
   QErrMsg := '';
   lTemStream := nil;
   bCacle := false;
@@ -1849,7 +1936,7 @@ begin
       if lOneDataSet.Fields[iField].FieldKind in [fkInternalCalc] then
       begin
         bCacle := true;
-        break;
+        Break;
       end;
     end;
     // 参数赋值
@@ -2016,7 +2103,7 @@ begin
     begin
       lOneDataSet.MultiIndex := 0;
     end;
-    Result := true;
+    result := true;
   finally
     lOneDataSet.EnableControls;
     lDictParam.Clear;
@@ -2033,7 +2120,7 @@ var
   lResultBytes: TOneResultBytes;
   lZip: TZipFile;
 begin
-  Result := nil;
+  result := nil;
   lResultBytes := nil;
   lOutBytes := nil;
   lJonsObj := TJsonObject.Create;
@@ -2058,7 +2145,7 @@ begin
     end
     else if (lResultBytes.ContentType.ToLower = 'application/zip') or (lResultBytes.ContentType.ToLower = 'application/octet-stream') then
     begin
-      Result := TMemoryStream.Create;
+      result := TMemoryStream.Create;
       lZipStream := TMemoryStream.Create;
       lZip := TZipFile.Create;
       try
@@ -2066,15 +2153,15 @@ begin
         lZipStream.Position := 0;
         lZip.Open(lZipStream, TZipMode.zmRead);
         lZip.Read(0, lOutBytes);
-        Result.Write(lOutBytes, 0, length(lOutBytes));
+        result.Write(lOutBytes, 0, length(lOutBytes));
         self.SetErrTrueResult(QErrMsg);
       finally
         lZip.Free;
         lZipStream.Free;
         if not self.IsErrTrueResult(QErrMsg) then
         begin
-          Result.Free;
-          Result := nil;
+          result.Free;
+          result := nil;
         end;
       end;
       exit;
@@ -2101,7 +2188,7 @@ var
   lErrMsg: string;
   lDataResult: TOneDataResult;
 begin
-  Result := false;
+  result := false;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
@@ -2138,7 +2225,7 @@ begin
     if lDataResult.ResultOK then
     begin
       QTranInfo.TranID := lDataResult.ResultData;
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2157,7 +2244,7 @@ var
   lErrMsg: string;
   lDataResult: TOneDataResult;
 begin
-  Result := false;
+  result := false;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
@@ -2198,7 +2285,7 @@ begin
     if lDataResult.ResultOK then
     begin
       QTranInfo.TranID := lDataResult.ResultData;
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2217,7 +2304,7 @@ var
   lErrMsg: string;
   lDataResult: TOneDataResult;
 begin
-  Result := false;
+  result := false;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
@@ -2258,7 +2345,7 @@ begin
     if lDataResult.ResultOK then
     begin
       QTranInfo.TranID := lDataResult.ResultData;
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2277,7 +2364,7 @@ var
   lErrMsg: string;
   lDataResult: TOneDataResult;
 begin
-  Result := false;
+  result := false;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
@@ -2318,7 +2405,7 @@ begin
     if lDataResult.ResultOK then
     begin
       QTranInfo.TranID := lDataResult.ResultData;
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2337,7 +2424,7 @@ var
   lErrMsg: string;
   lDataResult: TOneDataResult;
 begin
-  Result := false;
+  result := false;
   if not self.FConnected then
   begin
     // 如果已经连接过就不在连接，
@@ -2378,7 +2465,7 @@ begin
     if lDataResult.ResultOK then
     begin
       QTranInfo.TranID := lDataResult.ResultData;
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2397,7 +2484,7 @@ var
   tempMsg, lFileName: string;
   TempStream: TMemoryStream;
 begin
-  Result := false;
+  result := false;
   QVirtualInfo.ErrMsg := '';
   if not self.FConnected then
   begin
@@ -2480,7 +2567,7 @@ begin
     begin
       // 有可能上传文件名称和最后文件名称不一至
       QVirtualInfo.RemoteFileName := lResult.ResultData;
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2501,7 +2588,7 @@ var
   lInStream: TMemoryStream;
   tempMsg, lLocalPath, lAFileName: string;
 begin
-  Result := false;
+  result := false;
   lResultBytes := nil;
   QVirtualInfo.ErrMsg := '';
   if not self.FConnected then
@@ -2597,7 +2684,7 @@ begin
         end;
       end;
       lInStream.SaveToFile(QVirtualInfo.LocalFile);
-      Result := true;
+      result := true;
     finally
       lInStream.Free;
     end;
@@ -2620,7 +2707,7 @@ var
   lResult: TActionResult<string>;
   tempMsg: string;
 begin
-  Result := false;
+  result := false;
   QVirtualInfo.ErrMsg := '';
   if not self.FConnected then
   begin
@@ -2672,7 +2759,7 @@ begin
     end;
     if lResult.ResultSuccess then
     begin
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2693,7 +2780,7 @@ var
   lFileStream: TFileStream;
   lLocalPath, lFileName: string;
 begin
-  Result := false;
+  result := false;
   QVirtualTask.ErrMsg := '';
   QVirtualTask.TaskID := '';
   if not self.FConnected then
@@ -2821,7 +2908,7 @@ begin
       QVirtualTask.FileTotalSize := lResult.ResultData.FileTotalSize;
       QVirtualTask.FileName := lResult.ResultData.FileName;
       QVirtualTask.NewFileName := lResult.ResultData.NewFileName;
-      Result := true;
+      result := true;
     end;
   finally
     if lResultJsonValue <> nil then
@@ -2845,7 +2932,7 @@ var
   iChunSize: int64;
   isEnd: boolean;
 begin
-  Result := false;
+  result := false;
   QVirtualTask.UpDownMode := '上传';
   if QVirtualTask.TaskID = '' then
   begin
@@ -2950,7 +3037,7 @@ begin
       end;
 
     end;
-    Result := true;
+    result := true;
   finally
     lFileStream.Free;
     lResult.Free;
@@ -2968,7 +3055,7 @@ var
   lInStream: TMemoryStream;
   isEnd: boolean;
 begin
-  Result := false;
+  result := false;
   QVirtualTask.UpDownMode := '下载';
   if QVirtualTask.TaskID = '' then
   begin
@@ -3065,7 +3152,7 @@ begin
       end;
 
     end;
-    Result := true;
+    result := true;
   finally
     lFileStream.Free;
     lResult.Free;
@@ -3077,7 +3164,7 @@ var
   lJsonValue: TJsonValue;
   lServerResult: TActionResult<TList<TZTInfo>>;
 begin
-  Result := nil;
+  result := nil;
   lJsonValue := nil;
   QErrMsg := '';
   lJsonValue := self.GetResultJsonValue(URL_HTTP_HTTPServer_ZTManage_OneGetZTList, QErrMsg);
@@ -3098,7 +3185,7 @@ begin
       self.FErrMsg := '服务端消息:' + lServerResult.ResultMsg;
       exit;
     end;
-    Result := lServerResult.ResultData;
+    result := lServerResult.ResultData;
   finally
     lServerResult.Free;
     if lJsonValue <> nil then
@@ -3111,16 +3198,16 @@ var
   lList: TList<TZTInfo>;
   i: Integer;
 begin
-  Result := nil;
+  result := nil;
   lList := nil;
   lList := self.OneGetZTList(QErrMsg);
   try
     if lList = nil then
       exit;
-    Result := TStringList.Create;
+    result := TStringList.Create;
     for i := 0 to lList.Count - 1 do
     begin
-      Result.Add(lList[i].ZTCode + '=' + lList[i].ZTCaption);
+      result.Add(lList[i].ZTCode + '=' + lList[i].ZTCaption);
     end;
   finally
     if lList <> nil then
@@ -3144,7 +3231,7 @@ var
   lServerResult: TActionResult<int64>;
   IsOK: boolean;
 begin
-  Result := -1;
+  result := -1;
   IsOK := false;
   QErrMsg := '';
   lResultJsonValue := nil;
@@ -3168,12 +3255,12 @@ begin
       QErrMsg := '服务端消息:' + lServerResult.ResultMsg;
       exit;
     end;
-    Result := lServerResult.ResultData;
+    result := lServerResult.ResultData;
     IsOK := true;
   finally
     if not IsOK then
     begin
-      Result := -1;
+      result := -1;
     end;
     lJsonObj.Free;
     if lResultJsonValue <> nil then
@@ -3192,7 +3279,7 @@ var
   lServerResult: TActionResult<TList<int64>>;
   IsOK: boolean;
 begin
-  Result := TList<int64>.Create;
+  result := TList<int64>.Create;
   IsOK := false;
   QErrMsg := '';
   lResultJsonValue := nil;
@@ -3208,7 +3295,7 @@ begin
       QErrMsg := lErrMsg;
       exit;
     end;
-    lServerResult.ResultData := Result;
+    lServerResult.ResultData := result;
     if not OneNeonHelper.JsonToObject(lServerResult, lResultJsonValue, lErrMsg) then
     begin
       QErrMsg := '返回的数据解析成TResult<TClientConnect>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
@@ -3223,8 +3310,8 @@ begin
   finally
     if not IsOK then
     begin
-      Result.Free;
-      Result := nil;
+      result.Free;
+      result := nil;
     end;
     lJsonObj.Free;
     if lResultJsonValue <> nil then

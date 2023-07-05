@@ -196,6 +196,9 @@ type
     edSendMsgTest: TEdit;
     Label21: TLabel;
     tbSendMsg: TButton;
+    dbPoolAuto: TDBCheckBox;
+    qryZTSetFPoolAuto: TBooleanField;
+    Label22: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure tbStartClick(Sender: TObject);
     procedure tbStopClick(Sender: TObject);
@@ -434,6 +437,7 @@ begin
     qryZTSetFConnectionStr.AsString := lZTSet.ConnectionStr;
     qryZTSetFIsEnable.AsBoolean := lZTSet.IsEnable;
     qryZTSetFIsMain.AsBoolean := lZTSet.IsMain;
+    qryZTSetFPoolAuto.AsBoolean := lZTSet.PoolAuto;
     qryZTSet.Post;
   end;
   qryZTSet.MergeChangeLog;
@@ -921,16 +925,18 @@ procedure TfrmMain.tbZTConnectSetClick(Sender: TObject);
 begin
   if qryZTSet.IsEmpty then
     exit;
+  self.SendToBack();
   //
   FDConnection1.ConnectionString := qryZTSetFConnectionStr.AsString;
   if TfrmFDGUIxFormsConnEdit.Execute(FDConnection1, '账套连接编辑') then
   begin
     try
+
       qryZTSet.Edit;
       qryZTSetFPhyDriver.AsString := FDConnection1.DriverName;
       qryZTSetFConnectionStr.AsString := FDConnection1.ConnectionString;
-      qryZTSetFIsEnable.AsBoolean := false;
-      qryZTSetFIsMain.AsBoolean := false;
+      // qryZTSetFIsEnable.AsBoolean := false;
+      // qryZTSetFIsMain.AsBoolean := false;
       qryZTSet.Post;
     except
       showMessage('连接失败,请验证服务器是否存在或账号密码是否错误');
@@ -1101,6 +1107,7 @@ begin
       lZTSet.ConnectionStr := qryZTSetFConnectionStr.AsString;
       lZTSet.IsEnable := qryZTSetFIsEnable.AsBoolean;
       lZTSet.IsMain := qryZTSetFIsMain.AsBoolean;
+      lZTSet.PoolAuto := qryZTSetFPoolAuto.AsBoolean;
       qryZTSet.Next;
     end;
   finally

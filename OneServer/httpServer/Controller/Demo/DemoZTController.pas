@@ -13,6 +13,7 @@ type
     // 返回结果 [{"name":"flm0"},{"name":"flm1"},{"name":"flm2"}]
     function GetData(): TActionResult<TFDMemtable>;
     function SaveData(QPersons: TList<TPersonDemo>): TActionResult<string>;
+    function LockZTTest(): string;
   end;
 
 function CreateNewDemoZTController(QRouterItem: TOneRouterWorkItem): TObject;
@@ -78,8 +79,7 @@ begin
   end;
 end;
 
-function TDemoZTController.SaveData(QPersons: TList<TPersonDemo>)
-  : TActionResult<string>;
+function TDemoZTController.SaveData(QPersons: TList<TPersonDemo>): TActionResult<string>;
 var
   i, iErr: integer;
   lOneZTMange: TOneZTManage;
@@ -148,6 +148,31 @@ begin
       lConnection.Rollback;
     end;
     lZTItem.UnLockWork;
+  end;
+end;
+
+function TDemoZTController.LockZTTest(): string;
+var
+  lErrMsg: string;
+  lOneZTMange: TOneZTManage;
+  lZTItem: TOneZTItem;
+begin
+
+  result := '开始执行';
+  lOneZTMange := TOneGlobal.GetInstance().ZTManage;
+  // 账套为空时,默认取主账套
+  lZTItem := lOneZTMange.LockZTItem('', lErrMsg);
+  if lZTItem = nil then
+  begin
+    result := lErrMsg;
+    exit;
+  end;
+  try
+    sleep(5000);
+
+  finally
+    lZTItem.UnLockWork;
+    result := '执行成功';
   end;
 end;
 

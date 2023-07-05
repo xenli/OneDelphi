@@ -24,8 +24,8 @@ object frmMain: TfrmMain
     ActivePage = tabServerReamk
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 878
-    ExplicitHeight = 515
+    ExplicitWidth = 880
+    ExplicitHeight = 512
     object tabServerReamk: TTabSheet
       Caption = #20013#38388#20214#35828#26126
       object Memo1: TMemo
@@ -34,6 +34,11 @@ object frmMain: TfrmMain
         Width = 874
         Height = 481
         Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -15
+        Font.Name = 'Segoe UI'
+        Font.Style = []
         Lines.Strings = (
           'OneDelphi:'
           #19968#20010'MVC'#21450#20256#32479'DataSet'#26694#26550
@@ -46,9 +51,10 @@ object frmMain: TfrmMain
           ''
           '                                                 '#21483#20861'(FLM)'#20986#21697
           '                                                 QQ:378464060')
+        ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 870
-        ExplicitHeight = 480
+        ExplicitWidth = 872
+        ExplicitHeight = 477
       end
     end
     object TabSheet1: TTabSheet
@@ -1181,7 +1187,7 @@ object frmMain: TfrmMain
     Height = 75
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 878
+    ExplicitWidth = 880
     object Image1: TImage
       Left = 1
       Top = 1
@@ -1272,7 +1278,7 @@ object frmMain: TfrmMain
       ParentFont = False
       TabOrder = 0
       OnClick = BtnResClick
-      ExplicitLeft = 635
+      ExplicitLeft = 637
     end
     object btnClose: TBitBtn
       AlignWithMargins = True
@@ -1293,14 +1299,14 @@ object frmMain: TfrmMain
       ParentFont = False
       TabOrder = 1
       OnClick = HookCloseMainClick
-      ExplicitLeft = 755
+      ExplicitLeft = 757
     end
   end
   object plZTSet: TPanel
-    Left = 235
-    Top = 154
+    Left = 219
+    Top = 146
     Width = 401
-    Height = 232
+    Height = 319
     Caption = '9091'
     Color = clSkyBlue
     ParentBackground = False
@@ -1347,6 +1353,22 @@ object frmMain: TfrmMain
       Width = 80
       Height = 20
       Caption = #36830#25509#23383#31526#20018
+    end
+    object Label22: TLabel
+      Left = 35
+      Top = 232
+      Width = 342
+      Height = 41
+      AutoSize = False
+      Caption = #26080#38480#25193#23481','#20250#30452#33267#25968#25454#24211#29992#23613#36830#25509','#35831#27880#24847#20195#30721#25104#23545' LockZTItem-UnLockWork'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -15
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      WordWrap = True
+      StyleName = 'Windows'
     end
     object dbZTCode: TDBEdit
       Left = 120
@@ -1403,8 +1425,8 @@ object frmMain: TfrmMain
       OnClick = tbZTConnectSetClick
     end
     object dbIsEnable: TDBCheckBox
-      Left = 93
-      Top = 200
+      Left = 120
+      Top = 207
       Width = 102
       Height = 17
       Caption = #26159#21542#21487#29992
@@ -1413,8 +1435,8 @@ object frmMain: TfrmMain
       TabOrder = 6
     end
     object tbZTSetOK: TButton
-      Left = 296
-      Top = 198
+      Left = 304
+      Top = 279
       Width = 89
       Height = 25
       Caption = #30830#23450
@@ -1422,8 +1444,8 @@ object frmMain: TfrmMain
       OnClick = tbZTSetOKClick
     end
     object tbZTPing: TButton
-      Left = 201
-      Top = 198
+      Left = 177
+      Top = 279
       Width = 89
       Height = 25
       Caption = #27979#35797#36830#25509
@@ -1431,8 +1453,8 @@ object frmMain: TfrmMain
       OnClick = tbZTPingClick
     end
     object dbIsMain: TDBCheckBox
-      Left = 4
-      Top = 199
+      Left = 35
+      Top = 209
       Width = 73
       Height = 17
       Caption = #20027#36134#22871
@@ -1449,6 +1471,16 @@ object frmMain: TfrmMain
       DataSource = dsZTSet
       Enabled = False
       TabOrder = 10
+    end
+    object dbPoolAuto: TDBCheckBox
+      Left = 248
+      Top = 207
+      Width = 129
+      Height = 17
+      Caption = #36134#22871#26080#38480#25193#23481
+      DataField = 'FPoolAuto'
+      DataSource = dsZTSet
+      TabOrder = 11
     end
   end
   object qryZTSet: TFDMemTable
@@ -1474,6 +1506,10 @@ object frmMain: TfrmMain
     end
     object qryZTSetFMaxPoolCount: TIntegerField
       FieldName = 'FMaxPoolCount'
+    end
+    object qryZTSetFPoolAuto: TBooleanField
+      DisplayLabel = #27744#25193#23481
+      FieldName = 'FPoolAuto'
     end
     object qryZTSetFPhyDriver: TWideStringField
       FieldName = 'FPhyDriver'

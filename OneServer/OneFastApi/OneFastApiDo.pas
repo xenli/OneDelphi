@@ -484,6 +484,11 @@ begin
         QApiAll.errMsg := '未设计的角色权限[' + QApiInfo.fastApi.FApiRole + ']';
         exit;
       end;
+    end
+    else
+    begin
+      // 不需角色权限 返回true
+      Result := true;
     end;
   end
   else if QApiInfo.fastApi.FApiAuthor = 'AppID验证' then

@@ -120,7 +120,7 @@ begin
         for iParam := 0 to lApiAll.paramJson.count - 1 do
         begin
           lJsonName := lApiAll.paramJson.Pairs[iParam].JsonString.Value;
-          lJsonValue := lApiAll.paramJson.Pairs[iParam].JsonValue.ToJSON;
+          lJsonValue := lApiAll.paramJson.Pairs[iParam].JsonValue.value;
           lFrReport.Script.AddVariable(lJsonName, 'string', lJsonValue);
         end;
       end;
