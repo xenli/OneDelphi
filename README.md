@@ -466,3 +466,5 @@ OneDelphi正式版,正式发布.
         4.增加Api使用Demo  
         5.优化一些功能  
 ### Delphi三层中间件 Dephi中间件 Delphi开源中间件
+### 叫兽的另一款[OneLazarus中间件](https://github.com/xenli/OneLazarus "OneLazarus中间件")
+### 群友维护的基于[Cross-Socket OneDelphi中间件](https://gitee.com/cityboat/OnePascal "Cross-Socket OneDelphi中间件")
