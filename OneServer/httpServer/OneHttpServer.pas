@@ -101,7 +101,17 @@ begin
     Result := HTTP_NOTFOUND;
     exit;
   end;
-  lURI := System.Net.URLClient.TURI.Create('http://' + Ctxt.Host + Ctxt.Url);
+	try
+		lURI := System.Net.URLClient.TURI.Create('http://' + Ctxt.Host + Ctxt.Url);
+	except 
+		on e:exception do
+		begin
+			Ctxt.OutContent := UTF8Encode(e.Message);
+			Ctxt.OutContentType := TEXT_CONTENT_TYPE;
+			Result := 500;
+			exit;
+		end;
+	end;
   lUrlPath := lURI.Path;
   lUrlPath := OneHttpCtxtResult.FormatRootName(lUrlPath);
   lwatchTimer := TStopwatch.StartNew;
@@ -303,7 +313,7 @@ begin
   self.FStopRequest := False;
   self.FPort := 9090;
   self.FThreadPoolCount := 100;
-  self.FKeepAliveTimeOut := 30000;
+  self.FKeepAliveTimeOut := 0;
   self.FHttpQueueLength := 1000;
   self.FHttpServer := nil;
   self.FHttpsServer := nil;
