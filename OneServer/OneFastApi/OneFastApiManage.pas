@@ -127,6 +127,8 @@ type
     FFieldDefaultValue_: string;
     FFieldShowPass_: string;
     FFieldCheckEmpty_: boolean;
+    FFieldIsMust_: boolean;
+    FFieldIsMustValue_: boolean;
   published
     property FFieldID: string read FFieldID_ write FFieldID_;
     property FDataID: string read FDataID_ write FDataID_;
@@ -147,6 +149,8 @@ type
     property FFieldDefaultValue: string read FFieldDefaultValue_ write FFieldDefaultValue_;
     property FFieldShowPass: string read FFieldShowPass_ write FFieldShowPass_;
     property FFieldCheckEmpty: boolean read FFieldCheckEmpty_ write FFieldCheckEmpty_;
+    property FFieldIsMust: boolean read FFieldIsMust_ write FFieldIsMust_;
+    property FFieldIsMustValue: boolean read FFieldIsMustValue_ write FFieldIsMustValue_;
   end;
 
   TFastApiFilter = class
@@ -444,6 +448,7 @@ var
   //
   lSQLList: TStringList;
   tempSQL: string;
+  lOpenMode: emDataOpenMode;
 begin
   Result := false;
   if QDatas = nil then
@@ -478,12 +483,30 @@ begin
     begin
       lApiData.FDataJsonName := lApiData.FDataName;
     end;
-
-    if lApiData.DataOpenMode() in [openDataStore, doStore] then
+    lOpenMode := lApiData.DataOpenMode();
+    if lOpenMode in [openDataStore, doStore] then
     begin
       if lApiData.FDataStoreName = '' then
       begin
         self.errMsg_ := '数据集打开模式[' + lApiData.FDataOpenMode + ']存储过程名称不可为空';
+        exit;
+      end;
+    end;
+    if lOpenMode in [appendDatas] then
+    begin
+      if lApiData.FDataTable = '' then
+      begin
+        self.errMsg_ := '数据集添加数据模式[' + lApiData.FDataOpenMode + ']表名设置不可为空';
+        exit;
+      end;
+      if lApiData.FDataPrimaryKey = '' then
+      begin
+        self.errMsg_ := '数据集添加数据模式[' + lApiData.FDataOpenMode + ']主键设置不可为空';
+        exit;
+      end;
+      if lApiData.ChildFields.Count = 0 then
+      begin
+        self.errMsg_ := '数据集添加数据模式[' + lApiData.FDataOpenMode + ']未设计要保存的字段';
         exit;
       end;
     end;
@@ -548,7 +571,8 @@ begin
             begin
               // 只能是单字段过滤,固定SQL
               lApiFilter.FFilterbMust := true;
-              lApiFilter.FFilterbValue := true;
+              // SQL固定参数,一定要有,但不一定要求有值
+              // lApiFilter.FFilterbValue := true;
             end;
 
             // 条件字段也是固定的

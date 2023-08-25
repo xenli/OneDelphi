@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 75
     Width = 882
     Height = 516
-    ActivePage = tabServerReamk
+    ActivePage = tabHTTPServer
     Align = alClient
     TabOrder = 0
     ExplicitWidth = 880
@@ -53,8 +53,6 @@ object frmMain: TfrmMain
           '                                                 QQ:378464060')
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 872
-        ExplicitHeight = 477
       end
     end
     object TabSheet1: TTabSheet
@@ -179,6 +177,7 @@ object frmMain: TfrmMain
         ParentColor = False
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 872
         object Label1: TLabel
           Left = 3
           Top = 56
@@ -414,6 +413,8 @@ object frmMain: TfrmMain
         Align = alClient
         Caption = #20854#23427#37197#32622
         TabOrder = 1
+        ExplicitWidth = 872
+        ExplicitHeight = 155
         object chWinTaskStart: TCheckBox
           Left = 15
           Top = 30
@@ -447,6 +448,7 @@ object frmMain: TfrmMain
         Align = alTop
         Caption = 'WebSocket(WS)'#37197#32622
         TabOrder = 2
+        ExplicitWidth = 872
         object Label18: TLabel
           Left = 246
           Top = 35
@@ -1303,8 +1305,8 @@ object frmMain: TfrmMain
     end
   end
   object plZTSet: TPanel
-    Left = 219
-    Top = 146
+    Left = 203
+    Top = 170
     Width = 401
     Height = 319
     Caption = '9091'

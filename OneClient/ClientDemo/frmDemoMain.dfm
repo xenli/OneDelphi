@@ -113,7 +113,7 @@ object frDemoMain: TfrDemoMain
     Top = 80
     Width = 899
     Height = 479
-    ActivePage = tabDataSet
+    ActivePage = tabDML
     Align = alClient
     TabOrder = 2
     ExplicitWidth = 895

@@ -227,6 +227,10 @@ type
     qryFieldFFieldFormat: TWideStringField;
     vwFieldFFieldFormat: TcxGridDBColumn;
     tbReportDesign: TdxBarLargeButton;
+    qryFieldFFieldIsMust: TBooleanField;
+    qryFieldFFieldIsMustValue: TBooleanField;
+    vwFieldFFieldIsMust: TcxGridDBColumn;
+    vwFieldFFieldIsMustValue: TcxGridDBColumn;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbClientDisConnectClick(Sender: TObject);
     procedure tbRefshClick(Sender: TObject);

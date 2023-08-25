@@ -1773,6 +1773,10 @@ begin
                 begin
                   LZTQuery.Params[iParam].AsStream := OneStreamString.Base64ToStream(LOneParam.ParamValue);
                 end
+                 else if lFieldType = TFieldType.ftBlob then
+                begin
+                  LZTQuery.Params[iParam].AsStream := OneStreamString.Base64ToStream(LOneParam.ParamValue);
+                end
                 else
                   LZTQuery.Params[iParam].Value := LOneParam.ParamValue;
               end;
@@ -2061,7 +2065,11 @@ begin
       end;
       if LFDParam.ParamType in [TParamType.ptInput, TParamType.ptInputOutput, TParamType.ptOutput] then
       begin
-        if LFDParam.DataType = ftWideMemo then
+        if LOneParam.ParamValue = const_OneParamIsNull_Value then
+        begin
+          LFDParam.Clear();
+        end
+        else if LFDParam.DataType = ftWideMemo then
         begin
           LFDParam.AsWideMemo := LOneParam.ParamValue;
         end

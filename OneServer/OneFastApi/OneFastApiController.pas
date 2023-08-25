@@ -40,14 +40,21 @@ var
 begin
   lTokenItem := nil;
   lJsonValue := nil;
-  lTokenItem := self.GetCureentToken(lErrMsg);
-  lJsonValue := OneFastApiDo.DoFastApi(lTokenItem, QPostJson);
   try
-    result := lJsonValue.tostring;
-  finally
-    if lJsonValue <> nil then
+    lTokenItem := self.GetCureentToken(lErrMsg);
+    lJsonValue := OneFastApiDo.DoFastApi(lTokenItem, QPostJson);
+    try
+      result := lJsonValue.tostring;
+    finally
+      if lJsonValue <> nil then
+      begin
+        lJsonValue.free;
+      end;
+    end;
+  except
+    on e:exception do
     begin
-      lJsonValue.free;
+      result := '发生异常,异常消息['+e.Message+']';
     end;
   end;
 end;
@@ -83,7 +90,6 @@ begin
   result.ResultData := '刷新FastApi模板信息成功';
   result.SetResultTrue;
 end;
-
 
 initialization
 

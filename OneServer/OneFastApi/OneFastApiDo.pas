@@ -50,6 +50,7 @@ type
     token: TOneTokenItem;
     postDataJson: TJsonObject;
 
+    dataJson: TJsonValue;
     pageJson: TJsonObject;
     //
     ClientZT: TOneZTItem;
@@ -81,6 +82,7 @@ function DoFastResultJson(QApiInfo: TFastApiInfo; QApiAll: TApiAll): TJsonValue;
 function DoOpenData(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 function DoDataStore(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 function DoDml(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
+function DoAppendDatas(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 
 function BuildDataSQLAndParams(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 function BuildFilterSQLAndParams(QApiData: TFastApiData; QApiFilter: TFastApiFilter; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
@@ -89,9 +91,12 @@ function BuildFilterParamValue(QApiAll: TApiAll; QApiFilter: TFastApiFilter; QPa
 function BuildDataToJsonArray(QApiData: TFastApiData; Query: TDataSet; QApiAll: TApiAll): TJsonArray;
 function BlobFieldToBase64(ABlobField: TBlobField): string;
 
+function BuildAppendDataSet(Query: TDataSet; QApiData: TFastApiData; QApiAll: TApiAll): boolean;
+function SetFieldValue(QDataField: TField; QApiField: TFastApiField; QDataJson: TJsonObject; QApiAll: TApiAll): boolean;
+
 implementation
 
-uses OneGlobal, OneGUID, OneStreamString;
+uses OneGlobal, OneUUID, OneGUID, OneStreamString;
 
 constructor TApiStepResult.Create;
 begin
@@ -142,6 +147,7 @@ begin
   self.postDataJson := nil;
   self.paramJson := nil;
   self.pageJson := nil;
+  self.dataJson := nil;
   self.ZTDict := nil;
   self.ClientZT := nil;
   self.StepResultList := TList<TApiStepResult>.Create;
@@ -164,6 +170,7 @@ begin
 
   token := nil;
   postDataJson := nil;
+  dataJson := nil;
   paramJson := nil;
   pageJson := nil;
   self.ZTDict := nil;
@@ -175,6 +182,7 @@ function TApiAll.GetZTItem(QZTCode: string): TOneZTItem;
 var
   lZTItem: TOneZTItem;
 begin
+  Result := nil;
   if self.ClientZT <> nil then
   begin
     Result := self.ClientZT;
@@ -279,6 +287,7 @@ begin
     try
       lApiAll.token := QToken;
       lApiAll.postDataJson := QPostDataJson;
+      lApiAll.dataJson := lApiDataJson;
       lApiAll.paramJson := TJsonObject(lApiParamJson);
       lApiAll.pageJson := TJsonObject(lApiPageJson);
       lApiAll.ZTDict := lZTItemDict;
@@ -716,6 +725,8 @@ begin
       appendDatas:
         begin
           // 批量增加数据
+          if not DoAppendDatas(lApiData, QApiAll, lStepResult) then
+            exit;
         end;
     end;
     if (lApiData.ChildDatas <> nil) and (lApiData.ChildDatas.Count > 0) then
@@ -870,6 +881,7 @@ begin
     QApiAll.errMsg := '校验存储过程失败,请检查是否有此存储过程[' + QApiData.FDataStoreName + ']';
     exit;
   end;
+  lPTResult := 0;
   // 参数处理
   for iParam := lFDStored.params.Count - 1 downto 0 do
   begin
@@ -1042,6 +1054,40 @@ begin
   END;
 end;
 
+// 批量增加数据
+function DoAppendDatas(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
+var
+  lZTItem: TOneZTItem;
+  LZTQuery: TFDQuery;
+begin
+  Result := false;
+  if QApiAll.dataJson = nil then
+  begin
+    QApiAll.errMsg := '提交的数据[apiData]为空!';
+    exit;
+  end;
+  // 获取账套
+  lZTItem := QApiAll.GetZTItem(QApiData.FDataZTCode);
+  // 打开一个空数据
+  LZTQuery := lZTItem.ADQuery;
+  LZTQuery.UpdateOptions.UpdateTableName := QApiData.FDataTable;
+  LZTQuery.UpdateOptions.KeyFields := QApiData.FDataPrimaryKey;
+  LZTQuery.SQL.Text := 'select * from ' + QApiData.FDataTable + ' where 1=2 ';
+  LZTQuery.Open();
+
+  // 开始打添加JSON数据
+  if not BuildAppendDataSet(LZTQuery, QApiData, QApiAll) then
+  begin
+    exit;
+  end;
+  // 保存数据有错,退出
+  if LZTQuery.ApplyUpdates(0) > 0 then
+  begin
+
+  end;
+  Result := true;
+end;
+
 function BuildDataSQLAndParams(QApiData: TFastApiData; QApiAll: TApiAll; QStepResult: TApiStepResult): boolean;
 var
   iFilter: integer;
@@ -1198,33 +1244,38 @@ begin
     end
     else if QApiFilter.FFilterDefaultType = 'fromSys' then
     begin
-      if tempValue = 'UnionID' then
+      if QApiFilter.FFilterDefaultValue = 'UnionID' then
       begin
         tempValue := QApiAll.UnionID;
       end
-      else if tempValue = 'SysGUID' then
+      else if QApiFilter.FFilterDefaultValue = 'SysGUID' then
       begin
         tempValue := OneGUID.GetGUID32;
       end
-      else if tempValue = 'SysDateTime' then
+      else if QApiFilter.FFilterDefaultValue = 'SysUUID' then
+      begin
+        tempValue := OneUUID.GetUUIDStr;
+      end
+      else if QApiFilter.FFilterDefaultValue = 'SysDateTime' then
       begin
         tempValue := FormatDateTime('yyyy-mm-dd hh:mm:ss', now);
       end
-      else if tempValue = 'SysDate' then
+      else if QApiFilter.FFilterDefaultValue = 'SysDate' then
       begin
         tempValue := FormatDateTime('yyyy-mm-dd', now);
       end
-      else if tempValue = 'SysTime' then
+      else if QApiFilter.FFilterDefaultValue = 'SysTime' then
       begin
         tempValue := FormatDateTime('hh:mm', now);
       end
-      else if tempValue = 'SysYear' then
+      else if QApiFilter.FFilterDefaultValue = 'SysYear' then
       begin
         tempValue := FormatDateTime('yyyy', now);
       end
       else
       begin
-        QApiAll.errMsg := '参数配置[' + QApiFilter.FFilterName + '],类型[' + QApiFilter.FFilterDefaultType + ']值[' + tempValue + ']未实现';
+        QApiAll.errMsg := '参数配置[' + QApiFilter.FFilterName + '],类型[' +
+          QApiFilter.FFilterDefaultType + ']值[' + QApiFilter.FFilterDefaultValue + ']未实现';
         exit;
       end;
     end
@@ -1246,6 +1297,7 @@ begin
   // 添加参数
   if tempValue = '' then
   begin
+    // 空值，存储过程执行DML需要添加参数
     if QApiData.DataOpenMode in [openDataStore, doStore] then
     begin
       if QApiFilter.FbOutParam then
@@ -1254,6 +1306,13 @@ begin
         lParam.Name := QApiFilter.FFilterField;
         lParam.ParamType := TParamType.ptInputOutput;
       end;
+    end
+    else if QApiData.DataOpenMode in [doDMLSQL] then
+    begin
+      // DMLSQL参数为空值时也要加参数
+      lParam := QStepResult.FBuildParams.AddParameter;
+      lParam.Name := QApiFilter.FFilterField;
+      lParam.Value := '';
     end;
   end
   else
@@ -1687,6 +1746,295 @@ begin
     Result := OneStreamString.StreamToBase64Str(LBlobStream);
   finally
     LBlobStream.Free;
+  end;
+end;
+
+function SetFieldValue(QDataField: TField; QApiField: TFastApiField; QDataJson: TJsonObject; QApiAll: TApiAll): boolean;
+var
+  lJSONPair: TJSONPair;
+  tempValue: string;
+begin
+  Result := false;
+  tempValue := '';
+  if 1 = 1 then
+  begin
+    if QApiField.FFieldDefaultValueType = 'fromConst' then
+    begin
+      // 固定常量
+      tempValue := QApiField.FFieldDefaultValue;
+    end
+    else if QApiField.FFieldDefaultValueType = 'fromJsonParam' then
+    begin
+      // 取Post上来的Json参数
+      lJSONPair := QDataJson.Get(QApiField.FFieldJsonName);
+      if lJSONPair <> nil then
+        tempValue := lJSONPair.JsonValue.Value
+      else if QApiField.FFieldIsMust then
+      begin
+        // JSON必需上传相关参数
+        QApiAll.errMsg := '参数配置[' + QApiField.FFieldJsonName + '],上传的数据必需要有此信息';
+        exit;
+      end;
+
+    end
+    else if QApiField.FFieldDefaultValueType = 'fromSysToken' then
+    begin
+      tempValue := QApiField.FFieldDefaultValue;
+      if tempValue = 'TokenID' then
+      begin
+        tempValue := QApiAll.token.TokenID;
+      end
+      else if tempValue = 'TokenUserID' then
+      begin
+        tempValue := QApiAll.token.SysUserID;
+      end
+      else if tempValue = 'TokenUserCode' then
+      begin
+        tempValue := QApiAll.token.SysUserCode;
+      end
+      else if tempValue = 'TokenUserName' then
+      begin
+        tempValue := QApiAll.token.SysUserName;
+      end
+      else if tempValue = 'TokenLoginCode' then
+      begin
+        tempValue := QApiAll.token.LoginUserCode;
+      end
+      else
+      begin
+        QApiAll.errMsg := '参数配置[' + QApiField.FFieldName + '],类型[' + QApiField.FFieldDefaultValueType + ']值[' + tempValue + ']未实现';
+        exit;
+      end;
+    end
+    else if QApiField.FFieldDefaultValueType = 'fromPData' then
+    begin
+      // 获取父级数据
+      tempValue := '';
+      QApiAll.errMsg := '参数配置[' + QApiField.FFieldName + '],类型[' + QApiField.FFieldDefaultValueType + ']未实现';
+      exit;
+    end
+    else if QApiField.FFieldDefaultValueType = 'fromSys' then
+    begin
+      if QApiField.FFieldDefaultValue = 'UnionID' then
+      begin
+        tempValue := QApiAll.UnionID;
+      end
+      else if QApiField.FFieldDefaultValue = 'SysGUID' then
+      begin
+        tempValue := OneGUID.GetGUID32;
+      end
+      else if QApiField.FFieldDefaultValue = 'SysUUID' then
+      begin
+        tempValue := OneUUID.GetUUIDStr;
+      end
+      else if QApiField.FFieldDefaultValue = 'SysDateTime' then
+      begin
+        tempValue := FormatDateTime('yyyy-mm-dd hh:mm:ss', now);
+      end
+      else if QApiField.FFieldDefaultValue = 'SysDate' then
+      begin
+        tempValue := FormatDateTime('yyyy-mm-dd', now);
+      end
+      else if QApiField.FFieldDefaultValue = 'SysTime' then
+      begin
+        tempValue := FormatDateTime('hh:mm', now);
+      end
+      else if QApiField.FFieldDefaultValue = 'SysYear' then
+      begin
+        tempValue := FormatDateTime('yyyy', now);
+      end
+      else
+      begin
+        QApiAll.errMsg := '参数配置[' + QApiField.FFieldName +
+          '],类型[' + QApiField.FFieldDefaultValueType + ']值[' + QApiField.FFieldDefaultValue + ']未实现';
+        exit;
+      end;
+    end
+    else
+    begin
+      QApiAll.errMsg := '参数配置[' + QApiField.FFieldName +
+        '],类型[' + QApiField.FFieldDefaultValueType + ']未设计';
+      exit;
+    end;
+  end;
+  // 要求有值
+  if QApiField.FFieldIsMustValue then
+  begin
+    if tempValue.Trim = '' then
+    begin
+      QApiAll.errMsg := '参数[' + QApiField.FFieldName + ']参数必需有值';
+      exit;
+    end;
+  end;
+  // 赋值
+  case QDataField.DataType of
+    TFieldType.ftString:
+      QDataField.AsString := tempValue;
+    TFieldType.ftWideString:
+      QDataField.AsWideString := tempValue;
+    TFieldType.ftSmallint:
+      QDataField.AsString := tempValue;
+    TFieldType.ftInteger:
+      QDataField.AsString := tempValue;
+    TFieldType.ftWord:
+      QDataField.AsString := tempValue;
+    TFieldType.ftBoolean:
+      QDataField.AsString := tempValue;
+    TFieldType.ftFloat:
+      QDataField.AsString := tempValue;
+    TFieldType.ftCurrency:
+      QDataField.AsString := tempValue;
+    TFieldType.ftBCD:
+      QDataField.AsString := tempValue;
+    TFieldType.ftDate:
+      QDataField.AsString := tempValue;
+    TFieldType.ftTime:
+      QDataField.AsString := tempValue;
+    TFieldType.ftDateTime:
+      QDataField.AsString := tempValue;
+    TFieldType.ftBytes:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftVarBytes:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftAutoInc:
+      QDataField.AsString := tempValue;
+    TFieldType.ftBlob:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftMemo:
+      QDataField.AsString := tempValue;
+    TFieldType.ftGraphic:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftTypedBinary:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftFixedChar:
+      QDataField.AsString := tempValue;
+
+    TFieldType.ftLargeint:
+      QDataField.AsString := tempValue;
+    TFieldType.ftADT:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftArray:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftOraBlob:
+      QDataField.AsBytes := TNetEncoding.Base64.DecodeStringToBytes(tempValue);
+    TFieldType.ftOraClob:
+      QDataField.AsString := tempValue;
+    TFieldType.ftVariant:
+      QDataField.AsString := tempValue;
+    TFieldType.ftGuid:
+      QDataField.AsString := tempValue;
+    TFieldType.ftTimeStamp:
+      QDataField.AsString := tempValue;
+    TFieldType.ftFMTBcd:
+      QDataField.AsString := tempValue;
+    TFieldType.ftFixedWideChar:
+      QDataField.AsString := tempValue;
+    TFieldType.ftWideMemo:
+      QDataField.AsWideString := tempValue;
+    TFieldType.ftOraTimeStamp:
+      QDataField.AsString := tempValue;
+    TFieldType.ftOraInterval:
+      QDataField.AsString := tempValue;
+    TFieldType.ftLongWord:
+      QDataField.AsString := tempValue;
+    TFieldType.ftShortint:
+      QDataField.AsString := tempValue;
+    TFieldType.ftByte:
+      QDataField.AsString := tempValue;
+    TFieldType.ftExtended:
+      QDataField.AsString := tempValue;
+    TFieldType.ftTimeStampOffset:
+      QDataField.AsString := tempValue;
+    TFieldType.ftSingle:
+      QDataField.AsString := tempValue;
+  end;
+  Result := true;
+end;
+
+function BuildAppendDataSet(Query: TDataSet; QApiData: TFastApiData; QApiAll: TApiAll): boolean;
+var
+  lApiField: TFastApiField;
+  iField, iArr: integer;
+  lDataFieldDict: TDictionary<string, TField>;
+  lField: TField;
+  lDataJsonArr: TJsonArray;
+  tempJson: TJsonValue;
+  tempJsonObj: TJsonObject;
+  isMustFreeArr: boolean;
+begin
+  Result := false;
+  lDataJsonArr := nil;
+  isMustFreeArr := false;
+  lDataFieldDict := TDictionary<string, TField>.Create;
+  try
+    // 遍历数据集字段，信息先保存起来
+    for iField := 0 to Query.Fields.Count - 1 do
+    begin
+      lField := Query.Fields[iField];
+      lDataFieldDict.Add(lField.FieldName.ToLower, lField);
+    end;
+
+    // 校验字段,是否全部存在
+    for iField := 0 to QApiData.ChildFields.Count - 1 do
+    begin
+      lApiField := QApiData.ChildFields[iField];
+      // 是否参与,后面看要不要这个标识，一般存添加数据字段多是要保存的
+      // if lApiField.FFieldProvidFlagUpdate then
+      if not lDataFieldDict.ContainsKey(lApiField.FFieldName.ToLower) then
+      begin
+        QApiAll.errMsg := 'Api设置字段[' + lApiField.FFieldName + ']在表[' + QApiData.FDataTable + ']不存在';
+        exit;
+      end;
+    end;
+    // 添加数据
+    if QApiAll.dataJson is TJsonArray then
+    begin
+      lDataJsonArr := TJsonArray(QApiAll.dataJson);
+    end
+    else if QApiAll.dataJson is TJsonObject then
+    begin
+      lDataJsonArr := TJsonArray.Create();
+      // 这边需要自已释放
+      isMustFreeArr := true;
+      lDataJsonArr.Add(TJsonObject(QApiAll.dataJson));
+    end;
+    for iArr := 0 to lDataJsonArr.Count - 1 do
+    begin
+      tempJson := lDataJsonArr.Items[iArr];
+      if not(tempJson is TJsonObject) then
+      begin
+        QApiAll.errMsg := '上传的ApiData里面的数据必需是Json对象{key:value}';
+        exit;
+      end;
+      tempJsonObj := TJsonObject(tempJson);
+      // 开始处理数据
+      Query.Append;
+      for iField := 0 to QApiData.ChildFields.Count - 1 do
+      begin
+        lApiField := QApiData.ChildFields[iField];
+        lField := lDataFieldDict.Items[lApiField.FFieldName.ToLower];
+        // 字段取值
+        if not SetFieldValue(lField, lApiField, tempJsonObj, QApiAll) then
+        begin
+          exit;
+        end;
+      end;
+      Query.Post;
+    end;
+
+    Result := true;
+  finally
+    lDataFieldDict.Clear;
+    lDataFieldDict.Free;
+    if isMustFreeArr then
+    begin
+      for iArr := lDataJsonArr.Count - 1 downto 0 do
+      begin
+        lDataJsonArr.Remove(iArr);
+      end;
+      lDataJsonArr.Free;
+    end;
+    lDataJsonArr := nil;
   end;
 end;
 

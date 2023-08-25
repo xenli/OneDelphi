@@ -1643,7 +1643,7 @@ begin
               else
                 lOneParam.ParamValue := varToStr(lFDParam.Value);
             end;
-          ftStream:
+          ftStream,ftBlob:
             begin
               // ×ª»¯³ÉBase64
               if lFDParam.IsNull then

@@ -101,22 +101,32 @@ begin
     Result := HTTP_NOTFOUND;
     exit;
   end;
-	try
-		lURI := System.Net.URLClient.TURI.Create('http://' + Ctxt.Host + Ctxt.Url);
-	except 
-		on e:exception do
-		begin
-			Ctxt.OutContent := UTF8Encode(e.Message);
-			Ctxt.OutContentType := TEXT_CONTENT_TYPE;
-			Result := 500;
-			exit;
-		end;
-	end;
+  try
+    lURI := System.Net.URLClient.TURI.Create('http://' + Ctxt.Host + Ctxt.Url);
+  except
+    on e: exception do
+    begin
+      Ctxt.OutContent := UTF8Encode(e.Message);
+      Ctxt.OutContentType := TEXT_CONTENT_TYPE;
+      Result := 500;
+      exit;
+    end;
+  end;
   lUrlPath := lURI.Path;
   lUrlPath := OneHttpCtxtResult.FormatRootName(lUrlPath);
   lwatchTimer := TStopwatch.StartNew;
   //
   try
+    if (self.FLog <> nil) and (self.FLog.IsHTTPLog) then
+    begin
+      self.FLog.WriteHTTPLog('请求URL:[' + Ctxt.Host + Ctxt.Url + ']');
+      self.FLog.WriteHTTPLog('请求头部:[' + Ctxt.InHeaders+ ']');
+      if not IsMultipartForm(Ctxt.InContentType) then
+      begin
+        self.FLog.WriteHTTPLog('请求内容:' + UTF8Decode(Ctxt.InContent));
+        // self.FLog.WriteHTTPLog('输出内容:' + Ctxt.OutContent);
+      end;
+    end;
     // 大异常处理,包一层,防止大异常没处理
     try
       // 解析URL调用相关路由方法
@@ -245,7 +255,6 @@ begin
         lFileName := OneFileHelper.CombineExeRunPathB('OnePlatform\OneWeb', lFileName);
         Ctxt.OutContent := UTF8Encode(lFileName);
         Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
-        Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
         Result := HTTP_SUCCESS;
         exit;
       end
@@ -270,7 +279,6 @@ begin
         lFileName := OneFileHelper.CombinePath(lPhy, lFileName);
         Ctxt.OutContent := UTF8Encode(lFileName);
         Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
-        Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
         Result := HTTP_SUCCESS;
         exit;
       end
@@ -281,7 +289,7 @@ begin
         exit;
       end;
     except
-      on e: Exception do
+      on e: exception do
       begin
         self.FLog.WriteLog('ExceptAll', e.Message);
         Ctxt.OutContent := UTF8Encode(e.Message);
@@ -294,13 +302,8 @@ begin
     lRequestMilSec := lwatchTimer.ElapsedMilliseconds;
     if (self.FLog <> nil) and (self.FLog.IsHTTPLog) then
     begin
-      self.FLog.WriteHTTPLog('请求用时:[' + lRequestMilSec.ToString + ']毫秒');
-      self.FLog.WriteHTTPLog('请求URL:[' + Ctxt.Host + Ctxt.Url + ']');
-      if not IsMultipartForm(Ctxt.InContentType) then
-      begin
-        self.FLog.WriteHTTPLog('请求内容:' + UTF8Decode(Ctxt.InContent));
-        // self.FLog.WriteHTTPLog('输出内容:' + Ctxt.OutContent);
-      end;
+      self.FLog.WriteHTTPLog('执行状态:[' + Result.ToString() + ']');
+      self.FLog.WriteHTTPLog('请求用时:[' + lRequestMilSec.ToString + ']');
     end;
   end;
 end;
@@ -313,6 +316,7 @@ begin
   self.FStopRequest := False;
   self.FPort := 9090;
   self.FThreadPoolCount := 100;
+  // HTTP短连接即来即去没必要保持请求完后，还保持连接
   self.FKeepAliveTimeOut := 0;
   self.FHttpQueueLength := 1000;
   self.FHttpServer := nil;
@@ -390,7 +394,7 @@ begin
     self.FStarted := True;
     Result := True;
   except
-    on e: Exception do
+    on e: exception do
     begin
       self.FErrMsg := '启动服务器失败,原因:' + e.Message + ';解决方案可偿试管理员启动程序或换个端口临听（端口重复绑定）。';
       self.FHttpServer.Free;

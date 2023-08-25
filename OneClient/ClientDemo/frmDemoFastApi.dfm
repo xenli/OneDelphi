@@ -199,7 +199,7 @@ object frDemoFastApi: TfrDemoFastApi
         Height = 594
         Align = alClient
         TabOrder = 0
-        Properties.ActivePage = tabSheetDataInfo
+        Properties.ActivePage = tabSheetField
         Properties.CustomButtons.Buttons = <>
         Properties.Style = 10
         ExplicitWidth = 996
@@ -210,6 +210,8 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetDataInfo: TcxTabSheet
           Caption = #25968#25454#38598#20449#24687
           ImageIndex = 0
+          ExplicitWidth = 996
+          ExplicitHeight = 572
           object Panel10: TPanel
             Left = 0
             Top = 0
@@ -217,6 +219,7 @@ object frDemoFastApi: TfrDemoFastApi
             Height = 137
             Align = alTop
             TabOrder = 0
+            ExplicitWidth = 996
             object cxLabel5: TcxLabel
               Left = 4
               Top = 6
@@ -438,6 +441,8 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alClient
             Caption = 'SQL'#35821#21477#21450'SQL'#21442#25968'--->SQL'#22266#23450#26465#20214#34892' and 101=102'
             TabOrder = 1
+            ExplicitWidth = 996
+            ExplicitHeight = 435
             Height = 436
             Width = 1000
             object dbFDataSQL: TcxDBMemo
@@ -448,6 +453,8 @@ object frDemoFastApi: TfrDemoFastApi
               DataBinding.DataSource = dsData
               Properties.ScrollBars = ssBoth
               TabOrder = 0
+              ExplicitWidth = 992
+              ExplicitHeight = 413
               Height = 414
               Width = 996
             end
@@ -536,6 +543,77 @@ object frDemoFastApi: TfrDemoFastApi
                 DataBinding.FieldName = 'FFieldJsonName'
                 Width = 100
               end
+              object vwFieldFFieldDefaultValueType: TcxGridDBColumn
+                DataBinding.FieldName = 'FFieldDefaultValueType'
+                PropertiesClassName = 'TcxImageComboBoxProperties'
+                Properties.Items = <
+                  item
+                    Description = #22266#23450#24120#37327
+                    ImageIndex = 0
+                    Value = 'fromConst'
+                  end
+                  item
+                    Description = #21069#31471#21442#25968#21462#20540
+                    Value = 'fromJsonParam'
+                  end
+                  item
+                    Description = #31995#32479#29992#25143#20449#24687
+                    Value = 'fromSysToken'
+                  end
+                  item
+                    Description = #31995#32479#24120#37327#21462#20540
+                    Value = 'fromSys'
+                  end>
+                Width = 100
+              end
+              object vwFieldFFieldDefaultValue: TcxGridDBColumn
+                DataBinding.FieldName = 'FFieldDefaultValue'
+                PropertiesClassName = 'TcxComboBoxProperties'
+                Properties.Items.Strings = (
+                  #8212#8212#8212#8212#31995#32479#29992#25143#20449#24687#8212#8212#8212#8212
+                  '--'#30331#38470#29992#25143'TokenID'
+                  'TokenID'
+                  '--'#30331#38470#29992#25143'ID'
+                  'TokenUserID'
+                  '--'#30331#38470#29992#25143#20195#30721
+                  'TokenUserCode'
+                  '--'#30331#38470#29992#25143#21517#31216
+                  'TokenUserName'
+                  '--'#30331#38470#29992#25143#30331#38470#20195#30721
+                  'TokenLoginCode'
+                  #8212#8212#8212#8212#31995#32479#24120#37327#21462#20540#8212#8212#8212#8212
+                  '--'#26412#27425#25805#20316'Api'#35831#27714#20851#32852'ID'
+                  'UnionID'
+                  '--'#21462'32'#20301'GUID'
+                  'SysGUID'
+                  '--'#21462#25972#22411'ID'
+                  'SysUUID'
+                  '--'#21462#26102#38388'  yyyy-mm-dd hh:mm:ss'
+                  'SysDateTime'
+                  '--'#21462#26085#26399' yyyy-mm-dd'
+                  'SysDate'
+                  '--'#21462#26102#38388' hh:mm'
+                  'SysTime'
+                  '--'#21462#24180#20221' yyyy'
+                  'SysYear'
+                  #8212#8212#8212#8212#29238#32423#25968#25454#21462#20540':'#22635#20889#29238#32423#25968#25454#23383#27573#8212#8212#8212#8212
+                  #8212#8212#8212#8212#22266#23450#24120#37327':'#20540#26159#20160#20040#23601#21462#20160#20040#8212#8212#8212#8212
+                  #8212#8212#8212#8212#21069#31471#21442#25968#21462#20540':'#21462#21069#31471'JSON'#21517#31216#23545#24212#30340#21442#25968#20540#8212#8212#8212#8212
+                  '')
+                Width = 100
+              end
+              object vwFieldFFieldIsMust: TcxGridDBColumn
+                DataBinding.FieldName = 'FFieldIsMust'
+                PropertiesClassName = 'TcxCheckBoxProperties'
+                Properties.NullStyle = nssUnchecked
+                Width = 80
+              end
+              object vwFieldFFieldIsMustValue: TcxGridDBColumn
+                DataBinding.FieldName = 'FFieldIsMustValue'
+                PropertiesClassName = 'TcxCheckBoxProperties'
+                Properties.NullStyle = nssUnchecked
+                Width = 72
+              end
               object vwFieldFFieldKind: TcxGridDBColumn
                 DataBinding.FieldName = 'FFieldKind'
                 Width = 100
@@ -576,20 +654,12 @@ object frDemoFastApi: TfrDemoFastApi
                 DataBinding.FieldName = 'FFieldProvidFlagWhere'
                 Width = 100
               end
-              object vwFieldFFieldDefaultValueType: TcxGridDBColumn
-                DataBinding.FieldName = 'FFieldDefaultValueType'
-                Width = 100
-              end
-              object vwFieldFFieldDefaultValue: TcxGridDBColumn
-                DataBinding.FieldName = 'FFieldDefaultValue'
+              object vwFieldFFieldSaveCheckEmpty: TcxGridDBColumn
+                DataBinding.FieldName = 'FFieldCheckEmpty'
                 Width = 100
               end
               object vwFieldFFieldShowPassChar: TcxGridDBColumn
                 DataBinding.FieldName = 'FFieldShowPass'
-                Width = 100
-              end
-              object vwFieldFFieldSaveCheckEmpty: TcxGridDBColumn
-                DataBinding.FieldName = 'FFieldCheckEmpty'
                 Width = 100
               end
             end
@@ -601,8 +671,6 @@ object frDemoFastApi: TfrDemoFastApi
         object tabSheetParams: TcxTabSheet
           Caption = #26465#20214#21442#25968#35774#32622
           ImageIndex = 2
-          ExplicitWidth = 996
-          ExplicitHeight = 572
           object Panel11: TPanel
             Left = 0
             Top = 0
@@ -611,7 +679,6 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 0
-            ExplicitWidth = 996
             object tbParamsGet: TcxButton
               Left = 5
               Top = 4
@@ -650,8 +717,6 @@ object frDemoFastApi: TfrDemoFastApi
             Height = 345
             Align = alClient
             TabOrder = 1
-            ExplicitWidth = 996
-            ExplicitHeight = 344
             object vwParam: TcxGridDBBandedTableView
               Navigator.Buttons.CustomButtons = <>
               ScrollbarAnnotations.CustomAnnotations = <>
@@ -842,6 +907,8 @@ object frDemoFastApi: TfrDemoFastApi
                   'UnionID'
                   '--'#21462'32'#20301'GUID'
                   'SysGUID'
+                  '--'#21462#25972#22411'ID'
+                  'SysUUID'
                   '--'#21462#26102#38388'  yyyy-mm-dd hh:mm:ss'
                   'SysDateTime'
                   '--'#21462#26085#26399' yyyy-mm-dd'
@@ -885,8 +952,6 @@ object frDemoFastApi: TfrDemoFastApi
             Align = alBottom
             Caption = #36807#28388#27169#24335'->'#22810#23383#27573#25110#20540#36873#25321
             TabOrder = 2
-            ExplicitTop = 379
-            ExplicitWidth = 996
             Height = 193
             Width = 1000
             object dbFFilterFieldItems: TcxDBMemo
@@ -920,7 +985,6 @@ object frDemoFastApi: TfrDemoFastApi
                 '---'#36755#20837'3'#21462#24471'SQL and 1=1 '#32452#35013)
               ScrollBars = ssBoth
               TabOrder = 1
-              ExplicitWidth = 442
             end
           end
         end
@@ -1025,6 +1089,10 @@ object frDemoFastApi: TfrDemoFastApi
         Height = 594
         Align = alClient
         Lines.Strings = (
+          '----20230812'#33050#26412#22686#21152'---'
+          'alter table onefast_api_field add FFieldIsMust bit'
+          'alter table onefast_api_field add FFieldIsMustValue bit'
+          ''
           '----20230527'#33050#26412#22686#21152'---'
           'alter table onefast_api_field add FFieldFormat nvarchar(20)'
           ''
@@ -1087,6 +1155,8 @@ object frDemoFastApi: TfrDemoFastApi
           #9'FFieldShowPass bit NULL,'
           #9'FFieldCheckEmpty bit NULL,'
           '        FFieldFormat nvarchar(20) Null,'
+          '        FFieldIsMust  bit NULL,'
+          '        FFieldIsMustValue bit Null'
           ')'
           '-------FastApi'#26465#20214#34920'-------------'
           'CREATE TABLE dbo.onefast_api_filter('
@@ -2108,6 +2178,14 @@ object frDemoFastApi: TfrDemoFastApi
     object qryFieldFFieldCheckEmpty: TBooleanField
       DisplayLabel = #26816#31354
       FieldName = 'FFieldCheckEmpty'
+    end
+    object qryFieldFFieldIsMust: TBooleanField
+      DisplayLabel = #24517#38656#23383#27573
+      FieldName = 'FFieldIsMust'
+    end
+    object qryFieldFFieldIsMustValue: TBooleanField
+      DisplayLabel = #24517#38656#26377#20540
+      FieldName = 'FFieldIsMustValue'
     end
   end
   object qryFilter: TOneDataSet

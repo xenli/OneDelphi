@@ -146,7 +146,7 @@ end;
 
 procedure TOneControllerBase.RemoveCurrentThreadLock(QThreadID: TThreadID);
 begin
-  if QThreadID > 0 then
+  if QThreadID >= 0 then
   begin
     FCurrentThreadLocks.Remove(QThreadID);
   end;
