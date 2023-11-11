@@ -101,6 +101,12 @@ begin
     Result := HTTP_NOTFOUND;
     exit;
   end;
+  if (Ctxt.Host='') then
+  begin
+    //有些恶意的这个为空
+    Result := HTTP_NOTFOUND;
+    exit;
+  end;
   try
     lURI := System.Net.URLClient.TURI.Create('http://' + Ctxt.Host + Ctxt.Url);
   except

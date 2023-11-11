@@ -235,6 +235,7 @@
         <DCCReference Include="OneFastCleint\OneFastPlatManage.pas"/>
         <DCCReference Include="httpServer\Controller\TestApiController.pas"/>
         <DCCReference Include="OneFastApi\OneFastReportController.pas"/>
+        <DCCReference Include="OneUniDemo\UniFileDownController.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

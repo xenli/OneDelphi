@@ -110,7 +110,8 @@ uses
   TestApiController in 'httpServer\Controller\TestApiController.pas',
   OneFastReportController in 'OneFastApi\OneFastReportController.pas',
   Vcl.Themes,
-  Vcl.Styles;
+  Vcl.Styles,
+  UniFileDownController in 'OneUniDemo\UniFileDownController.pas';
 
 var
   lpStartupInfo: TStartupInfo;
