@@ -7,6 +7,26 @@
 ------OneFastCleint
 	快速开发框架,或报表或原型快速演示
 
+************2023-12-08***********
+服务端:
+	1.增加10分钟未交互的连接,主动断掉，重连。。。
+                主要有的驱动或数据库配置你保活没用。。。久的连接会未明其妙挂了。倒不如断开重连下，太久没交互的连接
+	主要更改以下方法，增加两个保活机制
+                function TOneZTPool.LockZTItem(var QErrMsg: string): TOneZTItem;  
+
+               if SecondsBetween(Now, lZTItem.FLastTime) >= 600 then
+               begin
+                  lZTItem.ADConnection.Close(True);
+                  lZTItem.ADConnection.Open;
+               end;         
+
+                同上面也是为了保证数据库是连接情况下，才使用账套
+                if (not lZTItem.ADConnection.Connected) then
+               begin
+                 //判断状态如果未连接重新连接下
+                 lZTItem.ADConnection.Open;
+                end;   
+
 ************2023-09-14***********
 服务端:
 	1.服务端增加Demo OneUniDemo\UniFileDownController

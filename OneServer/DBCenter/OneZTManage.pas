@@ -110,6 +110,7 @@ type
     FLastTime: TDateTime;
     // 不工作时释放
     FUnLockFree: boolean;
+
   private
     // 单纯获取一个连接 FDConnection
     function GetADConnection: TFDConnection;
@@ -659,7 +660,17 @@ begin
         if self.FZTItems[i].IsWorking then
           continue;
         lZTItem := self.FZTItems[i];
-        // 找到一个中断
+        // 找到一个中断，同时如果很久没交互,重新断开连接交互
+        // 10分钟没交互,断开连接重新连
+        if SecondsBetween(Now(), lZTItem.FLastTime) > 600 then
+        begin
+          try
+            lZTItem.ADConnection.Close;
+            lZTItem.ADConnection.Open;
+          except
+
+          end;
+        end;
         break;
       end;
     end;
@@ -683,6 +694,11 @@ begin
     // 工作量加1
     lZTItem.IsWorking := true;
     self.FPoolWorkCount := self.FPoolWorkCount + 1;
+    if (not lZTItem.ADConnection.Connected) then
+    begin
+      // 判断状态如果未连接重新连接下
+      lZTItem.ADConnection.Open;
+    end;
     Result := lZTItem;
   finally
     TMonitor.exit(self.FLockObj);
@@ -843,7 +859,11 @@ var
 BEGIN
   Result := nil;
   QErrMsg := '';
-  TMonitor.Enter(FLockObject);
+  if not TMonitor.TryEnter(self.FLockObject) then
+  begin
+    QErrMsg := '账套池[' + QZTCode + ']获取锁失败!!!';
+    exit;
+  end;
   try
     if FStop then
     begin
@@ -1773,7 +1793,7 @@ begin
                 begin
                   LZTQuery.Params[iParam].AsStream := OneStreamString.Base64ToStream(LOneParam.ParamValue);
                 end
-                 else if lFieldType = TFieldType.ftBlob then
+                else if lFieldType = TFieldType.ftBlob then
                 begin
                   LZTQuery.Params[iParam].AsStream := OneStreamString.Base64ToStream(LOneParam.ParamValue);
                 end

@@ -7,7 +7,7 @@ uses OneHttpController, OneHttpCtxtResult, OneHttpRouterManage, System.SysUtils,
   FireDAC.Comp.Client, Data.DB, System.JSON, System.IOUtils;
 
 type
-  TPersonResult = class
+  TPersonResult = class(TObject)
   private
     FPerson: TPersonDemo;
     FResultCode: string;
@@ -53,6 +53,7 @@ type
     procedure TestNoParam();
     //
     function TestStr(): string;
+    function TestStrList(qList: TList<string>): string;
     // 代函数返回值
     function GetStr(): string;
     function GetInt(): integer;
@@ -211,6 +212,7 @@ begin
   lPersonDemo := TPersonDemo.Create;
   lPersonDemo.name := '范联满flm123';
   lPersonDemo.age := 32;
+  lPersonDemo.Parent :='爸爸';
   result := lPersonDemo;
 end;
 
@@ -354,6 +356,18 @@ begin
   result := 'TestStr';
 end;
 
+function TDemoController.TestStrList(qList: TList<string>): string;
+var
+  tempStr: string;
+  i: integer;
+begin
+  for i := 0 to qList.Count - 1 do
+  begin
+     tempStr := tempStr+','+ qList[i];
+  end;
+  result := tempStr;
+end;
+
 function TDemoController.OneGetName(name: string): string;
 begin
   result := '上传的Url参数name=' + name;
@@ -366,6 +380,7 @@ begin
   lPersonDemo := TPersonDemo.Create;
   lPersonDemo.name := name;
   lPersonDemo.age := age;
+  lPersonDemo.Parent := '爸爸';
   result := lPersonDemo;
 end;
 

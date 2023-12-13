@@ -29,9 +29,11 @@ type
   private
     FaName: string;
     FAag: integer;
+    FParent:string;
   public
     property name: string read FaName write FaName;
     property age: integer read FAag write FAag;
+    property Parent: string read FParent write FParent;
   end;
 
   TPersonrecord = record
