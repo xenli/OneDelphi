@@ -55,26 +55,37 @@ QQ群：814696487（原来的群被封了，请加新群）
 
 ## 更新日志
 
-************2023-12-08***********
-服务端:
-	1.增加10分钟未交互的连接,主动断掉，重连。。。
-                主要有的驱动或数据库配置你保活没用。。。久的连接会未明其妙挂了。倒不如断开重连下，太久没交互的连接
-	主要更改以下方法，增加两个保活机制
-                function TOneZTPool.LockZTItem(var QErrMsg: string): TOneZTItem;  
+************2023-12-15***********  
+服务端:  
+	1.增加自增ID数据集保存时,返回正确的获取自增ID后的数据集  
 
-               if SecondsBetween(Now, lZTItem.FLastTime) >= 600 then
-               begin
-                  lZTItem.ADConnection.Close(True);
-                  lZTItem.ADConnection.Open;
-               end;         
+客户端:  
+	2.增加自增ID数据集Demo  OneClientDemo   
+	其数据集 Data.DataInfo.IsReturnData := true 即可原数据取回  
+	当设置 DataInfo.IsReturnData := true 是整个数据集提交，整个返回加载  
+	不适用于大数据。。。增大传输压力，个人建议主键还是不要用自增,OneClientDataset提供了方便的获取整型ID的方法  
+	请认真看各个DEMO  
+	
+************2023-12-08***********  
+服务端:  
+	1.增加10分钟未交互的连接,主动断掉，重连。。。  
+                主要有的驱动或数据库配置你保活没用。。。久的连接会未明其妙挂了。倒不如断开重连下，太久没交互的连接  
+	主要更改以下方法，增加两个保活机制  
+                function TOneZTPool.LockZTItem(var QErrMsg: string): TOneZTItem;    
 
-                同上面也是为了保证数据库是连接情况下，才使用账套
-                if (not lZTItem.ADConnection.Connected) then
+               if SecondsBetween(Now, lZTItem.FLastTime) >= 600 then  
                begin
-                 //判断状态如果未连接重新连接下
-                 lZTItem.ADConnection.Open;
-                end;   
-				
+                  lZTItem.ADConnection.Close(True);  
+                  lZTItem.ADConnection.Open;  
+               end;          
+
+                同上面也是为了保证数据库是连接情况下，才使用账套  
+                if (not lZTItem.ADConnection.Connected) then  
+               begin  
+                 //判断状态如果未连接重新连接下  
+                 lZTItem.ADConnection.Open;  
+                end;     
+				 
 ************2023-09-14***********
 服务端:
 	1.服务端增加Demo OneUniDemo\UniFileDownController

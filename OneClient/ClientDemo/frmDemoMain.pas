@@ -81,6 +81,7 @@ type
     tbClientDisConnect: TButton;
     GroupBox1: TGroupBox;
     edNoJoinFields: TMemo;
+    dbRetureData: TCheckBox;
     procedure tbClientConnectClick(Sender: TObject);
     procedure tbOpenDataClick(Sender: TObject);
     procedure tbSaveDataClick(Sender: TObject);
@@ -110,7 +111,15 @@ begin
     showMessage('请先打开数据集');
     exit;
   end;
+//  if dbRetureData.Checked then
+//  begin
+//    qryOpenData.FieldByName(edPrimaryKey.Text).AutoGenerateValue := TAutoRefreshFlag.arNone;
+//  end;
   qryOpenData.Append;
+  // if dbRetureData.Checked then
+  // begin
+  // qryOpenData.FieldByName(edPrimaryKey.Text).AsInteger := -1;
+  // end;
 end;
 
 procedure TfrDemoMain.tbClientConnectClick(Sender: TObject);
@@ -285,6 +294,8 @@ begin
   qryOpenData.DataInfo.Connection := OneConnection;
   qryOpenData.DataInfo.TableName := edTableName.Text;
   qryOpenData.DataInfo.PrimaryKey := edPrimaryKey.Text;
+  // 有自增ID的这个打勾即可
+  qryOpenData.DataInfo.IsReturnData := dbRetureData.Checked;
   if qryOpenData.State in dsEditModes then
     qryOpenData.Post;
   // 两个方法多行，最终调用同一个方法

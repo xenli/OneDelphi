@@ -9,7 +9,7 @@ uses
   system.Net.HttpClient, system.JSON, Rest.JSON, system.Net.URLClient,
   FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageBin, FireDAC.Phys.Intf,
   FireDAC.Stan.StorageJSON, FireDAC.Stan.StorageXML, system.TypInfo,
-  OneClientResult, OneNeonHelper, OneClientDataInfo, OneStreamString,
+  OneClientResult, OneNeonHelper, OneClientDataInfo, OneStreamString, FireDAC.Comp.DataSet,
   OneSQLCrypto, FireDAC.Stan.Param, system.Zip, system.Math, system.NetEncoding;
 
 const
@@ -1602,7 +1602,11 @@ begin
       begin
         lTemStream := TMemoryStream.Create;
         try
-          lOneDataSet.ResourceOptions.StoreItems := [siMeta, siDelta];
+          if lOneDataSet.DataInfo.IsReturnData then
+            // 提交整个数据集，和返回整个数据集,用在自增
+            lOneDataSet.ResourceOptions.StoreItems := [sidata, siMeta, siDelta]
+          else
+            lOneDataSet.ResourceOptions.StoreItems := [siMeta, siDelta];
           lOneDataSet.SaveToStream(lTemStream, sfBinary);
           lSaveDML.SaveData := OneStreamString.StreamToBase64Str(lTemStream);
         finally
@@ -1643,7 +1647,7 @@ begin
               else
                 lOneParam.ParamValue := varToStr(lFDParam.Value);
             end;
-          ftStream,ftBlob:
+          ftStream, ftBlob:
             begin
               // 转化成Base64
               if lFDParam.IsNull then
@@ -1826,12 +1830,13 @@ begin
             QErrMsg := '数据集[' + lOneDataSet.Name + ']流写入字符串出错';
             exit;
           end;
-          if lCacleList[i] then
+          if (lCacleList[i]) or (lOneDataSet.DataInfo.IsReturnData and QIsSave) then
           begin
             // 有计算字段的比较特殊加载模式
             tempOneDataSet := TFDMemtable.Create(nil);
             try
               tempOneDataSet.LoadFromStream(lTemStream, sfBinary);
+              // lOneDataSet.CopyDataSet(tempOneDataSet);
               lOneDataSet.MergeDataSet(tempOneDataSet, dmDataSet, mmNone);
             finally
               tempOneDataSet.Free;

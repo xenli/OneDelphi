@@ -328,8 +328,7 @@ begin
       begin
         if lDataResultItem.FTempStream <> nil then
         begin
-          lDataResultItem.ResultContext := OneStreamString.StreamToBase64Str
-            (lDataResultItem.FTempStream);
+          lDataResultItem.ResultContext := OneStreamString.StreamToBase64Str(lDataResultItem.FTempStream);
           // 即时释放内存
           lDataResultItem.FTempStream.Clear;
           lDataResultItem.FTempStream.Free;

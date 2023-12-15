@@ -113,7 +113,7 @@ object frDemoMain: TfrDemoMain
     Top = 80
     Width = 899
     Height = 479
-    ActivePage = tabDML
+    ActivePage = tabDataSet
     Align = alClient
     TabOrder = 2
     ExplicitWidth = 895
@@ -226,7 +226,7 @@ object frDemoMain: TfrDemoMain
       end
       object tbOpenData: TButton
         Left = 60
-        Top = 206
+        Top = 228
         Width = 106
         Height = 25
         Caption = #25171#24320#25968#25454
@@ -249,7 +249,7 @@ object frDemoMain: TfrDemoMain
       end
       object tbAppend: TButton
         Left = 172
-        Top = 206
+        Top = 228
         Width = 113
         Height = 25
         Caption = #22686#21152#37197#32622
@@ -258,7 +258,7 @@ object frDemoMain: TfrDemoMain
       end
       object tbDel: TButton
         Left = 307
-        Top = 206
+        Top = 228
         Width = 144
         Height = 25
         Caption = #21024#38500#19968#26465#25968#25454
@@ -267,7 +267,7 @@ object frDemoMain: TfrDemoMain
       end
       object DBGrid1: TDBGrid
         Left = 60
-        Top = 237
+        Top = 259
         Width = 549
         Height = 172
         DataSource = dsOpenData
@@ -286,7 +286,7 @@ object frDemoMain: TfrDemoMain
       end
       object tbSaveData: TButton
         Left = 465
-        Top = 206
+        Top = 228
         Width = 144
         Height = 25
         Caption = #20445#23384#25968#25454
@@ -295,7 +295,7 @@ object frDemoMain: TfrDemoMain
       end
       object GroupBox1: TGroupBox
         Left = 615
-        Top = 237
+        Top = 259
         Width = 234
         Height = 172
         Caption = #19981#21442#19982#20445#23384#30340#23383#27573#19968#34892#19968#20010
@@ -309,6 +309,14 @@ object frDemoMain: TfrDemoMain
           ScrollBars = ssVertical
           TabOrder = 0
         end
+      end
+      object dbRetureData: TCheckBox
+        Left = 121
+        Top = 205
+        Width = 97
+        Height = 17
+        Caption = #33258#22686#36820#22238#25968#25454
+        TabOrder = 14
       end
     end
     object tabDML: TTabSheet

@@ -1834,8 +1834,9 @@ begin
           if not lZTItem.FCustTran then
             lZTItem.ADTransaction.Commit;
         end;
-        QOneDataResult.ResultOK := true;
         isCommit := true;
+        QOneDataResult.ResultOK := true;
+        Result := true;
       except
         on e: Exception do
         begin
