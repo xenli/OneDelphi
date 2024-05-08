@@ -55,16 +55,16 @@ QQ群：814696487（原来的群被封了，请加新群）
 
 ## 更新日志
 
-*****************2024-04-30*****************
-服务端:
+*****************2024-04-30*****************  
+服务端:  
 	1:承担web站点时，增加mjs文件头部的输出
-	OneHttpServer单元 GetCustContentType 如果系统返回的不一样。这边自定义一些就好了
-客户端:
- 	1.文件分块上传，返回文件名的问题处理，详细看demo 
+	OneHttpServer单元 GetCustContentType 如果系统返回的不一样。这边自定义一些就好了  
+客户端:  
+ 	1.文件分块上传，返回文件名的问题处理，详细看demo   
 
-*****************2024-04-10*****************
-服务端: 增加 TOneAuthor=> TCustomAttribute 注解,需授权验证才可以访问API接口
-   增加Demo TDemoAuthorController 使用例子
+*****************2024-04-10*****************  
+服务端: 增加 TOneAuthor=> TCustomAttribute 注解,需授权验证才可以访问API接口  
+   增加Demo TDemoAuthorController 使用例子  
    TDemoAuthorController = class(TOneControllerBase)
   public
     // 建议使用方式
@@ -86,87 +86,89 @@ QQ群：814696487（原来的群被封了，请加新群）
   end;
         
 
-*****************2024-04-05*****************
-服务端: 增加 TOneRouter=> TCustomAttribute 注解
-            增加匿名路由,如下Demo DemoAttributeController
-              //增加匿名路由,访问地址如下
-             //http://127.0.0.1:9090/DemoAttribute/mytest
-             //而不是 http://127.0.0.1:9090/DemoAttribute/CustRouter
-    [TOneRouter('/mytest')]
-    [TOneHttpPost]
-    function CustRouter(name: string; sex: string): string;
+*****************2024-04-05*****************  
+服务端: 
+    增加 TOneRouter=> TCustomAttribute 注解  
+            增加匿名路由,如下Demo DemoAttributeController  
+              //增加匿名路由,访问地址如下  
+             //http://127.0.0.1:9090/DemoAttribute/mytest  
+             //而不是 http://127.0.0.1:9090/DemoAttribute/CustRouter  
+    [TOneRouter('/mytest')]  
+    [TOneHttpPost]  
+    function CustRouter(name: string; sex: string): string;  
+
+  
+*****************2024-04-04*****************  
+服务端: 
+    增加 TCustomAttribute 注解相关功能,慢慢升级吧。大多人理解不了这些东东，  
+	Attribute功能玩法有很多，高版本D才支持，这也是我一直不加上去的原因。。。   
+                思考在三后，还是加了，慢慢增加一些Attribute高级玩法，  
+	升级这些多很快，我也就好了半小时，增加此功能。。OnePascel本身就易于扩展自已想要的东东  
+           1.参考服务端Demo  DemoAttributeController  
+  如下：	 
+   type  
+  TDemoAttributeController = class(TOneControllerBase)  
+     //取参数取的是ULR ?后面的参数,且只支持Get访问,不需要以OneGet开头  
+    [TOneHttpGet]  
+    function GetTest(name: string;sex:string): string;  
+ 
+     //取参数取的是ULR路径的参数 /url路径/myname/mysex;,不需要以OnePath开头  
+    [TOneHttpPath]  
+    function GetPath(name: string;sex:string): string;  
+
+    //取参数取的是post Data数据且为JSON格式,且只支持Post访问,不需要以OnePost开头  
+    [TOneHttpPost]  
+    function PostTest(name: string;sex:string): string;  
+
+     //取参数取的是post Data数据,且只支持Post访问  
+     //data数据是表单格式 key1=value1&key2=value2  
+     //数据之间是用&关联  
+    [TOneHttpForm]  
+    function PostForm(name: string;sex:string): string;  
 
 
-*****************2024-04-04*****************
-服务端: 增加 TCustomAttribute 注解相关功能,慢慢升级吧。大多人理解不了这些东东，
-	Attribute功能玩法有很多，高版本D才支持，这也是我一直不加上去的原因。。。
-                思考在三后，还是加了，慢慢增加一些Attribute高级玩法，
-	升级这些多很快，我也就好了半小时，增加此功能。。OnePascel本身就易于扩展自已想要的东东
-           1.参考服务端Demo  DemoAttributeController
-  如下：	
-   type
-  TDemoAttributeController = class(TOneControllerBase)
-  public
-     //取参数取的是ULR ?后面的参数,且只支持Get访问,不需要以OneGet开头
-    [TOneHttpGet]
-    function GetTest(name: string;sex:string): string;
-
-     //取参数取的是ULR路径的参数 /url路径/myname/mysex;,不需要以OnePath开头
-    [TOneHttpPath]
-    function GetPath(name: string;sex:string): string;
-
-    //取参数取的是post Data数据且为JSON格式,且只支持Post访问,不需要以OnePost开头
-    [TOneHttpPost]
-    function PostTest(name: string;sex:string): string;
-
-     //取参数取的是post Data数据,且只支持Post访问
-     //data数据是表单格式 key1=value1&key2=value2
-     //数据之间是用&关联
-    [TOneHttpForm]
-    function PostForm(name: string;sex:string): string;
-
-
-  end;
+  end;  
 
 
 
  
-*****************2024-03-30*****************
-服务端:由httpanyServer改成httpserver
-           momrmot2的httpanyserver在某此场景环境不极其不稳定
+*****************2024-03-30*****************  
+服务端:  
+    由httpanyServer改成httpserver   
+           momrmot2的httpanyserver在某此场景环境不极其不稳定  
 
-*****************2024-01-28*****************
-主要进行控件升级mormot2升级,neo控件升级
+*****************2024-01-28*****************  
+主要进行控件升级mormot2升级,neo控件升级  
 
 
-*****************2024-01-13*****************
-服务端增加web目录功能:
-	1.OneWeb目录,Exe运行程序下同级目录  OnePlatform\OneWeb 承担web站点
-                   我的Exe路径 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug
-	   访问路径示例如下 http://127.0.0.1:9090/oneweb/index.html 
-                   即访问目录 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\index.html 网站
-	   访问路径示例如下 http://127.0.0.1:9090/oneweb/myjxc/index.html 
-                   即访问目录 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\myjxc\index.html 网站
+*****************2024-01-13*****************  
+服务端增加web目录功能:  
+	1.OneWeb目录,Exe运行程序下同级目录  OnePlatform\OneWeb 承担web站点  
+                   我的Exe路径 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug  
+	   访问路径示例如下 http://127.0.0.1:9090/oneweb/index.html   
+                   即访问目录 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\index.html 网站  
+	   访问路径示例如下 http://127.0.0.1:9090/oneweb/myjxc/index.html   
+                   即访问目录 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\myjxc\index.html 网站  
                  
-	 2.HTTP访问路径  http://127.0.0.1:9090/onewebv/虚拟目录代码/index.html 
-                   访问的是虚拟目录的站点,其它功能是oneWeb类似，oneWeb只是固定目录,onewebv 可以访问自定义目录
+	2.HTTP访问路径  http://127.0.0.1:9090/onewebv/虚拟目录代码/index.html   
+                   访问的是虚拟目录的站点,其它功能是oneWeb类似，oneWeb只是固定目录,onewebv 可以访问自定义目录  
                 
-                 3. OneFile 目录,Exe运行程序下同级目录  OnePlatform\OneFile 
-                     http://127.0.0.1:9090/OneFile/my.txt 
-                     以文件流形式输出文件
+                 3. OneFile 目录,Exe运行程序下同级目录  OnePlatform\OneFile   
+                     http://127.0.0.1:9090/OneFile/my.txt   
+                     以文件流形式输出文件  
 
-	2.Mormot2 BUG修正,请自行去修正此单元
-                  单元  mormot.net.http.pas 
-                  方法: function THttpRequestContext.ContentFromFile有Bug
-	  Bug原因,文件为空时输出的是false,找不到文件，是不对的。
-                  修正如下:
-                  ContentLength := FileSize(FileName);
-	  //在此句加这个判断即可
-  	  if ContentLength=0 then
-	 begin
-    	    result := true;
-    	    exit;
- 	 end;
+	2.Mormot2 BUG修正,请自行去修正此单元  
+                  单元  mormot.net.http.pas   
+                  方法: function THttpRequestContext.ContentFromFile有Bug  
+	  Bug原因,文件为空时输出的是false,找不到文件，是不对的。 
+                  修正如下: 
+                  ContentLength := FileSize(FileName); 
+	  //在此句加这个判断即可  
+  	  if ContentLength=0 then  
+	 begin  
+    	    result := true;  
+    	    exit;  
+ 	 end;  
 
 
 ************2023-12-15***********  
