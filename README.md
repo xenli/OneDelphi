@@ -24,22 +24,21 @@ QQ群：814696487（原来的群被封了，请加新群）
 	https://synopse.info/files/mormot2static.7z   
 ### 2.控件包mormot2源码路径加到Lib
 
-----以上多是基础操作不会的不要问，没时间回答-----
+----以上都是基础操作不会的不要问，没时间回答-----
 ### 3.打开 OneService.dpr 工程
 ### 4.编译，运行 即可
 ### 5.目前做好了MVC基础功能看源码单元httpServer->Controller->Demo-> DemoController.pas
-   // 注册到路由 DemoController.initialization部份，路由如何注册
-   // 注意，路由名称 不要一样，否则会判定已注册过，跳过
-  // 多例模式注册
-  OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoA',TDemoController, 100, CreateNewDemoController);
-  // 单例模式注册
-  OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('DemoB',TDemoController, 100, CreateNewDemoController);
-  // 方法注册
- OneHttpRouterManage.GetInitRouterManage().AddHTTPEvenWork('DemoEven',HelloWorldEven, 10);
+  // 注册到路由 DemoController.initialization部份，路由如何注册  
+  // 注意，路由名称 不要一样，否则会判定已注册过，跳过  
+  // 多例模式注册  
+  OneHttpRouterManage.GetInitRouterManage().AddHTTPPoolWork('DemoA',TDemoController, 100, CreateNewDemoController);  
+  // 单例模式注册  
+  OneHttpRouterManage.GetInitRouterManage().AddHTTPSingleWork('DemoB',TDemoController, 100, CreateNewDemoController);  
+  // 方法注册  
+ OneHttpRouterManage.GetInitRouterManage().AddHTTPEvenWork('DemoEven',HelloWorldEven, 10);  
  
 ### 6.直接用http页面输入地址请求相关url或者相关HTTP请求工具
-  例:  http://127.0.0.1:9090/DemoA/GetPersonListT
-
+  例:  > http://127.0.0.1:9090/DemoA/GetPersonListT
 
 
 ## 目前传统客户端基本已完成;
@@ -51,21 +50,23 @@ QQ群：814696487（原来的群被封了，请加新群）
 ### 6.虚拟文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 ### 7.大文件上传下载-对应Demo->OneClientDemoVirtualFile.dproj
 
-![](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg "title")
+<!-- ![](https://bbs.2ccc.com/attachments/2023/flmbbb_202358101428.jpg "title") -->
 
 ## 更新日志
 
 *****************2024-04-30*****************  
 服务端:  
-	1:承担web站点时，增加mjs文件头部的输出
+	1:承担web站点时，增加mjs文件头部的输出  
 	OneHttpServer单元 GetCustContentType 如果系统返回的不一样。这边自定义一些就好了  
 客户端:  
  	1.文件分块上传，返回文件名的问题处理，详细看demo   
 
 *****************2024-04-10*****************  
-服务端: 增加 TOneAuthor=> TCustomAttribute 注解,需授权验证才可以访问API接口  
+服务端: 
+   增加 TOneAuthor=> TCustomAttribute 注解,需授权验证才可以访问API接口    
    增加Demo TDemoAuthorController 使用例子  
-   TDemoAuthorController = class(TOneControllerBase)
+```pascal
+  TDemoAuthorController = class(TOneControllerBase)
   public
     // 建议使用方式
     // 跟据ulr?后面的参数获取相关验证信息
@@ -84,10 +85,12 @@ QQ群：814696487（原来的群被封了，请加新群）
     [TOneHttpGet]
     function GetTestC(name: string; sex: string): string;
   end;
-        
+```
 
 *****************2024-04-05*****************  
-服务端: 
+服务端:  
+
+```pascal
     增加 TOneRouter=> TCustomAttribute 注解  
             增加匿名路由,如下Demo DemoAttributeController  
               //增加匿名路由,访问地址如下  
@@ -96,80 +99,83 @@ QQ群：814696487（原来的群被封了，请加新群）
     [TOneRouter('/mytest')]  
     [TOneHttpPost]  
     function CustRouter(name: string; sex: string): string;  
-
+```
   
 *****************2024-04-04*****************  
 服务端: 
-    增加 TCustomAttribute 注解相关功能,慢慢升级吧。大多人理解不了这些东东，  
-	Attribute功能玩法有很多，高版本D才支持，这也是我一直不加上去的原因。。。   
-                思考在三后，还是加了，慢慢增加一些Attribute高级玩法，  
-	升级这些多很快，我也就好了半小时，增加此功能。。OnePascel本身就易于扩展自已想要的东东  
-           1.参考服务端Demo  DemoAttributeController  
+    增加 TCustomAttribute 注解相关功能,慢慢升级吧。大多人理解不了这些东西  
+	Attribute功能玩法有很多，高版本D才支持，这也是我一直不加上去的原因，思考再三后，还是加了
+	慢慢增加一些Attribute高级玩法，  
+	升级这些都很快，我也就好了半小时，增加此功能。。OnePascel本身就易于扩展自已想要的东西  
+#### 1.参考服务端Demo  DemoAttributeController  
   如下：	 
-   type  
-  TDemoAttributeController = class(TOneControllerBase)  
+``` pascal
+ type  
+  TDemoAttributeController = class(TOneControllerBase)
      //取参数取的是ULR ?后面的参数,且只支持Get访问,不需要以OneGet开头  
-    [TOneHttpGet]  
-    function GetTest(name: string;sex:string): string;  
+    [TOneHttpGet]
+    function GetTest(name: string;sex:string): string;
  
-     //取参数取的是ULR路径的参数 /url路径/myname/mysex;,不需要以OnePath开头  
-    [TOneHttpPath]  
-    function GetPath(name: string;sex:string): string;  
+     //取参数取的是ULR路径的参数 /url路径/myname/mysex;,不需要以OnePath开头
+    [TOneHttpPath]
+    function GetPath(name: string;sex:string): string;
 
-    //取参数取的是post Data数据且为JSON格式,且只支持Post访问,不需要以OnePost开头  
-    [TOneHttpPost]  
-    function PostTest(name: string;sex:string): string;  
-
-     //取参数取的是post Data数据,且只支持Post访问  
-     //data数据是表单格式 key1=value1&key2=value2  
-     //数据之间是用&关联  
-    [TOneHttpForm]  
-    function PostForm(name: string;sex:string): string;  
-
-
-  end;  
-
-
+    //取参数取的是post Data数据且为JSON格式,且只支持Post访问,不需要以OnePost开头
+    [TOneHttpPost]
+    function PostTest(name: string;sex:string): string;
+     //取参数取的是post Data数据,且只支持Post访问
+     //data数据是表单格式 key1=value1&key2=value2
+     //数据之间是用&关联
+    [TOneHttpForm]
+    function PostForm(name: string;sex:string): string;
+  end; 
+```
 
  
 *****************2024-03-30*****************  
 服务端:  
     由httpanyServer改成httpserver   
-           momrmot2的httpanyserver在某此场景环境不极其不稳定  
+    momrmot2的httpanyserver在某此场景环境不极其不稳定  
 
 *****************2024-01-28*****************  
 主要进行控件升级mormot2升级,neo控件升级  
 
 
 *****************2024-01-13*****************  
-服务端增加web目录功能:  
+服务端:  
+    增加web目录功能:  
+
 	1.OneWeb目录,Exe运行程序下同级目录  OnePlatform\OneWeb 承担web站点  
-                   我的Exe路径 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug  
-	   访问路径示例如下 http://127.0.0.1:9090/oneweb/index.html   
-                   即访问目录 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\index.html 网站  
-	   访问路径示例如下 http://127.0.0.1:9090/oneweb/myjxc/index.html   
-                   即访问目录 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\myjxc\index.html 网站  
-                 
+      	我的Exe路径 D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug   
+	  	访问路径示例如下 http://127.0.0.1:9090/oneweb/index.html   
+        即访问目D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\index.html网站
+		访问路径示例如下 http://127.0.0.1:9090/oneweb/myjxc/index.html      
+        即访问目录D:\devTool\delphi\project\OneDelphi\OneServer\Win64\Debug\OnePlatform\OneWeb\myjxc\index.html网站  
+
 	2.HTTP访问路径  http://127.0.0.1:9090/onewebv/虚拟目录代码/index.html   
-                   访问的是虚拟目录的站点,其它功能是oneWeb类似，oneWeb只是固定目录,onewebv 可以访问自定义目录  
+        访问的是虚拟目录的站点,其它功能是oneWeb类似，oneWeb只是固定目录,onewebv 可以访问自定义目录  
                 
-                 3. OneFile 目录,Exe运行程序下同级目录  OnePlatform\OneFile   
-                     http://127.0.0.1:9090/OneFile/my.txt   
-                     以文件流形式输出文件  
+    3. OneFile 目录,Exe运行程序下同级目录  OnePlatform\OneFile   
+        http://127.0.0.1:9090/OneFile/my.txt   
+        以文件流形式输出文件  
 
-	2.Mormot2 BUG修正,请自行去修正此单元  
-                  单元  mormot.net.http.pas   
-                  方法: function THttpRequestContext.ContentFromFile有Bug  
-	  Bug原因,文件为空时输出的是false,找不到文件，是不对的。 
-                  修正如下: 
-                  ContentLength := FileSize(FileName); 
-	  //在此句加这个判断即可  
-  	  if ContentLength=0 then  
-	 begin  
-    	    result := true;  
-    	    exit;  
- 	 end;  
 
+	4.Mormot2 BUG修正,请自行去修正此单元  
+        单元  mormot.net.http.pas   
+        方法: function THttpRequestContext.ContentFromFile有Bug  
+	Bug原因,文件为空时输出的是false,找不到文件，是不对的。 
+        修正如下: 
+
+
+```pascal
+    ContentLength := FileSize(FileName); 
+	//在此句加这个判断即可  
+  	if ContentLength=0 then  
+	begin  
+		result := true;  
+		exit;  
+ 	end;  
+```
 
 ************2023-12-15***********  
 服务端:  
@@ -179,34 +185,36 @@ QQ群：814696487（原来的群被封了，请加新群）
 	2.增加自增ID数据集Demo  OneClientDemo   
 	其数据集 Data.DataInfo.IsReturnData := true 即可原数据取回  
 	当设置 DataInfo.IsReturnData := true 是整个数据集提交，整个返回加载  
-	不适用于大数据。。。增大传输压力，个人建议主键还是不要用自增,OneClientDataset提供了方便的获取整型ID的方法  
+	不适用于大数据,增大传输压力。
+	个人建议主键还是不要用自增,OneClientDataset提供了方便的获取整型ID的方法  
 	请认真看各个DEMO  
 	
 ************2023-12-08***********  
 服务端:  
 	1.增加10分钟未交互的连接,主动断掉，重连。。。  
-                主要有的驱动或数据库配置你保活没用。。。久的连接会未明其妙挂了。倒不如断开重连下，太久没交互的连接  
+    主要有的驱动或数据库配置你保活没用。。。久的连接会未明其妙挂了。倒不如断开重连下，太久没交互的连接  
 	主要更改以下方法，增加两个保活机制  
-                function TOneZTPool.LockZTItem(var QErrMsg: string): TOneZTItem;    
+```pascal
+	function TOneZTPool.LockZTItem(var QErrMsg: string): TOneZTItem;    
 
-               if SecondsBetween(Now, lZTItem.FLastTime) >= 600 then  
-               begin
-                  lZTItem.ADConnection.Close(True);  
-                  lZTItem.ADConnection.Open;  
-               end;          
+	if SecondsBetween(Now, lZTItem.FLastTime) >= 600 then  
+	begin
+		lZTItem.ADConnection.Close(True);  
+		lZTItem.ADConnection.Open;  
+	end;          
 
-                同上面也是为了保证数据库是连接情况下，才使用账套  
-                if (not lZTItem.ADConnection.Connected) then  
-               begin  
-                 //判断状态如果未连接重新连接下  
-                 lZTItem.ADConnection.Open;  
-                end;     
-				 
-************2023-09-14***********
-服务端:
-	1.服务端增加Demo OneUniDemo\UniFileDownController
-	   一个是DataSet转Excel提供给前端下载,一个是图片下载,两个区别不大
-客户端:
+	同上面也是为了保证数据库是连接情况下，才使用账套  
+	if (not lZTItem.ADConnection.Connected) then  
+	begin  
+		//判断状态如果未连接重新连接下  
+		lZTItem.ADConnection.Open;  
+	end;     
+```				 
+************2023-09-14***********  
+服务端:  
+	1.服务端增加Demo OneUniDemo\UniFileDownController  
+	 一个是DataSet转Excel提供给前端下载,一个是图片下载,两个区别不大
+客户端:  
 	1.OneUniapp增加文件下载Demo demoExcelDown.vue
 	
 ************2023-08-15***********  
