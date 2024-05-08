@@ -236,6 +236,8 @@
         <DCCReference Include="httpServer\Controller\TestApiController.pas"/>
         <DCCReference Include="OneFastApi\OneFastReportController.pas"/>
         <DCCReference Include="OneUniDemo\UniFileDownController.pas"/>
+        <DCCReference Include="httpServer\Controller\Demo\DemoAttributeController.pas"/>
+        <DCCReference Include="httpServer\Controller\Demo\DemoAuthorController.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

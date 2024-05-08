@@ -1468,7 +1468,8 @@ begin
             LZTQuery.FetchOptions.RecsSkip := -1;
             LZTQuery.FetchOptions.RecsMax := -1;
             lSQL := ClearOrderBySQL(lOpenData.OpenSQL);
-            lSQL := lSQL.Replace(' * ', ' 1 as one_zsys_temp_aaa ');
+            //只要替换第一个星号
+            lSQL := lSQL.Replace(' * ', ' 1 as one_zsys_temp_aaa ',[]);
             lSQL := 'select count(1) from ( ' + lSQL + ' ) tempCount';
             LZTQuery.SQL.Text := lSQL;
             for iParam := 0 to LZTQuery.Params.Count - 1 do
@@ -1873,7 +1874,14 @@ begin
     begin
       self.FLog.WriteSQLLog('账套方法[SaveDatas]:');
       self.FLog.WriteSQLLog('总共用时:[' + lRequestMilSec.ToString + ']毫秒');
-      self.FLog.WriteSQLLog('错误消息:[' + QOneDataResult.ResultMsg + ']');
+      if QOneDataResult.ResultOK then
+      begin
+         self.FLog.WriteSQLLog('成功消息:[' + QOneDataResult.ResultMsg + ']');
+      end
+      else
+      begin
+        self.FLog.WriteSQLLog('错误消息:[' + QOneDataResult.ResultMsg + ']');
+      end;
       for i := 0 to QSaveDMLDatas.Count - 1 do
       begin
         lDataSaveDML := QSaveDMLDatas[i];

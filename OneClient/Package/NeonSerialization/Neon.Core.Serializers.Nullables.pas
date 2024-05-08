@@ -1,7 +1,7 @@
 {******************************************************************************}
 {                                                                              }
 {  Neon: Serialization Library for Delphi                                      }
-{  Copyright (c) 2018-2021 Paolo Rossi                                         }
+{  Copyright (c) 2018 Paolo Rossi                                              }
 {  https://github.com/paolo-rossi/neon-library                                 }
 {                                                                              }
 {******************************************************************************}
@@ -161,8 +161,8 @@ function TNullableBooleanSerializer.Deserialize(AValue: TJSONValue; const
 var
   LNullValue: NullBoolean;
 begin
-  if AValue is TJSONBool then
-    LNullValue := (AValue as TJSONBool).AsBoolean
+  if TJSONUtils.IsBool(AValue) then
+    LNullValue := TJSONUtils.GetValueBool(AValue)
   else if AValue is TJSONNull then
     LNullValue := nil
   else
@@ -193,8 +193,7 @@ begin
       Exit(TJSONNull.Create);
     end;
   end;
-
-  Result := TJSONBool.Create(LValue.Value);
+  Result := TJSONUtils.GetJSONBool(LValue.Value);
 end;
 
 { TNullableIntegerSerializer }
@@ -366,7 +365,7 @@ var
   LNullValue: NullDateTime;
 begin
   if AValue is TJSONString then
-    LNullValue := TJSONUtils.JSONToDate(AValue.Value, AContext.GetConfiguration.GetUseUTCDate)
+    LNullValue := TJSONUtils.JSONToDateTime(AValue.Value, AContext.GetConfiguration.GetUseUTCDate)
   else if AValue is TJSONNull then
     LNullValue := nil
   else
@@ -398,7 +397,7 @@ begin
     end;
   end;
 
-  Result := TJSONString.Create(TJSONUtils.DateToJSON(LValue.Value, AContext.GetConfiguration.GetUseUTCDate))
+  Result := TJSONString.Create(TJSONUtils.DateTimeToJSON(LValue.Value, AContext.GetConfiguration.GetUseUTCDate))
 end;
 
 procedure RegisterNullableSerializers(ARegistry: TNeonSerializerRegistry);

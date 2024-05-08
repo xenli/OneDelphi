@@ -6,19 +6,20 @@ interface
 
 uses
   System.TypInfo, System.Generics.Collections, System.Classes,
-  System.Rtti, System.SysUtils;
+  System.Rtti, System.SysUtils, OneAttribute;
 
 type
   // 标准方法类型一等公民 resultProcedure=TEvenControllerProcedure
   emOneMethodType = (unknow, resultProcedure, sysProcedure, sysFunction);
-  emOneMethodResultType = (unknowResult, numberResult, stringResult, boolResult, objResult, listResult, objListResult, genericsListResult, genericsObjListResult, mapResult, arrayResult, recordResult);
+  emOneMethodResultType = (unknowResult, numberResult, stringResult, boolResult, objResult, listResult, objListResult,
+    genericsListResult, genericsObjListResult, mapResult, arrayResult, recordResult);
   // OneAll代表没有以下面为特殊规则的，不控制什么HTTPMethod可以访问,低版不采用注解
   // 方法头部 OneGetxxxx代表只支持Get方法
   // 方法头部 OnePost代表只支持Post方法
   // 方法头部 OnePath 代表 参数放在ulr路径 xxxx/参数1/参数2
   // 方法头部 OneForm代表只支持Post方法,且数据是表单形式 key1=value1&key2=value2&...
   // 方法头部 OneUpload代表是MulitePart提交包含文件
-  emOneHttpMethodMode = (OneAll, OneGet, OnePost, OneForm, OnePath, OneDownload);
+  emOneHttpMethodMode = (OneAll, OneGet, OnePost, OneForm, OnePath);
 
 type
   TOneMethodRtti = class;
@@ -31,6 +32,7 @@ type
     FMethodType: emOneMethodType;
     FHttpMethodType: emOneHttpMethodMode;
     FRttiMethod: TRttiMethod;
+    FAttribute: TList<TCustomAttribute>;
     //
     FHaveClassParam: boolean;
     FParamCount: integer;
@@ -53,6 +55,7 @@ type
     property MethodType: emOneMethodType read FMethodType;
     property HttpMethodType: emOneHttpMethodMode read FHttpMethodType;
     property RttiMethod: TRttiMethod read FRttiMethod;
+    property Attribute: TList<TCustomAttribute> read FAttribute;
     property HaveClassParam: boolean read FHaveClassParam;
     property ParamCount: integer read FParamCount;
     property ParamClassList: TList<TClass> read FParamClassList;
@@ -101,6 +104,7 @@ begin
   FParamCount := 0;
   FParamClassList := TList<TClass>.Create;
   FParamIsArryList := TList<boolean>.Create;
+  FAttribute := TList<TCustomAttribute>.Create;
 end;
 
 destructor TOneMethodRtti.Destroy;
@@ -115,6 +119,7 @@ begin
   FParamClassList.Free;
   FParamIsArryList.Clear;
   FParamIsArryList.Free;
+  FAttribute.Free;
   inherited Destroy;
 end;
 
@@ -405,6 +410,10 @@ var
   lParam: TRttiParameter;
   i, iMethod, iParam: integer;
   lOneMethodRtti: TOneMethodRtti;
+  vArrAttribute: TArray<TCustomAttribute>;
+  tempAttribute: TCustomAttribute;
+  iArr: integer;
+  tempRouter: string;
 begin
   FRttiContext := TRttiContext.Create;
   FRttiType := FRttiContext.GetType(QPersistentClass.ClassInfo);
@@ -438,6 +447,7 @@ begin
     lOneMethodRtti.FHaveClassParam := false;
     lOneMethodRtti.FResultRtti := vRttiMethod.ReturnType;
     lOneMethodRtti.FParamCount := Length(lParameters);
+
     // 分析方法名称
     // emOneHttpMethodMode =(OneAll,OneGet,OnePost,OneForm, OneFile);
     if lMethodName.StartsWith('oneget') then
@@ -455,14 +465,6 @@ begin
     else if lMethodName.StartsWith('oneform') then
     begin
       lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneForm;
-    end
-    else if lMethodName.StartsWith('oneupload') then
-    begin
-      // lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneUpload;
-    end
-    else if lMethodName.StartsWith('onedownload') then
-    begin
-      lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneDownload;
     end;
     // 分析方法或函数类型
     case vRttiMethod.MethodKind of
@@ -539,6 +541,48 @@ begin
         end;
       end;
 
+    end;
+
+    // 分析注解
+    tempRouter := '';
+    vArrAttribute := vRttiMethod.GetAttributes;
+    for iArr := 0 to Length(vArrAttribute) - 1 do
+    begin
+      tempAttribute := vArrAttribute[iArr];
+      lOneMethodRtti.FAttribute.Add(tempAttribute);
+      if tempAttribute is TOneHttpMethodAttribute then
+      begin
+        if tempAttribute is TOneHttpGet then
+        begin
+          lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneGet;
+        end
+        else if tempAttribute is TOneHttpPost then
+        begin
+          lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OnePost;
+        end
+        else if tempAttribute is TOneHttpPath then
+        begin
+          lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OnePath;
+        end
+        else if tempAttribute is TOneHttpForm then
+        begin
+          lOneMethodRtti.FHttpMethodType := emOneHttpMethodMode.OneForm;
+        end
+      end
+      else if tempAttribute is TOneRouter then
+      begin
+        tempRouter := TOneRouter(tempAttribute).Router;
+        if (tempRouter <> '') then
+        begin
+          tempRouter := tempRouter.Trim();
+          tempRouter := tempRouter.Replace('\', '/');
+          if (tempRouter[1] = '/') then
+          begin
+            tempRouter := tempRouter.Substring(1, tempRouter.Length - 1);
+          end;
+          lMethodName := tempRouter;
+        end;
+      end;
     end;
 
     if not FMethodList.ContainsKey(lMethodName) then

@@ -288,6 +288,7 @@ begin
   lSaveFile := self.GetSaveFile();
   ReportMain.LoadFromFile(lSaveFile);
   ReportMain.DesignReport;
+
 end;
 
 procedure TfrmFastApiReport.tbSaveReportClick(Sender: TObject);

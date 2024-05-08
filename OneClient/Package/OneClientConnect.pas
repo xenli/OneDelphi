@@ -20,6 +20,7 @@ const
   // token相关
   URL_HTTP_HTTPServer_TOKEN_ClientConnect = 'OneServer/Token/ClientConnect';
   URL_HTTP_HTTPServer_TOKEN_ClientConnectPing = 'OneServer/Token/ClientConnectPing';
+  URL_HTTP_HTTPServer_TOKEN_TokenBindUser = 'OneServer/Token/TokenBindUser';
 
   URL_HTTP_HTTPServer_TOKEN_ClientDisConnect = 'OneServer/Token/ClientDisConnect';
   URL_HTTP_HTTPServer_TOKEN_ClientPing = 'OneServer/Token/ClientPing';
@@ -116,6 +117,7 @@ type
     function DoConnect(qForceConnect: boolean = false): boolean;
     function DoConnectPing(): boolean;
     function DoPing(): boolean;
+    function DoTokenBindUser(qUserID: string; qUserCode: string; qUserName: string): boolean;
     procedure DisConnect;
       overload;
     // 提交bytes返回Bytes
@@ -363,6 +365,52 @@ begin
     if not OneNeonHelper.JsonToObject(lServerResult, lResultJsonValue, lErrMsg) then
     begin
       self.FErrMsg := '返回的数据解析成TResult<string>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
+      exit;
+    end;
+    if not lServerResult.ResultSuccess then
+    begin
+      self.FErrMsg := '服务端消息:' + lServerResult.ResultMsg;
+      exit;
+    end;
+    self.FConnected := true;
+    result := true;
+  finally
+    lJsonObj.Free;
+    if lResultJsonValue <> nil then
+    begin
+      lResultJsonValue.Free;
+    end;
+    lServerResult.Free;
+  end;
+end;
+
+function TOneConnection.DoTokenBindUser(qUserID: string; qUserCode: string; qUserName: string): boolean;
+var
+  lJsonObj: TJsonObject;
+  lResultJsonValue: TJsonValue;
+  lErrMsg: string;
+  lClientConnect: TClientConnect;
+  lServerResult: TActionResult<string>;
+begin
+  result := false;
+  lResultJsonValue := nil;
+  lServerResult := TActionResult<string>.Create;
+  lJsonObj := TJsonObject.Create;
+  try
+    lJsonObj.AddPair('TokenID', self.ClientIP);
+    lJsonObj.AddPair('UserID', qUserID);
+    lJsonObj.AddPair('UserCode', qUserCode);
+    lJsonObj.AddPair('UserName', qUserName);
+    lResultJsonValue := self.PostResultJsonValue(URL_HTTP_HTTPServer_TOKEN_TokenBindUser, lJsonObj.ToJSON(), lErrMsg);
+    if not self.IsErrTrueResult(lErrMsg) then
+    begin
+      self.FErrMsg := lErrMsg;
+      exit;
+    end;
+
+    if not OneNeonHelper.JsonToObject(lServerResult, lResultJsonValue, lErrMsg) then
+    begin
+      self.FErrMsg := '返回的数据解析成TResult<TClientConnect>出错,无法知道结果,数据:' + lResultJsonValue.ToJSON;
       exit;
     end;
     if not lServerResult.ResultSuccess then
@@ -2949,6 +2997,7 @@ begin
       end;
       exit;
     end;
+    QUpDownChunkCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownGetTask, 0, 0, '');
     QVirtualTask.FilePosition := 0;
   end
   else
@@ -3061,6 +3110,7 @@ var
   isEnd: boolean;
 begin
   result := false;
+  isEnd := false;
   QVirtualTask.UpDownMode := '下载';
   if QVirtualTask.TaskID = '' then
   begin
@@ -3161,6 +3211,12 @@ begin
   finally
     lFileStream.Free;
     lResult.Free;
+
+  end;
+  if (isEnd) and (result) then
+  begin
+    //保存文件成功
+    QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownSaveFileOk, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg)
   end;
 end;
 

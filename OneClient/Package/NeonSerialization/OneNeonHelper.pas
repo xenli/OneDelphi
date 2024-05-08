@@ -5,7 +5,7 @@ interface
 uses
   system.JSON, system.Classes, system.SysUtils, Rest.JSON, system.Rtti,
   Neon.Core.Persistence, Neon.Core.Serializers.DB, Neon.Core.Serializers.RTL,
-  Neon.Core.Serializers.Nullables, Neon.Core.Persistence.JSON, Data.DB;
+  Neon.Core.Serializers.Nullables, Neon.Core.Persistence.JSON, Data.DB, Neon.Core.Types;
 function GetDefalutNeonConfiguration(): INeonConfiguration;
 // 从文件读取配置，把JSON转换成对象
 function JSONToObjectFormFile(QObject: TObject; QFileName: string;
@@ -40,6 +40,7 @@ begin
   if Defalut_NeonConfiguration = nil then
   begin
     Defalut_NeonConfiguration := TNeonConfiguration.Default;
+    Defalut_NeonConfiguration.SetMembers([TNeonMembers.Standard, TNeonMembers.Fields, TNeonMembers.Properties]);
     lRegistry := Defalut_NeonConfiguration.GetSerializers;
     lRegistry.RegisterSerializer(TGUIDSerializer);
     lRegistry.RegisterSerializer(TStreamSerializer);

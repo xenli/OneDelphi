@@ -277,6 +277,18 @@ begin
           lTask.RemoteFile := TPath.GetDirectoryName(lTask.RemoteFile);
         lTask.RemoteFile := lTask.RemoteFile + TPath.GetFileName(lTask.LocalFile);
       end;
+      lTask.UpDownMode := '上传';
+      if not self.FConnection.GetTaskID(lTask) then
+      begin
+        self.ErrMsg := lTask.ErrMsg;
+        QCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownErr, 0, 0, lTask.ErrMsg);
+        exit;
+      end
+      else
+      begin
+        QCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownGetTask, 0, 0, lTask.ErrMsg);
+      end;
+      self.ReturnFileName := lTask.NewFileName;
       if not self.FConnection.UploadChunkFile(lTask, QCallBack) then
       begin
         self.ErrMsg := lTask.ErrMsg;

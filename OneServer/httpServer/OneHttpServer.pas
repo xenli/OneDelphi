@@ -63,10 +63,23 @@ type
   end;
 
 function CreateNewHTTPCtxt(Ctxt: THttpServerRequestAbstract): THTTPCtxt;
+function GetCustContentType(QFileType: string): string;
 
 implementation
 
 uses OneHttpRouterManage, OneHttpController, OneGlobal;
+
+function GetCustContentType(QFileType: string): string;
+var
+  vFileType: string;
+begin
+  //一些特别的头部扩展 :
+  Result := '';
+  vFileType := QFileType.ToLower();
+  // Content-Type
+  if vFileType = '.mjs' then
+    Result := 'Content-Type: application/javascript';
+end;
 
 { TOneHttpServer }
 function TOneHttpServer.OnRequest(Ctxt: THttpServerRequestAbstract): cardinal;
@@ -86,7 +99,8 @@ var
   lHTTPResult: THTTPResult; // HTTP执行结果，统一接口格式化
   lHTTPCtxt: THTTPCtxt; // HTTP请求相关信息,转成内部一个类处理
   // 静态文件输出
-  lFileName, lFileCode, lPhy: string;
+  lFilePath, lFileName, lFileCode, lPhy, lFileTag: string;
+  fs: TStringStream;
   tempI: integer;
   lTThreadID: string;
 begin
@@ -101,9 +115,9 @@ begin
     Result := HTTP_NOTFOUND;
     exit;
   end;
-  if (Ctxt.Host='') then
+  if (Ctxt.Host = '') then
   begin
-    //有些恶意的这个为空
+    // 有些恶意的这个为空
     Result := HTTP_NOTFOUND;
     exit;
   end;
@@ -126,7 +140,7 @@ begin
     if (self.FLog <> nil) and (self.FLog.IsHTTPLog) then
     begin
       self.FLog.WriteHTTPLog('请求URL:[' + Ctxt.Host + Ctxt.Url + ']');
-      self.FLog.WriteHTTPLog('请求头部:[' + Ctxt.InHeaders+ ']');
+      self.FLog.WriteHTTPLog('请求头部:[' + Ctxt.InHeaders + ']');
       if not IsMultipartForm(Ctxt.InContentType) then
       begin
         self.FLog.WriteHTTPLog('请求内容:' + UTF8Decode(Ctxt.InContent));
@@ -219,7 +233,7 @@ begin
             begin
               Ctxt.OutContent := lHTTPCtxt.OutContent;
               Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
-              Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
+              Ctxt.OutCustomHeaders :=   GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
               if lHTTPCtxt.ResponCustHeaderList <> '' then
               begin
                 Ctxt.OutCustomHeaders := Ctxt.OutCustomHeaders + #13#10 + lHTTPCtxt.ResponCustHeaderList;
@@ -253,14 +267,50 @@ begin
         Result := HTTP_SUCCESS;
         exit;
       end
+      else if lUrlPath.StartsWith('/onefile/') then
+      begin
+        lFileName := lUrlPath.Substring(8, lUrlPath.Length - 8);
+        // 有中文进行解码
+        lFileName := HTTPDecode(lFileName);
+        lFileName := OneFileHelper.CombineExeRunPathB('OnePlatform\onefile', lFileName);
+        Ctxt.OutContent := UTF8Encode(lFileName);
+        Ctxt.OutContentType := HTTP_RESP_STATICFILE;
+        Result := HTTP_SUCCESS;
+        exit;
+      end
       else if lUrlPath.StartsWith('/oneweb/') then
       begin
         lFileName := lUrlPath.Substring(8, lUrlPath.Length - 8);
         // 有中文进行解码
         lFileName := HTTPDecode(lFileName);
-        lFileName := OneFileHelper.CombineExeRunPathB('OnePlatform\OneWeb', lFileName);
-        Ctxt.OutContent := UTF8Encode(lFileName);
-        Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
+        lFilePath := OneFileHelper.CombineExeRunPathB('OnePlatform\OneWeb', lFileName);
+        lFileTag := Extractfileext(lFileName);
+        if lFileTag = '' then
+        begin
+          lFileName := lFileName + '.html';
+          lFileTag := '.html';
+        end;
+        if lFileTag = '.html' then
+        begin
+          // Ctxt.OutContent := StringToUTF8(vFileName);
+          fs := TStringStream.Create('', TEncoding.UTF8);
+          try
+            fs.LoadFromFile(lFilePath);
+            Ctxt.OutContent := UTF8Encode(fs.DataString);
+          finally
+            fs.Free;
+          end;
+          Ctxt.OutContentType := HTML_CONTENT_TYPE;
+        end
+        else
+        begin
+          Ctxt.OutCustomHeaders := GetCustContentType(lFileTag);
+          if Ctxt.OutCustomHeaders='' then
+            Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', lFileName);
+          // GetContentType(lFileTag);
+          Ctxt.OutContent := UTF8Encode(lFilePath);
+          Ctxt.OutContentType := HTTP_RESP_STATICFILE;
+        end;
         Result := HTTP_SUCCESS;
         exit;
       end
@@ -282,9 +332,33 @@ begin
           exit;
         end;
         lFileName := HTTPDecode(lFileName);
-        lFileName := OneFileHelper.CombinePath(lPhy, lFileName);
-        Ctxt.OutContent := UTF8Encode(lFileName);
-        Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
+        lFilePath := OneFileHelper.CombinePath(lPhy, lFileName);
+        lFileTag := Extractfileext(lFileName);
+        if lFileTag = '' then
+        begin
+          lFileName := lFileName + '.html';
+          lFileTag := '.html';
+        end;
+        if lFileTag = '.html' then
+        begin
+          // Ctxt.OutContent := StringToUTF8(vFileName);
+          fs := TStringStream.Create('', TEncoding.UTF8);
+          try
+            fs.LoadFromFile(lFilePath);
+            Ctxt.OutContent := UTF8Encode(fs.DataString);
+          finally
+            fs.Free;
+          end;
+          Ctxt.OutContentType := HTML_CONTENT_TYPE;
+        end
+        else
+        begin
+          Ctxt.OutCustomHeaders := GetCustContentType(lFileTag);
+          if Ctxt.OutCustomHeaders='' then
+            Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', lFileName);
+          Ctxt.OutContent := UTF8Encode(lFilePath);
+          Ctxt.OutContentType := HTTP_RESP_STATICFILE;
+        end;
         Result := HTTP_SUCCESS;
         exit;
       end
@@ -367,10 +441,10 @@ begin
     self.FHttpQueueLength := 1000;
   // 创建HTTP服务
   try
-    lHttpServerOptions := [hsoNoXPoweredHeader];
+    lHttpServerOptions := [];
     lServerSet := TOneGlobal.GetInstance().ServerSet;
     // hsoEnableTls开始ssl证书
-    self.FHttpServer := THttpAsyncServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi',
+    self.FHttpServer := THttpServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi',
       self.FThreadPoolCount, self.FKeepAliveTimeOut, lHttpServerOptions);
     self.FHttpServer.HttpQueueLength := self.FHttpQueueLength;
     self.FHttpServer.OnRequest := self.OnRequest;
@@ -383,7 +457,7 @@ begin
     begin
       // 启动https
       lHttpServerOptions := lHttpServerOptions + [hsoEnableTls];
-      self.FHttpsServer := THttpAsyncServer.Create(self.FHttpsPort.ToString(), nil, nil, 'oneDelphi',
+      self.FHttpsServer := THttpServer.Create(self.FHttpsPort.ToString(), nil, nil, 'oneDelphi',
         self.FThreadPoolCount, self.FKeepAliveTimeOut, lHttpServerOptions);
       self.FHttpsServer.HttpQueueLength := self.FHttpQueueLength;
       self.FHttpsServer.OnRequest := self.OnRequest;
@@ -391,6 +465,7 @@ begin
       self.FHttpsServer.RegisterCompress(CompressGZip);
       self.FHttpsServer.RegisterCompress(CompressZLib);
       self.FHttpsServer.RegisterCompress(CompressSynLZ);
+      //fHttpServer.WaitStarted('cert.pem', 'privkey.pem', '');
       self.FHttpsServer.WaitStarted(10, lServerSet.CertificateFile, lServerSet.PrivateKeyFile,
         lServerSet.PrivateKeyPassword, lServerSet.CACertificatesFile)
     end;

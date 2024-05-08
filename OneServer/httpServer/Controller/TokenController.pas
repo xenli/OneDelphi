@@ -17,17 +17,20 @@ type
 
   TClientLogin = record
   public
-    TokenID: string; // ClientConnect返回的tokenID如果有先进行 ClientConnect, 有的话进行绑定
-    LoginUserCode: string;
-    LoginPass: string;
+    TokenID: string;
+    UserID: string;
+    UserCode: string;
+    UserName: string;
   end;
 
   TOneTokenController = class(TOneControllerBase)
   public
+    // 连接服务端，验证安全性,无任何用户信息，只是产生个合法Token
     function ClientConnect(QCleintConnect: TClientConnect): TActionResult<TClientConnect>;
     function ClientDisConnect(TokenID: string): TActionResult<string>;
     function ClientPing(): TActionResult<string>;
     function ClientConnectPing(QCleintConnect: TClientConnect): TActionResult<string>;
+    function TokenBindUser(QClientLogin: TClientLogin): TActionResult<string>;
     // 批量产生UUIDs
     function GetUUID(): TActionResult<Int64>;
     function GetUUIDs(QCount: Integer): TActionResult<TList<Int64>>;
@@ -88,6 +91,33 @@ begin
   result.SetResultTrue();
 end;
 
+function TOneTokenController.TokenBindUser(QClientLogin: TClientLogin): TActionResult<string>;
+var
+  lOneGlobal: TOneGlobal;
+  lTokenItem: TOneTokenItem;
+begin
+  result := TActionResult<string>.Create(false, false);
+  if (QClientLogin.TokenID = '') then
+  begin
+    result.ResultMsg := 'TokenID为空无法绑定';
+    exit;
+  end;
+  lOneGlobal := TOneGlobal.GetInstance();
+  lTokenItem := nil;
+  lOneGlobal.TokenManage.TokenList.TryGetValue(QClientLogin.TokenID, lTokenItem);
+  if lTokenItem = nil then
+  begin
+    result.ResultMsg := 'TokenID无效,获取不到相关的Token信息';
+    exit;
+  end;
+  lTokenItem.LoginUserCode := QClientLogin.UserCode;
+  lTokenItem.SysUserID :=   QClientLogin.UserID;
+  lTokenItem.SysUserCode :=  QClientLogin.UserCode;
+  lTokenItem.SysUserName :=  QClientLogin.UserName;
+  result.ResultData := '绑定信息成功';
+  result.SetResultTrue();
+end;
+
 function TOneTokenController.ClientPing(): TActionResult<string>;
 begin
   result := TActionResult<string>.Create(false, false);
@@ -112,7 +142,7 @@ begin
   result.SetResultTrue();
 end;
 
-//只取一个
+// 只取一个
 function TOneTokenController.GetUUID(): TActionResult<Int64>;
 begin
   result := TActionResult<Int64>.Create(false, false);

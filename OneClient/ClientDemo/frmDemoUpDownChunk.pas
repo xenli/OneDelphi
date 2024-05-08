@@ -138,6 +138,7 @@ begin
       case QStatus of
         emUpDownChunkStatus.upDownStart:
           begin
+            edNewFileName.Text := OneVirtualFile.ReturnFileName;
             // 文件开始上传进度
             ProgressFile.Visible := True;
             ProgressFile.Max := QTotalSize;
@@ -183,8 +184,13 @@ begin
     begin
       application.ProcessMessages;
       case QStatus of
+        emUpDownChunkStatus.upDownGetTask:
+          begin
+            //获取任务成功,此时就有文件名了
+          end;
         emUpDownChunkStatus.upDownStart:
           begin
+            edNewFileName.Text := OneVirtualFile.ReturnFileName;
             // 文件开始上传进度
             ProgressFile.Visible := True;
             ProgressFile.Max := QTotalSize;

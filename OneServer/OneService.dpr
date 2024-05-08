@@ -111,7 +111,9 @@ uses
   OneFastReportController in 'OneFastApi\OneFastReportController.pas',
   Vcl.Themes,
   Vcl.Styles,
-  UniFileDownController in 'OneUniDemo\UniFileDownController.pas';
+  UniFileDownController in 'OneUniDemo\UniFileDownController.pas',
+  DemoAttributeController in 'httpServer\Controller\Demo\DemoAttributeController.pas',
+  DemoAuthorController in 'httpServer\Controller\Demo\DemoAuthorController.pas';
 
 var
   lpStartupInfo: TStartupInfo;

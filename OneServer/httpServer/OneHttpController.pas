@@ -9,7 +9,7 @@ uses
   System.TypInfo, OneHttpControllerRtti, OneHttpCtxtResult, OneHttpRouterManage,
   System.JSON, System.JSON.Serializers, Rest.JSON, System.Variants,
   Neon.Core.Persistence.JSON, System.Contnrs, OneNeonHelper, OneHttpConst, OneMultipart,
-  OneTokenManage;
+  OneTokenManage, OneAttribute;
 
 type
 {$M+}
@@ -39,9 +39,9 @@ type
     function InitOther: Boolean; virtual;
     // Procedure InitRe
     { 验证模式 }
-    function CheckAuthor(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean; virtual;
+    function CheckAuthor(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QForce: Boolean = false): Boolean; virtual;
     { 验证Token 合法性 }
-    function CheckToken(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean; virtual;
+    function CheckToken(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QForce: Boolean = false): Boolean; virtual;
     { 验证Token 签名 合法性 }
     function CheckSign(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean; virtual;
     // 获取方法参数值   var QParamNewObjs: TList<Tobject>
@@ -51,6 +51,8 @@ type
     procedure DoMethodFreeParams(QParamObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>);
     function DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult;
       QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>): Boolean; virtual;
+    function DoAttribute(QOneMethodRtti: TOneMethodRtti; QHTTPCtxt: THTTPCtxt;
+      QHTTPResult: THTTPResult): Boolean;
     { 结果输出编码设置 }
     procedure EndCodeResultOut(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult); virtual;
     //
@@ -89,8 +91,8 @@ begin
   // 默认支持跨域
   FbAllowOrigin := true;
   // 默认不开启验证
-  FAutoCheckToken := False;
-  FAutoCheckSign := False;
+  FAutoCheckToken := false;
+  FAutoCheckSign := false;
   FCurrentThreadLocks := TDictionary<TThreadID, THTTPCtxt>.Create;
 end;
 
@@ -158,7 +160,7 @@ var
   lThreadID: TThreadID;
   lHTTPCtxt: THTTPCtxt;
 begin
-  Result := False;
+  Result := false;
   QErrMsg := '';
   // 处理获取TokenID
   lHTTPCtxt := self.GetCurrentThreadLock();
@@ -261,12 +263,17 @@ begin
   Result := true;
 end;
 
-function TOneControllerBase.CheckAuthor(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean;
+function TOneControllerBase.CheckAuthor(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QForce: Boolean = false): Boolean;
 var
   lBearerToken: string;
 begin
-  Result := False;
-  if not self.FAutoCheckHeadAuthor then
+  Result := false;
+  if QForce then
+  begin
+
+  end
+  else
+    if not self.FAutoCheckHeadAuthor then
   begin
     Result := true;
     exit;
@@ -287,12 +294,17 @@ begin
   end;
 end;
 
-function TOneControllerBase.CheckToken(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean;
+function TOneControllerBase.CheckToken(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QForce: Boolean = false): Boolean;
 var
   lTokenID: string;
 begin
-  Result := False;
-  if not self.FAutoCheckToken then
+  Result := false;
+  if QForce then
+  begin
+
+  end
+  else
+    if not self.FAutoCheckToken then
   begin
     Result := true;
     exit;
@@ -318,7 +330,7 @@ var
   lTimeStr: string;
   lSign: string;
 begin
-  Result := False;
+  Result := false;
   if not self.FAutoCheckSign then
   begin
     Result := true;
@@ -360,7 +372,7 @@ begin
   self.FHTTPCtxt := nil;
   self.FHTTPResult := nil;
   // 是否正确执行了Invoke事件
-  isInvokeOK := False;
+  isInvokeOK := false;
   if self.FRouterItem = nil then
   begin
     // 挂载RTTI信息
@@ -520,7 +532,7 @@ begin
     //
     case QOneMethodRtti.HttpMethodType of
 
-      emOneHttpMethodMode.OneGet, emOneHttpMethodMode.OneDownload:
+      emOneHttpMethodMode.OneGet:
         begin
 {$REGION}
           // url获取参数,不能有类
@@ -606,7 +618,7 @@ begin
       emOneHttpMethodMode.OnePost, emOneHttpMethodMode.OneAll:
         begin
 {$REGION}
-          isOnlyHttpParam := False;
+          isOnlyHttpParam := false;
           if iParamLen > 0 then
           begin
             // 如果参数只有  THTTPCtxt,THTTPResult不需要判断上传内容格式
@@ -627,11 +639,11 @@ begin
                     end
                     else
                     begin
-                      isOnlyHttpParam := False;
+                      isOnlyHttpParam := false;
                     end;
                   end
               else
-                isOnlyHttpParam := False;
+                isOnlyHttpParam := false;
               end;
             end;
           end;
@@ -1166,9 +1178,9 @@ var
   isInvoke: Boolean;
 begin
   // 根据rtti来反射方法
-  Result := False;
+  Result := false;
   LValue := nil;
-  isInvoke := False;
+  isInvoke := false;
   if FRouterItem = nil then
   begin
     QHTTPResult.ResultMsg := '无相关的路由信息,无法进行方法调用!!!';
@@ -1186,6 +1198,7 @@ begin
     QHTTPResult.ResultMsg := lOneMethodRtti.ErrMsg;
     exit;
   end;
+
   // 访问方式控制
   if lOneMethodRtti.HttpMethodType <> emOneHttpMethodMode.OneAll then
   begin
@@ -1208,6 +1221,13 @@ begin
         end;
     end;
   end;
+
+  // 处理Attribute
+  if not self.DoAttribute(lOneMethodRtti, QHTTPCtxt, QHTTPResult) then
+  begin
+    exit;
+  end;
+
   lArgs := nil;
   try
     // 反射调用
@@ -1297,6 +1317,42 @@ begin
   finally
     setLength(lArgs, 0);
     lArgs := nil;
+  end;
+  Result := true;
+end;
+
+function TOneControllerBase.DoAttribute(QOneMethodRtti: TOneMethodRtti;
+  QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean;
+var
+  lAttributeList: TList<TCustomAttribute>;
+  lAttribute: TCustomAttribute;
+  lOneAuthor: TOneAuthor;
+begin
+  //
+  Result := false;
+  lAttributeList := QOneMethodRtti.Attribute;
+  for lAttribute in lAttributeList do
+  begin
+    if lAttribute is TOneAuthor then
+    begin
+      lOneAuthor := TOneAuthor(lAttribute);
+      if (lOneAuthor.AuthorGetMode = TOneAuthorGetMode.token) then
+      begin
+        Result := self.CheckToken(QHTTPCtxt, QHTTPResult, true);
+        exit;
+      end
+      else if (lOneAuthor.AuthorGetMode = TOneAuthorGetMode.header) then
+      begin
+        Result := self.CheckAuthor(QHTTPCtxt, QHTTPResult, true);
+        exit;
+      end
+      else
+      begin
+        QHTTPResult.ResultMsg := '未设计的验证模式AuthorGetMode';
+        Result := false;
+        exit;
+      end;
+    end;
   end;
   Result := true;
 end;

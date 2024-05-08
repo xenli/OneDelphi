@@ -26,7 +26,8 @@ type
   // upDownListProcess批量文件上传进度
   // upDownListEnd批量文件上传结束
   emUpDownMode = (UpLoad, DownLoad);
-  emUpDownChunkStatus = (upDownUnknow, upDownErr, upDownStart, upDownProcess, upDownEnd, upDownListStar, upDownListProcess, upDownListEnd);
+  emUpDownChunkStatus = (upDownUnknow, upDownErr, upDownGetTask, upDownStart, upDownProcess, upDownEnd,
+    upDownSaveFileOk, upDownListStar, upDownListProcess, upDownListEnd);
   EvenUpDownChunkCallBack = reference to procedure(QUpDownMode: emUpDownMode; QStatus: emUpDownChunkStatus; QTotalSize: int64; QPosition: int64; QErrmsg: string);
 
   EvenOKCallBack = reference to procedure(QIsOK: boolean; QErrmsg: string);

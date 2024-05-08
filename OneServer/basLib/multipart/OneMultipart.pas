@@ -34,7 +34,7 @@ type
 function IsMultipartForm(QContentType: string): Boolean;
 
 function MultipartFormDeCode(QContentType: string; QContent: RawByteString; var QErrMsg: string): TOneMultipartDecode;
-
+function MultipartFormStreamDeCode(QContentType: string; QStream:TStream; var QErrMsg: string): TOneMultipartDecode;
 implementation
 
 const
@@ -84,6 +84,29 @@ begin
   end;
 end;
 
+function MultipartFormStreamDeCode(QContentType: string;QStream:TStream; var QErrMsg: string): TOneMultipartDecode;
+var
+  lContentBuffer: TBytes;
+  lMultipartDecode: TOneMultipartDecode;
+begin
+  QStream.Position := 0;
+  setlength(lContentBuffer, QStream.Size);
+  QStream.Read(lContentBuffer, QStream.Size);
+   // lContentBuffer := TEncoding.ANSI.GetBytes(QContent);
+  lMultipartDecode := TOneMultipartDecode.Create;
+  try
+    lMultipartDecode.FContentType := QContentType;
+    lMultipartDecode.FContentBuffer := lContentBuffer;
+    lMultipartDecode.ParseMultiPartContent;
+    Result := lMultipartDecode;
+  except
+    on e: Exception do
+    begin
+      QErrMsg := e.Message;
+      Result := nil;
+    end;
+  end;
+end;
 { TOneMultipartDecode }
 constructor TOneMultipartDecode.Create;
 begin

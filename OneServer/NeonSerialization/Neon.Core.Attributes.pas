@@ -1,7 +1,7 @@
 {******************************************************************************}
 {                                                                              }
 {  Neon: Serialization Library for Delphi                                      }
-{  Copyright (c) 2018-2021 Paolo Rossi                                         }
+{  Copyright (c) 2018 Paolo Rossi                                              }
 {  https://github.com/paolo-rossi/neon-library                                 }
 {                                                                              }
 {******************************************************************************}
@@ -20,6 +20,8 @@
 {                                                                              }
 {******************************************************************************}
 unit Neon.Core.Attributes;
+
+{$I Neon.inc}
 
 interface
 
@@ -72,7 +74,6 @@ type
   ///   Read + Write Attribute
   /// </remarks>
   NeonIgnoreAttribute = class(NeonAttribute);
-
 
   /// <summary>
   ///   The Neon attribute [NeonUnwrapped] is a property/field annotation used to
@@ -131,6 +132,22 @@ type
     constructor Create(AIncludeValue: IncludeIf = IncludeIf.Always; const AIncludeFunction: string = 'ShouldInclude');
 
     property IncludeValue: TIncludeValue read FIncludeValue write FIncludeValue;
+  end;
+
+  /// <summary>
+  ///   The Neon annotation NeonFormat tells Neon to output the property (or field)
+  ///   in the specified format
+  /// </summary>
+  /// <remarks>
+  ///   Currently Base64 is supported for TBytes through a CustomSerializer
+  /// </remarks>
+  NeonFormat = (Native, Base64);
+  NeonFormatAttribute = class(NeonAttribute)
+  private
+    FFormatValue: NeonFormat;
+  public
+    constructor Create(AOutputValue: NeonFormat = NeonFormat.Native);
+    property FormatValue: NeonFormat read FFormatValue write FFormatValue;
   end;
 
   /// <summary>
@@ -220,6 +237,13 @@ type
   /// </summary>
   NeonRawValueAttribute = class(NeonAttribute);
 
+
+  /// <summary>
+  ///   The NeonAutoCreate tells Neon to create an object if it's nil. The
+  ///   class must have at least one parameterless Create constructor.
+  /// </summary>
+  NeonAutoCreateAttribute = class(NeonAttribute);
+
   {
   //Read Annotations
   NeonSetterAttribute = class(NeonAttribute);
@@ -281,6 +305,13 @@ end;
 constructor NeonEnumNamesAttribute.Create(const ANames: string);
 begin
   FNames := ANames.Split([',']);
+end;
+
+{ NeonFormatAttribute }
+
+constructor NeonFormatAttribute.Create(AOutputValue: NeonFormat);
+begin
+  FFormatValue := AOutputValue;
 end;
 
 end.

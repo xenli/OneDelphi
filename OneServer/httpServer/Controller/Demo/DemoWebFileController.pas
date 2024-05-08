@@ -59,7 +59,7 @@ begin
   for i := 0 to QFormData.Files.count - 1 do
   begin
     lWebRequestFile := TOneRequestFile(QFormData.Files.items[i]);
-    result.ResultData := result.ResultData + '当前接收到文件参数[' + lWebRequestFile.FieldName + ']' + '文件名称[' + Utf8Decode(lWebRequestFile.fileName) + ']' + #10#13;
+    result.ResultData := result.ResultData + '当前接收到文件参数[' + lWebRequestFile.FieldName + ']' + '文件名称[' + lWebRequestFile.fileName + ']' + #10#13;
     // 文件流 ,至于要咱样是业务问题
     tempStream := TCustomMemoryStream(lWebRequestFile.Stream);
     tempStream.Position := 0;

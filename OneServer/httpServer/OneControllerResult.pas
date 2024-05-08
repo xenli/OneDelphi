@@ -5,9 +5,6 @@ interface
 uses system.Generics.Collections, system.Rtti, OneRttiHelper, OneHttpConst;
 
 type
-  emOneResultMode = (resultString, OneGet, OnePost, OneForm, OneUpload, OneDownload);
-
-type
   IActionResult = interface;
 
   IActionResult = interface

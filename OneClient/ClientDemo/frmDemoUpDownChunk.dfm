@@ -315,6 +315,7 @@ object Form7: TForm7
     Top = 80
   end
   object OneConnection: TOneConnection
+    Connected = False
     IsHttps = False
     HTTPPort = 0
     ConnectionTimeout = 0

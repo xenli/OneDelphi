@@ -4,7 +4,7 @@ interface
 
 uses OneHttpController, OneHttpCtxtResult, OneHttpRouterManage, System.SysUtils,
   System.Generics.Collections, System.Contnrs, System.Classes,
-  FireDAC.Comp.Client, Data.DB, System.JSON, System.IOUtils;
+  FireDAC.Comp.Client, Data.DB, System.JSON, System.IOUtils,OneAttribute;
 
 type
   TPersonResult = class(TObject)
@@ -40,6 +40,7 @@ type
   TDemoController = class(TOneControllerBase)
   public
     // OnetGet支持Get访问
+
     procedure OneGetHelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
     // 最终结果:{ResultCode: "0001", ResultMsg: "", ResultCount: 0, ResultData: "欢迎来到HelloWorld"}
     procedure HelloWorld(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
@@ -108,9 +109,7 @@ type
 function CreateNewDemoController(QRouterItem: TOneRouterWorkItem): TObject;
 // 方法类型注册
 procedure HelloWorldEven(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult);
-
 implementation
-
 constructor TPersonResult.Create;
 begin
   inherited Create;
