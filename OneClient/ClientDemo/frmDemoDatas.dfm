@@ -2,7 +2,7 @@ object Form2: TForm2
   Left = 0
   Top = 0
   Caption = #25171#24320#20445#23384#22810#20010#25968#25454#38598'Demo->'#31616#21333#27979#35797'->'#21333#20010#25968#25454#38598#25152#26377#21151#33021#22810#25903#25345
-  ClientHeight = 430
+  ClientHeight = 429
   ClientWidth = 904
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET

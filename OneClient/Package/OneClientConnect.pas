@@ -10,7 +10,8 @@ uses
   FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageBin, FireDAC.Phys.Intf,
   FireDAC.Stan.StorageJSON, FireDAC.Stan.StorageXML, system.TypInfo,
   OneClientResult, OneNeonHelper, OneClientDataInfo, OneStreamString, FireDAC.Comp.DataSet,
-  OneSQLCrypto, FireDAC.Stan.Param, system.Zip, system.Math, system.NetEncoding;
+  OneSQLCrypto, FireDAC.Stan.Param, system.Zip, system.Math, system.NetEncoding, Data.SqlTimSt,
+  OneDate;
 
 const
   HTTP_Status_TokenFail = 498;
@@ -54,8 +55,7 @@ const
 type
   TOneConnection = class;
 
-  OneContentType = (ContentTypeText, ContentTypeHtml, ContentTypeStream,
-    ContentTypeZip);
+  OneContentType = (ContentTypeText, ContentTypeHtml, ContentTypeStream, ContentTypeZip);
 
   TOneResultBytes = class
   private
@@ -112,27 +112,20 @@ type
     procedure SetErrTrueResult(var QErrMsg: string);
     function IsErrTrueResult(QErrMsg: string): boolean;
     //
-    constructor Create(AOwner: TComponent);
-      override;
+    constructor Create(AOwner: TComponent); override;
     function DoConnect(qForceConnect: boolean = false): boolean;
     function DoConnectPing(): boolean;
     function DoPing(): boolean;
     function DoTokenBindUser(qUserID: string; qUserCode: string; qUserName: string): boolean;
-    procedure DisConnect;
-      overload;
+    procedure DisConnect; overload;
     // 提交bytes返回Bytes
-    function PostResultBytes(const QUrl: string; QPostDataBtye: TBytes): TOneResultBytes;
-      overload;
-    function PostResultBytes(const QUrl: string; QPostData: RawByteString): TOneResultBytes;
-      overload;
+    function PostResultBytes(const QUrl: string; QPostDataBtye: TBytes): TOneResultBytes; overload;
+    function PostResultBytes(const QUrl: string; QPostData: RawByteString): TOneResultBytes; overload;
     // 提交字符串，返回JSONValue
-    function PostResultJsonValue(const QUrl: string; QPostData: RawByteString; var QErrMsg: string): TJsonValue;
-      overload;
-    function PostResultJsonValue(const QUrl: string; QObject: TObject; var QErrMsg: string): TJsonValue;
-      overload;
+    function PostResultJsonValue(const QUrl: string; QPostData: RawByteString; var QErrMsg: string): TJsonValue; overload;
+    function PostResultJsonValue(const QUrl: string; QObject: TObject; var QErrMsg: string): TJsonValue; overload;
     // 提交Bytes，返回JSONValue
-    function PostResultJsonValue(const QUrl: string; QPostData: TBytes; var QErrMsg: string): TJsonValue;
-      overload;
+    function PostResultJsonValue(const QUrl: string; QPostData: TBytes; var QErrMsg: string): TJsonValue; overload;
     function PostResultContent(const QUrl: string; QPostData: string; var QResultData: string): boolean;
     // Get相关事件
     function GetResultBytes(const QUrl: string): TOneResultBytes;
@@ -143,13 +136,11 @@ type
     // 跟据OneDataSet打开数据集
     function OpenData(Sender: TObject): boolean;
     // 跟据List<OneDataSet>打开数据集
-    function OpenDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean;
-      overload;
+    function OpenDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean; overload;
     // 以文件流方式打开数据
     function DownLoadDataFile(QFileID: string; var QErrMsg: string): TMemoryStream;
     // 跟据List<TOneDataOpen(数据集信息收集)>打开数据集
-    function OpenDatasPost(QDataOpens: TList<TOneDataOpen>): TOneDataResult;
-      overload;
+    function OpenDatasPost(QDataOpens: TList<TOneDataOpen>): TOneDataResult; overload;
     //
     function ExecStored(Sender: TObject): boolean;
     function ExecScript(Sender: TObject): boolean;
@@ -157,17 +148,12 @@ type
     // 执行存储过程
     function ExecStoredPost(QDataOpen: TOneDataOpen): TOneDataResult;
     // 跟据dataSet保存数据
-    function SaveData(Sender: TObject): boolean;
-      overload;
-    function ExecDML(QSQL: string; QParamValues: array of Variant; Var QErrMsg: string): boolean;
-      overload;
-    function ExecDML(QSQL: string; QParamValues: array of Variant; QZTCode: string; Var QErrMsg: string): boolean;
-      overload;
+    function SaveData(Sender: TObject): boolean; overload;
+    function ExecDML(QSQL: string; QParamValues: array of Variant; Var QErrMsg: string): boolean; overload;
+    function ExecDML(QSQL: string; QParamValues: array of Variant; QZTCode: string; Var QErrMsg: string): boolean; overload;
     // 跟据List<OneDataSet>打开数据集
-    function SaveDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean;
-      overload;
-    function SaveDatasPost(QSaveDMLDatas: TList<TOneDataSaveDML>): TOneDataResult;
-      overload;
+    function SaveDatas(QObjectList: TList<TObject>; var QErrMsg: string): boolean; overload;
+    function SaveDatasPost(QSaveDMLDatas: TList<TOneDataSaveDML>): TOneDataResult; overload;
     // 把返回的结构转化成dataset
     function DataResultToDataSets(DataResult: TOneDataResult; QObjectList: TList<TObject>; QIsSave: boolean; Var QErrMsg: string): boolean;
     function DataResultToDataSet(QDataResult: TOneDataResult; QObject: TObject; Var QErrMsg: string): boolean;
@@ -671,8 +657,7 @@ begin
               finally
                 lIsPostEnd := true;
               end;
-            end
-            ).Start;
+            end).Start;
           while not lIsPostEnd do
           begin
             sleep(200);
@@ -751,7 +736,8 @@ begin
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' + TEncoding.UTF8.GetString(lBytes);;
+        result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' +
+          TEncoding.UTF8.GetString(lBytes);;
       end;
     except
       on e: Exception do
@@ -1014,7 +1000,8 @@ begin
         LResponseStream.Position := 0;
         setLength(lBytes, LResponseStream.Size);
         LResponseStream.Read(lBytes, LResponseStream.Size);
-        result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' + TEncoding.UTF8.GetString(lBytes);;
+        result.ErrMsg := '返回结果错误,错误代码:' + LResponse.StatusCode.ToString + ';错误状态:' + LResponse.StatusText + ';服务端错误:' +
+          TEncoding.UTF8.GetString(lBytes);;
       end;
     except
       on e: Exception do
@@ -1130,12 +1117,21 @@ begin
           else
             lOneParam.ParamValue := OneStreamString.StreamToBase64Str(lFDParam.AsStream);
         end;
+      ftTimeStamp:
+        begin
+          if lFDParam.IsNull then
+            lOneParam.ParamValue := const_OneParamIsNull_Value
+          else
+            lOneParam.ParamValue := OneSQLTimeStampToStr(lFDParam.AsSQLTimeStamp);
+        end
     else
       begin
         if lFDParam.IsNull then
           lOneParam.ParamValue := const_OneParamIsNull_Value
         else
+        begin
           lOneParam.ParamValue := varToStr(lFDParam.Value);
+        end;
       end;
     end;
   end;
@@ -1326,7 +1322,7 @@ begin
     lDataResult := self.ExecStoredPost(lDataOpen);
     if not lDataResult.ResultOK then
     begin
-      TOneDataSet(Sender).DataInfo.ErrMsg := '服务端消息:' + lDataResult.ResultMsg;
+      TOneDataSet(Sender).DataInfo.ErrMsg := lDataResult.ResultMsg;
       exit;
     end;
     if not self.DataResultToDataSet(lDataResult, Sender, lErrMsg) then
@@ -2281,6 +2277,7 @@ begin
       result := true;
     end;
   finally
+    lDataResult.Free;
     if lResultJsonValue <> nil then
     begin
       lResultJsonValue.Free;
@@ -2341,6 +2338,7 @@ begin
       result := true;
     end;
   finally
+    lDataResult.Free;
     if lResultJsonValue <> nil then
     begin
       lResultJsonValue.Free;
@@ -2401,6 +2399,7 @@ begin
       result := true;
     end;
   finally
+    lDataResult.Free;
     if lResultJsonValue <> nil then
     begin
       lResultJsonValue.Free;
@@ -2461,6 +2460,7 @@ begin
       result := true;
     end;
   finally
+    lDataResult.Free;
     if lResultJsonValue <> nil then
     begin
       lResultJsonValue.Free;
@@ -2521,6 +2521,7 @@ begin
       result := true;
     end;
   finally
+    lDataResult.Free;
     if lResultJsonValue <> nil then
     begin
       lResultJsonValue.Free;
@@ -3076,16 +3077,19 @@ begin
             isEnd := QVirtualTask.FilePosition >= QVirtualTask.FileTotalSize;
             if isEnd then
             begin
-              QUpDownChunkCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownEnd, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg);
+              QUpDownChunkCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownEnd, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition,
+                QVirtualTask.ErrMsg);
             end
             else
             begin
-              QUpDownChunkCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownProcess, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg);
+              QUpDownChunkCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownProcess, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition,
+                QVirtualTask.ErrMsg);
             end;
           end
           else
           begin
-            QUpDownChunkCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownErr, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg);
+            QUpDownChunkCallBack(emUpDownMode.UpLoad, emUpDownChunkStatus.upDownErr, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition,
+              QVirtualTask.ErrMsg);
           end;
         end;
       end;
@@ -3195,13 +3199,16 @@ begin
           begin
             isEnd := QVirtualTask.FilePosition >= QVirtualTask.FileTotalSize;
             if isEnd then
-              QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownEnd, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg)
+              QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownEnd, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition,
+                QVirtualTask.ErrMsg)
             else
-              QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownProcess, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg);
+              QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownProcess, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition,
+                QVirtualTask.ErrMsg);
           end
           else
           begin
-            QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownErr, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg);
+            QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownErr, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition,
+              QVirtualTask.ErrMsg);
           end;
         end;
       end;
@@ -3215,8 +3222,9 @@ begin
   end;
   if (isEnd) and (result) then
   begin
-    //保存文件成功
-    QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownSaveFileOk, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition, QVirtualTask.ErrMsg)
+    // 保存文件成功
+    QUpDownChunkCallBack(emUpDownMode.DownLoad, emUpDownChunkStatus.upDownSaveFileOk, QVirtualTask.FileTotalSize, QVirtualTask.FilePosition,
+      QVirtualTask.ErrMsg)
   end;
 end;
 

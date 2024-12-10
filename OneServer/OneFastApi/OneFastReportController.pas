@@ -23,7 +23,8 @@ type
 
 implementation
 
-{ 这边引用到了FR如果没装此控件的，屏B这个单元 }
+{ 这边引用到了FR如果没装此控件的，屏B这个单元，或者项目OneService屏B引用即可}
+//搜索关键字 CloseFastReportController
 uses OneGlobal, OneFastApiManage, OneFastApiDo, OneFileHelper, OneStreamString,
   frxClass, frxDBSet, frxDesgn, frxCross, frxBarcode, frxExportHTMLDiv,
   frxExportPPTX, frxExportDOCX, frxExportXLSX, frxExportHTML, frxExportPDF,

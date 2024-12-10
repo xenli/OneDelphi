@@ -25,15 +25,15 @@ begin
 
 	if @HMAC_CTX_init = nil then
 	begin
-		@HMAC_CTX_init:= LoadFunctionCLib('HMAC_CTX_init');
-		@HMAC_CTX_cleanup:= LoadFunctionCLib('HMAC_CTX_cleanup');
-		@HMAC_Init:= LoadFunctionCLib('HMAC_Init');
-		@HMAC_Init_ex:= LoadFunctionCLib('HMAC_Init_ex');
-		@HMAC_Update:= LoadFunctionCLib('HMAC_Update');
-		@HMAC_Final:= LoadFunctionCLib('HMAC_Final');
-		@HMAC:= LoadFunctionCLib('HMAC');
-		@HMAC_CTX_copy:= LoadFunctionCLib('HMAC_CTX_copy');
-		@HMAC_CTX_set_flags:= LoadFunctionCLib('HMAC_CTX_set_flags');
+		@HMAC_CTX_init:= LoadFuncCLibCrypto('HMAC_CTX_init');
+		@HMAC_CTX_cleanup:= LoadFuncCLibCrypto('HMAC_CTX_cleanup');
+		@HMAC_Init:= LoadFuncCLibCrypto('HMAC_Init');
+		@HMAC_Init_ex:= LoadFuncCLibCrypto('HMAC_Init_ex');
+		@HMAC_Update:= LoadFuncCLibCrypto('HMAC_Update');
+		@HMAC_Final:= LoadFuncCLibCrypto('HMAC_Final');
+		@HMAC:= LoadFuncCLibCrypto('HMAC');
+		@HMAC_CTX_copy:= LoadFuncCLibCrypto('HMAC_CTX_copy');
+		@HMAC_CTX_set_flags:= LoadFuncCLibCrypto('HMAC_CTX_set_flags');
 	end;
 
 end;

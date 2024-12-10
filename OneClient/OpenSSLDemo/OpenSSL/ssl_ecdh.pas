@@ -27,19 +27,19 @@ procedure SSL_InitSSLDH;
 begin
 	if @ECDH_OpenSSL = nil then
 	begin
-		@ECDH_OpenSSL:= LoadFunctionCLib('ECDH_OpenSSL');
+		@ECDH_OpenSSL:= LoadFuncCLibCrypto('ECDH_OpenSSL');
 
-		@ECDH_set_default_method:= LoadFunctionCLib('ECDH_set_default_method');
-		@ECDH_get_default_method:= LoadFunctionCLib('ECDH_get_default_method');
-		@ECDH_set_method:= LoadFunctionCLib('ECDH_set_method');
+		@ECDH_set_default_method:= LoadFuncCLibCrypto('ECDH_set_default_method');
+		@ECDH_get_default_method:= LoadFuncCLibCrypto('ECDH_get_default_method');
+		@ECDH_set_method:= LoadFuncCLibCrypto('ECDH_set_method');
               
-		@ECDH_compute_key:= LoadFunctionCLib('ECDH_compute_key');
+		@ECDH_compute_key:= LoadFuncCLibCrypto('ECDH_compute_key');
 
-		@ECDH_get_ex_new_index:= LoadFunctionCLib('ECDH_get_ex_new_index');
-		@ECDH_set_ex_data:= LoadFunctionCLib('ECDH_set_ex_data');
-		@ECDH_get_ex_data:= LoadFunctionCLib('ECDH_get_ex_data');
+		@ECDH_get_ex_new_index:= LoadFuncCLibCrypto('ECDH_get_ex_new_index');
+		@ECDH_set_ex_data:= LoadFuncCLibCrypto('ECDH_set_ex_data');
+		@ECDH_get_ex_data:= LoadFuncCLibCrypto('ECDH_get_ex_data');
 
-		@ERR_load_ECDH_strings:= LoadFunctionCLib('ERR_load_ECDH_strings');
+		@ERR_load_ECDH_strings:= LoadFuncCLibCrypto('ERR_load_ECDH_strings');
 
 	end;
 end;

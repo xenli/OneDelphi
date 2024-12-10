@@ -24,7 +24,7 @@ uses
   ssl_ecdsa in 'OpenSSL\ssl_ecdsa.pas',
   ssl_engine in 'OpenSSL\ssl_engine.pas',
   ssl_err in 'OpenSSL\ssl_err.pas',
-  ssl_evp in 'OpenSSL\ssl_evp.pas',
+  ssl_evphis in 'OpenSSL\ssl_evphis.pas',
   ssl_hmac in 'OpenSSL\ssl_hmac.pas',
   ssl_idea in 'OpenSSL\ssl_idea.pas',
   ssl_init in 'OpenSSL\ssl_init.pas',
@@ -51,7 +51,14 @@ uses
   ssl_util in 'OpenSSL\ssl_util.pas',
   ssl_x509 in 'OpenSSL\ssl_x509.pas',
   ssl_encode in 'OpenSSL\ssl_encode.pas',
-  ssl_sm4 in 'OpenSSL\ssl_sm4.pas';
+  ssl_sm4 in 'OpenSSL\ssl_sm4.pas',
+  ssl_sm3 in 'OpenSSL\ssl_sm3.pas',
+  ssl_evpmdctx in 'OpenSSL\ssl_evpmdctx.pas',
+  ssl_evp in 'OpenSSL\ssl_evp.pas',
+  ssl_typepointers in 'OpenSSL\ssl_typepointers.pas',
+  ssl_conver in 'OpenSSL\ssl_conver.pas',
+  ssl_evppkey in 'OpenSSL\ssl_evppkey.pas',
+  ssl_sm2 in 'OpenSSL\ssl_sm2.pas';
 
 {$R *.res}
 

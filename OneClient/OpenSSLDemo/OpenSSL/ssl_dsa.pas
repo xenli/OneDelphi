@@ -52,7 +52,7 @@ procedure EVP_PKEY_assign_DSA(key: PEVP_PKEY; dsa: PDSA); inline;
 procedure SSL_InitDSA;
 
 implementation
-uses ssl_lib, ssl_evp, ssl_const;
+uses ssl_lib, ssl_evphis, ssl_const;
 
 procedure EVP_PKEY_assign_DSA(key: PEVP_PKEY; dsa: PDSA); inline;
 begin
@@ -64,42 +64,42 @@ procedure SSL_InitDSA;
 begin
  if @DSA_new = nil then
   begin
-    @DSA_new := LoadFunctionCLib('DSA_new');
-    @DSA_new_method := LoadFunctionCLib('DSA_new_method');
-    @DSA_size := LoadFunctionCLib('DSA_size');
-    @DSA_generate_key := LoadFunctionCLib('DSA_generate_key');
-    @DSA_generate_parameters := LoadFunctionCLib('DSA_generate_parameters');
-    @DSA_generate_parameters_ex := LoadFunctionCLib('DSA_generate_parameters_ex');
-    @DSA_free := LoadFunctionCLib('DSA_free');
-    @DSA_up_ref := LoadFunctionCLib('DSA_up_ref');
+    @DSA_new := LoadFuncCLibCrypto('DSA_new');
+    @DSA_new_method := LoadFuncCLibCrypto('DSA_new_method');
+    @DSA_size := LoadFuncCLibCrypto('DSA_size');
+    @DSA_generate_key := LoadFuncCLibCrypto('DSA_generate_key');
+    @DSA_generate_parameters := LoadFuncCLibCrypto('DSA_generate_parameters');
+    @DSA_generate_parameters_ex := LoadFuncCLibCrypto('DSA_generate_parameters_ex');
+    @DSA_free := LoadFuncCLibCrypto('DSA_free');
+    @DSA_up_ref := LoadFuncCLibCrypto('DSA_up_ref');
        
-    @DSAparams_dup:= LoadFunctionCLib('DSAparams_dup');
-    @DSA_SIG_new:= LoadFunctionCLib('DSA_SIG_new');
-    @DSA_SIG_free:= LoadFunctionCLib('DSA_SIG_free');
-    @i2d_DSA_SIG:= LoadFunctionCLib('i2d_DSA_SIG');
-    @d2i_DSA_SIG:= LoadFunctionCLib('d2i_DSA_SIG');
-    @DSA_do_sign:= LoadFunctionCLib('DSA_do_sign');
-    @DSA_do_verify:= LoadFunctionCLib('DSA_do_verify');
-    @DSA_OpenSSL:= LoadFunctionCLib('DSA_OpenSSL');
-    @DSA_set_default_method:= LoadFunctionCLib('DSA_set_default_method');
-    @DSA_set_method:= LoadFunctionCLib('DSA_set_method');
-    @DSA_sign_setup:= LoadFunctionCLib('DSA_sign_setup');
-    @DSA_sign:= LoadFunctionCLib('DSA_sign');
-    @DSA_verify:= LoadFunctionCLib('DSA_verify');
-    @DSA_get_ex_new_index:= LoadFunctionCLib('DSA_get_ex_new_index');
-    @DSA_set_ex_data:= LoadFunctionCLib('DSA_set_ex_data');
-    @DSA_get_ex_data:= LoadFunctionCLib('DSA_get_ex_data');
-    @d2i_DSAPublicKey:= LoadFunctionCLib('d2i_DSAPublicKey');
-    @d2i_DSAPrivateKey:= LoadFunctionCLib('d2i_DSAPrivateKey');
-    @d2i_DSAparams:= LoadFunctionCLib('d2i_DSAparams');
-    @i2d_DSAPublicKey:= LoadFunctionCLib('i2d_DSAPublicKey');
-    @i2d_DSAPrivateKey:= LoadFunctionCLib('i2d_DSAPrivateKey');
-    @i2d_DSAparams:= LoadFunctionCLib('i2d_DSAparams');
-    @DSAparams_print:= LoadFunctionCLib('DSAparams_print');
-    @DSA_print:= LoadFunctionCLib('DSA_print');
-    @DSAparams_print_fp:= LoadFunctionCLib('DSAparams_print_fp');
-    @DSA_print_fp:= LoadFunctionCLib('DSA_print_fp');
-    @ERR_load_DSA_strings:= LoadFunctionCLib('ERR_load_DSA_strings');
+    @DSAparams_dup:= LoadFuncCLibCrypto('DSAparams_dup');
+    @DSA_SIG_new:= LoadFuncCLibCrypto('DSA_SIG_new');
+    @DSA_SIG_free:= LoadFuncCLibCrypto('DSA_SIG_free');
+    @i2d_DSA_SIG:= LoadFuncCLibCrypto('i2d_DSA_SIG');
+    @d2i_DSA_SIG:= LoadFuncCLibCrypto('d2i_DSA_SIG');
+    @DSA_do_sign:= LoadFuncCLibCrypto('DSA_do_sign');
+    @DSA_do_verify:= LoadFuncCLibCrypto('DSA_do_verify');
+    @DSA_OpenSSL:= LoadFuncCLibCrypto('DSA_OpenSSL');
+    @DSA_set_default_method:= LoadFuncCLibCrypto('DSA_set_default_method');
+    @DSA_set_method:= LoadFuncCLibCrypto('DSA_set_method');
+    @DSA_sign_setup:= LoadFuncCLibCrypto('DSA_sign_setup');
+    @DSA_sign:= LoadFuncCLibCrypto('DSA_sign');
+    @DSA_verify:= LoadFuncCLibCrypto('DSA_verify');
+    @DSA_get_ex_new_index:= LoadFuncCLibCrypto('DSA_get_ex_new_index');
+    @DSA_set_ex_data:= LoadFuncCLibCrypto('DSA_set_ex_data');
+    @DSA_get_ex_data:= LoadFuncCLibCrypto('DSA_get_ex_data');
+    @d2i_DSAPublicKey:= LoadFuncCLibCrypto('d2i_DSAPublicKey');
+    @d2i_DSAPrivateKey:= LoadFuncCLibCrypto('d2i_DSAPrivateKey');
+    @d2i_DSAparams:= LoadFuncCLibCrypto('d2i_DSAparams');
+    @i2d_DSAPublicKey:= LoadFuncCLibCrypto('i2d_DSAPublicKey');
+    @i2d_DSAPrivateKey:= LoadFuncCLibCrypto('i2d_DSAPrivateKey');
+    @i2d_DSAparams:= LoadFuncCLibCrypto('i2d_DSAparams');
+    @DSAparams_print:= LoadFuncCLibCrypto('DSAparams_print');
+    @DSA_print:= LoadFuncCLibCrypto('DSA_print');
+    @DSAparams_print_fp:= LoadFuncCLibCrypto('DSAparams_print_fp');
+    @DSA_print_fp:= LoadFuncCLibCrypto('DSA_print_fp');
+    @ERR_load_DSA_strings:= LoadFuncCLibCrypto('ERR_load_DSA_strings');
   end;
 end;
 

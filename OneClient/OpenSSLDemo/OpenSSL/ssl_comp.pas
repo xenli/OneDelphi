@@ -20,14 +20,14 @@ procedure SSL_InitCOMP;
 begin
   if @COMP_CTX_new = nil then
   begin
-    @COMP_CTX_new:= LoadFunctionCLib('COMP_CTX_new');
-    @COMP_CTX_free:= LoadFunctionCLib('COMP_CTX_free');
-    @COMP_compress_block:= LoadFunctionCLib('COMP_compress_block');
-    @COMP_expand_block:= LoadFunctionCLib('COMP_expand_block');
-    @COMP_rle:= LoadFunctionCLib('COMP_rle');
-    @COMP_zlib:= LoadFunctionCLib('COMP_zlib');
-    @COMP_zlib_cleanup:= LoadFunctionCLib('COMP_zlib_cleanup');
-    @BIO_f_zlib:= LoadFunctionCLib('BIO_f_zlib', false);
+    @COMP_CTX_new:= LoadFuncCLibCrypto('COMP_CTX_new');
+    @COMP_CTX_free:= LoadFuncCLibCrypto('COMP_CTX_free');
+    @COMP_compress_block:= LoadFuncCLibCrypto('COMP_compress_block');
+    @COMP_expand_block:= LoadFuncCLibCrypto('COMP_expand_block');
+    @COMP_rle:= LoadFuncCLibCrypto('COMP_rle');
+    @COMP_zlib:= LoadFuncCLibCrypto('COMP_zlib');
+    @COMP_zlib_cleanup:= LoadFuncCLibCrypto('COMP_zlib_cleanup');
+    @BIO_f_zlib:= LoadFuncCLibCrypto('BIO_f_zlib', false);
   end;
 end;
 

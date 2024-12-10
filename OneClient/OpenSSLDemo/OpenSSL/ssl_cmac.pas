@@ -23,15 +23,15 @@ begin
 
  if @CMAC_CTX_new = nil then
  begin
-    @CMAC_CTX_new:= LoadFunctionCLib('CMAC_CTX_new');
-    @CMAC_CTX_cleanup:= LoadFunctionCLib('CMAC_CTX_cleanup');
-    @CMAC_CTX_free:= LoadFunctionCLib('CMAC_CTX_free');
-    @CMAC_CTX_get0_cipher_ctx:= LoadFunctionCLib('CMAC_CTX_get0_cipher_ctx');
-    @CMAC_CTX_copy:= LoadFunctionCLib('CMAC_CTX_copy');
-    @CMAC_Init:= LoadFunctionCLib('CMAC_Init');
-    @CMAC_Update:= LoadFunctionCLib('CMAC_Update');
-    @CMAC_Final:= LoadFunctionCLib('CMAC_Final');
-    @CMAC_resume:= LoadFunctionCLib('CMAC_resume');
+    @CMAC_CTX_new:= LoadFuncCLibCrypto('CMAC_CTX_new');
+    @CMAC_CTX_cleanup:= LoadFuncCLibCrypto('CMAC_CTX_cleanup');
+    @CMAC_CTX_free:= LoadFuncCLibCrypto('CMAC_CTX_free');
+    @CMAC_CTX_get0_cipher_ctx:= LoadFuncCLibCrypto('CMAC_CTX_get0_cipher_ctx');
+    @CMAC_CTX_copy:= LoadFuncCLibCrypto('CMAC_CTX_copy');
+    @CMAC_Init:= LoadFuncCLibCrypto('CMAC_Init');
+    @CMAC_Update:= LoadFuncCLibCrypto('CMAC_Update');
+    @CMAC_Final:= LoadFuncCLibCrypto('CMAC_Final');
+    @CMAC_resume:= LoadFuncCLibCrypto('CMAC_resume');
  end;
 end;
 end.

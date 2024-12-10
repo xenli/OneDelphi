@@ -1,4 +1,4 @@
-unit ssl_lib;
+锘縰nit ssl_lib;
 
 interface
 
@@ -45,37 +45,74 @@ AnsiString =
 {$ENDIF};
 {$ENDIF};
 
-function SSLCryptHandle: THandle;
-function LoadSSLCrypt: Boolean;
-function LoadFunctionCLib(const FceName: String; const ACritical: Boolean = True): Pointer;
+function CLibCryptoHandle: THandle;
+function LoadCLibCrypto: Boolean;
+function LoadFuncCLibCrypto(const FceName: String; const ACritical: Boolean = True): Pointer;
+
+function CLibSSLHandle: THandle;
+function LoadCLibSSL: Boolean;
+function LoadFuncCLibSSL(const FceName: String; const ACritical: Boolean = True): Pointer;
 
 implementation
 
 
 var
   hCrypt: THandle = 0;
+  hSSL:THandle = 0;
 
-function SSLCryptHandle: THandle;
+function CLibCryptoHandle: THandle;
 begin
   Result := hCrypt;
 end;
 
-function LoadSSLCrypt: Boolean;
+function LoadCLibCrypto: Boolean;
 begin
   hCrypt := SafeLoadLibrary(CLibCrypto);
   Result := hCrypt <> 0;
 end;
 
-function LoadFunctionCLib(const FceName: String; const ACritical: Boolean = True): Pointer;
+function LoadFuncCLibCrypto(const FceName: String; const ACritical: Boolean = True): Pointer;
 begin
-  if SSLCryptHandle = 0 then
+  if CLibCryptoHandle = 0 then
   begin
-    if (not LoadSSLCrypt()) then
+    if (not LoadCLibCrypto()) then
     begin
-      raise Exception.Create('加载OpenSSL包出错,请放在正确的文件目录下或exe运行目录');
+      raise Exception.Create('鍔犺浇['+CLibCrypto+']閿欒');
     end;
   end;
-  Result := {$IFDEF MSWINDOWS}windows.{$ENDIF}GetProcAddress(SSLCryptHandle, PChar(FceName));
+  Result := {$IFDEF MSWINDOWS}windows.{$ENDIF}GetProcAddress(CLibCryptoHandle, PChar(FceName));
+  if ACritical then
+  begin
+    if Result = nil then
+    begin
+{$IFDEF fpc}
+      raise Exception.CreateFmt('Error loading library. Func %s'#13#10'%s', [FceName, SysErrorMessage(GetLastOSError)]);
+{$ELSE}
+      raise Exception.CreateFmt('Error loading library. Func %s'#13#10'%s', [FceName, SysErrorMessage(GetLastError)]);
+{$ENDIF}
+    end;
+  end;
+end;
+
+function CLibSSLHandle: THandle;
+begin
+  Result := hSSL;
+end;
+function LoadCLibSSL: Boolean;
+begin
+  hSSL := SafeLoadLibrary(CLibSSL);
+  Result := hSSL <> 0;
+end;
+function LoadFuncCLibSSL(const FceName: String; const ACritical: Boolean = True): Pointer;
+begin
+  if CLibSSLHandle = 0 then
+  begin
+    if (not LoadCLibSSL()) then
+    begin
+     raise Exception.Create('鍔犺浇['+CLibSSL+']閿欒');
+    end;
+  end;
+  Result := {$IFDEF MSWINDOWS}windows.{$ENDIF}GetProcAddress(CLibSSLHandle, PChar(FceName));
   if ACritical then
   begin
     if Result = nil then
@@ -97,6 +134,7 @@ if hCrypt <> 0 then
 begin
 {$IFDEF MSWINDOWS}
   FreeLibrary(hCrypt);
+  FreeLibrary(hSSL);
 {$ENDIF MSWINDOWS}
 {$IFDEF POSIX}
   dlclose(hCrypt);

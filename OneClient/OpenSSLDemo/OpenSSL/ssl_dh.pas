@@ -45,7 +45,7 @@ procedure SSL_InitDH;
 procedure EVP_PKEY_assign_DH(key: PEVP_PKEY; _dh: PDH); inline;
 
 implementation
-uses ssl_lib, ssl_evp, ssl_const;
+uses ssl_lib, ssl_evphis, ssl_const;
 
 procedure EVP_PKEY_assign_DH(key: PEVP_PKEY; _dh: PDH); inline;
 begin
@@ -57,34 +57,34 @@ procedure SSL_InitDH;
 begin
  if @DH_new = nil then
   begin
-    @d2i_DHparams_fp:= LoadFunctionCLib('d2i_DHparams_fp', false);
-    @i2d_DHparams_fp:= LoadFunctionCLib('i2d_DHparams_fp', false);
-    @d2i_DHparams_bio:= LoadFunctionCLib('d2i_DHparams_bio', false);
-    @i2d_DHparams_bio:= LoadFunctionCLib('i2d_DHparams_bio', false);
-    @DHparams_dup:= LoadFunctionCLib('DHparams_dup');
-    @DH_OpenSSL:= LoadFunctionCLib('DH_OpenSSL');
-    @DH_set_default_method:= LoadFunctionCLib('DH_set_default_method');
-    @DH_get_default_method:= LoadFunctionCLib('DH_get_default_method');
-    @DH_set_method:= LoadFunctionCLib('DH_set_method');
-    @DH_new_method:= LoadFunctionCLib('DH_new_method');
-    @DH_new:= LoadFunctionCLib('DH_new');
-    @DH_free:= LoadFunctionCLib('DH_free');
-    @DH_up_ref:= LoadFunctionCLib('DH_up_ref');
-    @DH_size:= LoadFunctionCLib('DH_size');
-    @DH_get_ex_new_index:= LoadFunctionCLib('DH_get_ex_new_index');
-    @DH_set_ex_data:= LoadFunctionCLib('DH_set_ex_data');
-    @DH_get_ex_data:= LoadFunctionCLib('DH_get_ex_data');
-    @DH_generate_parameters:= LoadFunctionCLib('DH_generate_parameters');
-    @DH_generate_parameters_ex:= LoadFunctionCLib('DH_generate_parameters_ex');
-    @DH_check:= LoadFunctionCLib('DH_check');
-    @DH_check_pub_key:= LoadFunctionCLib('DH_check_pub_key');
-    @DH_generate_key:= LoadFunctionCLib('DH_generate_key');
-    @DH_compute_key:= LoadFunctionCLib('DH_compute_key');
-    @d2i_DHparams:= LoadFunctionCLib('d2i_DHparams');
-    @i2d_DHparams:= LoadFunctionCLib('i2d_DHparams');
-    @DHparams_print_fp:= LoadFunctionCLib('DHparams_print_fp');
-    @DHparams_print:= LoadFunctionCLib('DHparams_print');
-    @ERR_load_DH_strings := LoadFunctionCLib('ERR_load_DH_strings');
+    @d2i_DHparams_fp:= LoadFuncCLibCrypto('d2i_DHparams_fp', false);
+    @i2d_DHparams_fp:= LoadFuncCLibCrypto('i2d_DHparams_fp', false);
+    @d2i_DHparams_bio:= LoadFuncCLibCrypto('d2i_DHparams_bio', false);
+    @i2d_DHparams_bio:= LoadFuncCLibCrypto('i2d_DHparams_bio', false);
+    @DHparams_dup:= LoadFuncCLibCrypto('DHparams_dup');
+    @DH_OpenSSL:= LoadFuncCLibCrypto('DH_OpenSSL');
+    @DH_set_default_method:= LoadFuncCLibCrypto('DH_set_default_method');
+    @DH_get_default_method:= LoadFuncCLibCrypto('DH_get_default_method');
+    @DH_set_method:= LoadFuncCLibCrypto('DH_set_method');
+    @DH_new_method:= LoadFuncCLibCrypto('DH_new_method');
+    @DH_new:= LoadFuncCLibCrypto('DH_new');
+    @DH_free:= LoadFuncCLibCrypto('DH_free');
+    @DH_up_ref:= LoadFuncCLibCrypto('DH_up_ref');
+    @DH_size:= LoadFuncCLibCrypto('DH_size');
+    @DH_get_ex_new_index:= LoadFuncCLibCrypto('DH_get_ex_new_index');
+    @DH_set_ex_data:= LoadFuncCLibCrypto('DH_set_ex_data');
+    @DH_get_ex_data:= LoadFuncCLibCrypto('DH_get_ex_data');
+    @DH_generate_parameters:= LoadFuncCLibCrypto('DH_generate_parameters');
+    @DH_generate_parameters_ex:= LoadFuncCLibCrypto('DH_generate_parameters_ex');
+    @DH_check:= LoadFuncCLibCrypto('DH_check');
+    @DH_check_pub_key:= LoadFuncCLibCrypto('DH_check_pub_key');
+    @DH_generate_key:= LoadFuncCLibCrypto('DH_generate_key');
+    @DH_compute_key:= LoadFuncCLibCrypto('DH_compute_key');
+    @d2i_DHparams:= LoadFuncCLibCrypto('d2i_DHparams');
+    @i2d_DHparams:= LoadFuncCLibCrypto('i2d_DHparams');
+    @DHparams_print_fp:= LoadFuncCLibCrypto('DHparams_print_fp');
+    @DHparams_print:= LoadFuncCLibCrypto('DHparams_print');
+    @ERR_load_DH_strings := LoadFuncCLibCrypto('ERR_load_DH_strings');
   end;
 end;
 

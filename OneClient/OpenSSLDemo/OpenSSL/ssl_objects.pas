@@ -52,40 +52,40 @@ procedure SSL_InitOBJ;
 begin
  if @OBJ_NAME_init = nil then
  begin
-    @OBJ_NAME_init:= LoadFunctionCLib('OBJ_NAME_init');
-    @OBJ_NAME_new_index:= LoadFunctionCLib('OBJ_NAME_new_index');
-    @OBJ_NAME_get:= LoadFunctionCLib('OBJ_NAME_get');
-    @OBJ_NAME_add:= LoadFunctionCLib('OBJ_NAME_add');
-    @OBJ_NAME_remove:= LoadFunctionCLib('OBJ_NAME_remove');
-    @OBJ_NAME_cleanup:= LoadFunctionCLib('OBJ_NAME_cleanup');
-    @OBJ_NAME_do_all:= LoadFunctionCLib('OBJ_NAME_do_all');
-    @OBJ_NAME_do_all_sorted:= LoadFunctionCLib('OBJ_NAME_do_all_sorted');
-    @OBJ_dup:= LoadFunctionCLib('OBJ_dup');
-    @OBJ_nid2obj:= LoadFunctionCLib('OBJ_nid2obj');
-    @OBJ_nid2ln:= LoadFunctionCLib('OBJ_nid2ln');
-    @OBJ_nid2sn:= LoadFunctionCLib('OBJ_nid2sn');
-    @OBJ_obj2nid:= LoadFunctionCLib('OBJ_obj2nid');
-    @OBJ_txt2obj:= LoadFunctionCLib('OBJ_txt2obj');
-    @OBJ_obj2txt:= LoadFunctionCLib('OBJ_obj2txt');
-    @OBJ_txt2nid:= LoadFunctionCLib('OBJ_txt2nid');
-    @OBJ_ln2nid:= LoadFunctionCLib('OBJ_ln2nid');
-    @OBJ_sn2nid:= LoadFunctionCLib('OBJ_sn2nid');
-    @OBJ_cmp:= LoadFunctionCLib('OBJ_cmp');
-    @OBJ_bsearch_:= LoadFunctionCLib('OBJ_bsearch_', false);
-    @OBJ_bsearch_ex_:= LoadFunctionCLib('OBJ_bsearch_ex_', false);
-    @OBJ_new_nid:= LoadFunctionCLib('OBJ_new_nid');
-    @OBJ_add_object:= LoadFunctionCLib('OBJ_add_object');
-    @OBJ_create:= LoadFunctionCLib('OBJ_create');
-    @OBJ_cleanup:= LoadFunctionCLib('OBJ_cleanup');
-    @OBJ_create_objects:= LoadFunctionCLib('OBJ_create_objects');
-    @OBJ_find_sigid_algs:= LoadFunctionCLib('OBJ_find_sigid_algs', false);
-    @OBJ_find_sigid_by_algs:= LoadFunctionCLib('OBJ_find_sigid_by_algs', false);
-    @OBJ_add_sigid:= LoadFunctionCLib('OBJ_add_sigid', false);
-    @OBJ_sigid_free:= LoadFunctionCLib('OBJ_sigid_free', false);
-    @check_defer:= LoadFunctionCLib('check_defer', false);
-    @ERR_load_OBJ_strings:= LoadFunctionCLib('ERR_load_OBJ_strings');
+    @OBJ_NAME_init:= LoadFuncCLibCrypto('OBJ_NAME_init');
+    @OBJ_NAME_new_index:= LoadFuncCLibCrypto('OBJ_NAME_new_index');
+    @OBJ_NAME_get:= LoadFuncCLibCrypto('OBJ_NAME_get');
+    @OBJ_NAME_add:= LoadFuncCLibCrypto('OBJ_NAME_add');
+    @OBJ_NAME_remove:= LoadFuncCLibCrypto('OBJ_NAME_remove');
+    @OBJ_NAME_cleanup:= LoadFuncCLibCrypto('OBJ_NAME_cleanup');
+    @OBJ_NAME_do_all:= LoadFuncCLibCrypto('OBJ_NAME_do_all');
+    @OBJ_NAME_do_all_sorted:= LoadFuncCLibCrypto('OBJ_NAME_do_all_sorted');
+    @OBJ_dup:= LoadFuncCLibCrypto('OBJ_dup');
+    @OBJ_nid2obj:= LoadFuncCLibCrypto('OBJ_nid2obj');
+    @OBJ_nid2ln:= LoadFuncCLibCrypto('OBJ_nid2ln');
+    @OBJ_nid2sn:= LoadFuncCLibCrypto('OBJ_nid2sn');
+    @OBJ_obj2nid:= LoadFuncCLibCrypto('OBJ_obj2nid');
+    @OBJ_txt2obj:= LoadFuncCLibCrypto('OBJ_txt2obj');
+    @OBJ_obj2txt:= LoadFuncCLibCrypto('OBJ_obj2txt');
+    @OBJ_txt2nid:= LoadFuncCLibCrypto('OBJ_txt2nid');
+    @OBJ_ln2nid:= LoadFuncCLibCrypto('OBJ_ln2nid');
+    @OBJ_sn2nid:= LoadFuncCLibCrypto('OBJ_sn2nid');
+    @OBJ_cmp:= LoadFuncCLibCrypto('OBJ_cmp');
+    @OBJ_bsearch_:= LoadFuncCLibCrypto('OBJ_bsearch_', false);
+    @OBJ_bsearch_ex_:= LoadFuncCLibCrypto('OBJ_bsearch_ex_', false);
+    @OBJ_new_nid:= LoadFuncCLibCrypto('OBJ_new_nid');
+    @OBJ_add_object:= LoadFuncCLibCrypto('OBJ_add_object');
+    @OBJ_create:= LoadFuncCLibCrypto('OBJ_create');
+    @OBJ_cleanup:= LoadFuncCLibCrypto('OBJ_cleanup');
+    @OBJ_create_objects:= LoadFuncCLibCrypto('OBJ_create_objects');
+    @OBJ_find_sigid_algs:= LoadFuncCLibCrypto('OBJ_find_sigid_algs', false);
+    @OBJ_find_sigid_by_algs:= LoadFuncCLibCrypto('OBJ_find_sigid_by_algs', false);
+    @OBJ_add_sigid:= LoadFuncCLibCrypto('OBJ_add_sigid', false);
+    @OBJ_sigid_free:= LoadFuncCLibCrypto('OBJ_sigid_free', false);
+    @check_defer:= LoadFuncCLibCrypto('check_defer', false);
+    @ERR_load_OBJ_strings:= LoadFuncCLibCrypto('ERR_load_OBJ_strings');
     
  end;
 end;
 
-end.
+end.

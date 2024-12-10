@@ -1,0 +1,1 @@
+ {$DEFINE One_NoFastReport}

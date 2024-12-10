@@ -29,21 +29,21 @@ begin
  if @AES_options = nil then
   begin
         
-      @AES_options:= LoadFunctionCLib('AES_options');
-      @AES_set_encrypt_key:= LoadFunctionCLib('AES_set_encrypt_key');
-      @AES_set_decrypt_key:= LoadFunctionCLib('AES_set_decrypt_key');
-      @AES_encrypt:= LoadFunctionCLib('AES_encrypt');
-      @AES_decrypt:= LoadFunctionCLib('AES_decrypt');
-      @AES_ecb_encrypt:= LoadFunctionCLib('AES_ecb_encrypt');
-      @AES_cbc_encrypt:= LoadFunctionCLib('AES_cbc_encrypt');
-      @AES_cfb128_encrypt:= LoadFunctionCLib('AES_cfb128_encrypt');
-      @AES_cfb1_encrypt:= LoadFunctionCLib('AES_cfb1_encrypt');
-      @AES_cfb8_encrypt:= LoadFunctionCLib('AES_cfb8_encrypt');
-      @AES_ofb128_encrypt:= LoadFunctionCLib('AES_ofb128_encrypt');
-      @AES_ige_encrypt:= LoadFunctionCLib('AES_ige_encrypt');
-      @AES_bi_ige_encrypt:= LoadFunctionCLib('AES_bi_ige_encrypt');
-      @AES_wrap_key:= LoadFunctionCLib('AES_wrap_key');
-      @AES_unwrap_key:= LoadFunctionCLib('AES_unwrap_key');
+      @AES_options:= LoadFuncCLibCrypto('AES_options');
+      @AES_set_encrypt_key:= LoadFuncCLibCrypto('AES_set_encrypt_key');
+      @AES_set_decrypt_key:= LoadFuncCLibCrypto('AES_set_decrypt_key');
+      @AES_encrypt:= LoadFuncCLibCrypto('AES_encrypt');
+      @AES_decrypt:= LoadFuncCLibCrypto('AES_decrypt');
+      @AES_ecb_encrypt:= LoadFuncCLibCrypto('AES_ecb_encrypt');
+      @AES_cbc_encrypt:= LoadFuncCLibCrypto('AES_cbc_encrypt');
+      @AES_cfb128_encrypt:= LoadFuncCLibCrypto('AES_cfb128_encrypt');
+      @AES_cfb1_encrypt:= LoadFuncCLibCrypto('AES_cfb1_encrypt');
+      @AES_cfb8_encrypt:= LoadFuncCLibCrypto('AES_cfb8_encrypt');
+      @AES_ofb128_encrypt:= LoadFuncCLibCrypto('AES_ofb128_encrypt');
+      @AES_ige_encrypt:= LoadFuncCLibCrypto('AES_ige_encrypt');
+      @AES_bi_ige_encrypt:= LoadFuncCLibCrypto('AES_bi_ige_encrypt');
+      @AES_wrap_key:= LoadFuncCLibCrypto('AES_wrap_key');
+      @AES_unwrap_key:= LoadFuncCLibCrypto('AES_unwrap_key');
 
   end;
 end;

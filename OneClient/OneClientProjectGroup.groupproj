@@ -63,6 +63,18 @@
         <Projects Include="ClientDemo\OneClientDemoHttpWaitHint.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="ClientDemo\OneCleintDemoCustTranB.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneCleintDemoCustTranC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneClientDemoOpenIncCache.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ClientDemo\OneClientDemoBillLock.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -251,14 +263,50 @@
     <Target Name="OneClientDemoHttpWaitHint:Make">
         <MSBuild Projects="ClientDemo\OneClientDemoHttpWaitHint.dproj" Targets="Make"/>
     </Target>
+    <Target Name="OneCleintDemoCustTranB">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTranB.dproj"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTranB:Clean">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTranB.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTranB:Make">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTranB.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTranC">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTranC.dproj"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTranC:Clean">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTranC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneCleintDemoCustTranC:Make">
+        <MSBuild Projects="ClientDemo\OneCleintDemoCustTranC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneClientDemoOpenIncCache">
+        <MSBuild Projects="ClientDemo\OneClientDemoOpenIncCache.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoOpenIncCache:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoOpenIncCache.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoOpenIncCache:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoOpenIncCache.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OneClientDemoBillLock">
+        <MSBuild Projects="ClientDemo\OneClientDemoBillLock.dproj"/>
+    </Target>
+    <Target Name="OneClientDemoBillLock:Clean">
+        <MSBuild Projects="ClientDemo\OneClientDemoBillLock.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OneClientDemoBillLock:Make">
+        <MSBuild Projects="ClientDemo\OneClientDemoBillLock.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="OneClient;OneClientDemo;OneCleintDemoDatas;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate;OneClientDemoFastFile;OneClientDemoFastApi;OneClientDemoWebSocket;OneClientDemoWebSocketChat;OneClientDemoScript;OneClientDemoRefreshSingle;OneClientDemoHttpWaitHint"/>
+        <CallTarget Targets="OneClient;OneClientDemo;OneCleintDemoDatas;OneCleintDemoCustTran;OneCleintDemoPostGet;OneCleintDemoAsync;OneClientDemoVirtualFile;OneClientDemoUpDownChunt;OneClientDemoUUID;OneClientDemoMetaInfo;OneClientDemoSQLToClass;OneClientDemoLsh;OneClientDemoUpdate;OneClientDemoFastFile;OneClientDemoFastApi;OneClientDemoWebSocket;OneClientDemoWebSocketChat;OneClientDemoScript;OneClientDemoRefreshSingle;OneClientDemoHttpWaitHint;OneCleintDemoCustTranB;OneCleintDemoCustTranC;OneClientDemoOpenIncCache;OneClientDemoBillLock"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="OneClient:Clean;OneClientDemo:Clean;OneCleintDemoDatas:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean;OneClientDemoFastFile:Clean;OneClientDemoFastApi:Clean;OneClientDemoWebSocket:Clean;OneClientDemoWebSocketChat:Clean;OneClientDemoScript:Clean;OneClientDemoRefreshSingle:Clean;OneClientDemoHttpWaitHint:Clean"/>
+        <CallTarget Targets="OneClient:Clean;OneClientDemo:Clean;OneCleintDemoDatas:Clean;OneCleintDemoCustTran:Clean;OneCleintDemoPostGet:Clean;OneCleintDemoAsync:Clean;OneClientDemoVirtualFile:Clean;OneClientDemoUpDownChunt:Clean;OneClientDemoUUID:Clean;OneClientDemoMetaInfo:Clean;OneClientDemoSQLToClass:Clean;OneClientDemoLsh:Clean;OneClientDemoUpdate:Clean;OneClientDemoFastFile:Clean;OneClientDemoFastApi:Clean;OneClientDemoWebSocket:Clean;OneClientDemoWebSocketChat:Clean;OneClientDemoScript:Clean;OneClientDemoRefreshSingle:Clean;OneClientDemoHttpWaitHint:Clean;OneCleintDemoCustTranB:Clean;OneCleintDemoCustTranC:Clean;OneClientDemoOpenIncCache:Clean;OneClientDemoBillLock:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="OneClient:Make;OneClientDemo:Make;OneCleintDemoDatas:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make;OneClientDemoFastFile:Make;OneClientDemoFastApi:Make;OneClientDemoWebSocket:Make;OneClientDemoWebSocketChat:Make;OneClientDemoScript:Make;OneClientDemoRefreshSingle:Make;OneClientDemoHttpWaitHint:Make"/>
+        <CallTarget Targets="OneClient:Make;OneClientDemo:Make;OneCleintDemoDatas:Make;OneCleintDemoCustTran:Make;OneCleintDemoPostGet:Make;OneCleintDemoAsync:Make;OneClientDemoVirtualFile:Make;OneClientDemoUpDownChunt:Make;OneClientDemoUUID:Make;OneClientDemoMetaInfo:Make;OneClientDemoSQLToClass:Make;OneClientDemoLsh:Make;OneClientDemoUpdate:Make;OneClientDemoFastFile:Make;OneClientDemoFastApi:Make;OneClientDemoWebSocket:Make;OneClientDemoWebSocketChat:Make;OneClientDemoScript:Make;OneClientDemoRefreshSingle:Make;OneClientDemoHttpWaitHint:Make;OneCleintDemoCustTranB:Make;OneCleintDemoCustTranC:Make;OneClientDemoOpenIncCache:Make;OneClientDemoBillLock:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -550,6 +550,10 @@ var
             tempData.Filter := tempStepResult.FFilterField + '=' + QuoTedStr(tempPData.FieldByName(tempStepResult.FPFilterField).AsString);
             tempData.Filtered := true;
             tempJsonArr := BuildDataToJsonArray(tempStepResult.FApiData, tempData, QApiAll);
+            if not QApiAll.isDoOK then
+            begin
+              exit;
+            end;
             if tempStepResult.FResultDataJsonArr = nil then
             begin
               tempStepResult.FResultDataJsonArr := TJsonArray.Create;
@@ -573,6 +577,10 @@ var
           if tempPStepResult.FResultJsonObj <> nil then
           begin
             tempJsonArr := BuildDataToJsonArray(tempStepResult.FApiData, tempStepResult.FDataSet, QApiAll);
+            if not QApiAll.isDoOK then
+            begin
+              exit;
+            end;
             tempPStepResult.FResultJsonObj.AddPair(tempStepResult.FApiData.FDataJsonName, tempJsonArr);
           end;
         end;
@@ -587,6 +595,7 @@ var
 
 begin
   lJsonObj := TJsonObject.Create();
+  lJsonArr := nil;
   Result := lJsonObj;
   lJsonObj.AddPair('ResultSuccess', TJSONBool.Create(QApiAll.isDoOK));
   lJsonObj.AddPair('ResultCode', QApiAll.resultCode);
@@ -595,85 +604,99 @@ begin
   begin
     exit;
   end;
+
   try
-    lJsonResultData := TJsonObject.Create;
-    lJsonObj.AddPair('ResultData', lJsonResultData);
-    for iStep := 0 to QApiAll.StepResultList.Count - 1 do
-    begin
-      lStepJson := TJsonObject.Create();
-      lStepResult := QApiAll.StepResultList[iStep];
-      lStepResult.FResultJsonObj := lStepJson;
-      lJsonResultData.AddPair(lStepResult.FApiData.FDataJsonName, lStepJson);
-      if lStepResult.FDataSet <> nil then
+    try
+      lJsonResultData := TJsonObject.Create;
+      lJsonObj.AddPair('ResultData', lJsonResultData);
+      for iStep := 0 to QApiAll.StepResultList.Count - 1 do
       begin
-        lJsonArr := BuildDataToJsonArray(lStepResult.FApiData, lStepResult.FDataSet, QApiAll);
-        if lStepResult.FApiData.FDataJsonType = 'JsonObject' then
+        lStepJson := TJsonObject.Create();
+        lStepResult := QApiAll.StepResultList[iStep];
+        lStepResult.FResultJsonObj := lStepJson;
+        lJsonResultData.AddPair(lStepResult.FApiData.FDataJsonName, lStepJson);
+        if lStepResult.FDataSet <> nil then
         begin
-          if lJsonArr.Count = 0 then
+          lJsonArr := BuildDataToJsonArray(lStepResult.FApiData, lStepResult.FDataSet, QApiAll);
+          if not QApiAll.isDoOK then
           begin
-            lStepJson.AddPair('Data', TJsonNull.Create);
+            exit;
+          end;
+          if lStepResult.FApiData.FDataJsonType = 'JsonObject' then
+          begin
+            if lJsonArr.Count = 0 then
+            begin
+              lStepJson.AddPair('Data', TJsonNull.Create);
+            end
+            else
+            begin
+              lStepJson.AddPair('Data', TJsonValue(lJsonArr.Items[0].clone));
+            end;
+            lJsonArr.Free;
           end
           else
           begin
-            lStepJson.AddPair('Data', TJsonValue(lJsonArr.Items[0].clone));
+            lStepJson.AddPair('Data', lJsonArr);
+            lStepResult.FResultDataJsonArr := lJsonArr;
           end;
-          lJsonArr.Free;
+          // 参数增加
+          if lStepResult.FApiData.DataOpenMode in [openDataStore, doStore] then
+          begin
+            lParamJson := TJsonObject.Create;
+            lStepJson.AddPair('Params', lParamJson);
+            for iParam := 0 to lStepResult.FBuildParams.Count - 1 do
+            begin
+              lParam := lStepResult.FBuildParams[iParam];
+              if lParam.ParamType in [ptOutput, ptInputOutput] then
+              begin
+                // 输出参数
+                lParamJson.AddPair(lParam.Name, lParam.AsString);
+              end;
+            end;
+          end;
+
+          lStepJson.AddPair('DataCount', TJsonNumber.Create(lStepResult.FDataSet.RecordCount));
         end
         else
         begin
-          lStepJson.AddPair('Data', lJsonArr);
-          lStepResult.FResultDataJsonArr := lJsonArr;
-        end;
-        // 参数增加
-        if lStepResult.FApiData.DataOpenMode in [openDataStore, doStore] then
-        begin
-          lParamJson := TJsonObject.Create;
-          lStepJson.AddPair('Params', lParamJson);
-          for iParam := 0 to lStepResult.FBuildParams.Count - 1 do
+          if lStepResult.FApiData.DataOpenMode in [openDataStore, doStore] then
           begin
-            lParam := lStepResult.FBuildParams[iParam];
-            if lParam.ParamType in [ptOutput, ptInputOutput] then
+            // 添加输出参数,如果没有返回数据集
+            lParamJson := TJsonObject.Create;
+            lStepJson.AddPair('Params', lParamJson);
+            for iParam := 0 to lStepResult.FBuildParams.Count - 1 do
             begin
-              // 输出参数
-              lParamJson.AddPair(lParam.Name, lParam.AsString);
+              lParam := lStepResult.FBuildParams[iParam];
+              if lParam.ParamType in [ptOutput, ptInputOutput] then
+              begin
+                // 输出参数
+                lParamJson.AddPair(lParam.Name, lParam.AsString);
+              end;
             end;
           end;
         end;
-
-        lStepJson.AddPair('DataCount', TJsonNumber.Create(lStepResult.FDataSet.RecordCount));
-      end
-      else
-      begin
-        if lStepResult.FApiData.DataOpenMode in [openDataStore, doStore] then
+        if lStepResult.FApiData.DataOpenMode = doDMLSQL then
         begin
-          // 添加输出参数,如果没有返回数据集
-          lParamJson := TJsonObject.Create;
-          lStepJson.AddPair('Params', lParamJson);
-          for iParam := 0 to lStepResult.FBuildParams.Count - 1 do
-          begin
-            lParam := lStepResult.FBuildParams[iParam];
-            if lParam.ParamType in [ptOutput, ptInputOutput] then
-            begin
-              // 输出参数
-              lParamJson.AddPair(lParam.Name, lParam.AsString);
-            end;
-          end;
+          lStepJson.AddPair('AffectedCount', TJsonNumber.Create(lStepResult.FResultAffected));
         end;
+        DoChildStepResult(lStepResult.FChilds);
       end;
-      if lStepResult.FApiData.DataOpenMode = doDMLSQL then
+      //
+    except
+      on e: exception do
       begin
-        lStepJson.AddPair('AffectedCount', TJsonNumber.Create(lStepResult.FResultAffected));
+        QApiAll.isDoOK := false;
+        QApiAll.errMsg := e.Message;
       end;
-      DoChildStepResult(lStepResult.FChilds);
     end;
-    //
-  except
-    on e: exception do
+  finally
+    if not QApiAll.isDoOK then
     begin
       lJsonObj.Get('ResultSuccess').JsonValue := TJSONBool.Create(false);
-      lJsonObj.Get('ResultMsg').JsonValue := TJsonString.Create(e.Message);
+      lJsonObj.Get('ResultMsg').JsonValue := TJsonString.Create(QApiAll.errMsg);
     end;
   end;
+
 end;
 
 function DoFastApiStep(QApiDatas: TList<TFastApiData>; QApiAll: TApiAll; QPStepResult: TApiStepResult): boolean;
@@ -1029,7 +1052,8 @@ begin
       begin
         if iRowsAffected < QApiData.FMinAffected then
         begin
-          QApiAll.errMsg := '执行失败:数据集[' + QApiData.FDataName + ']当前影响行数[' + iRowsAffected.ToString + ']小于设置最小影响行数[' + QApiData.FMinAffected.ToString + ']';
+          QApiAll.errMsg := '执行失败:数据集[' + QApiData.FDataName + ']当前影响行数[' + iRowsAffected.ToString + ']小于设置最小影响行数[' +
+            QApiData.FMinAffected.ToString + ']';
           exit;
         end;
       end;
@@ -1037,7 +1061,8 @@ begin
       begin
         if iRowsAffected > QApiData.FMaxAffected then
         begin
-          QApiAll.errMsg := '执行失败:数据集[' + QApiData.FDataName + ']当前影响行数[' + iRowsAffected.ToString + ']大于设置最大影响行数[' + QApiData.FMaxAffected.ToString + ']';
+          QApiAll.errMsg := '执行失败:数据集[' + QApiData.FDataName + ']当前影响行数[' + iRowsAffected.ToString + ']大于设置最大影响行数[' +
+            QApiData.FMaxAffected.ToString + ']';
           exit;
         end;
       end;
@@ -1274,8 +1299,8 @@ begin
       end
       else
       begin
-        QApiAll.errMsg := '参数配置[' + QApiFilter.FFilterName + '],类型[' +
-          QApiFilter.FFilterDefaultType + ']值[' + QApiFilter.FFilterDefaultValue + ']未实现';
+        QApiAll.errMsg := '参数配置[' + QApiFilter.FFilterName + '],类型[' + QApiFilter.FFilterDefaultType + ']值[' + QApiFilter.FFilterDefaultValue
+          + ']未实现';
         exit;
       end;
     end
@@ -1300,11 +1325,56 @@ begin
     // 空值，存储过程执行DML需要添加参数
     if QApiData.DataOpenMode in [openDataStore, doStore] then
     begin
+      // 存储过程无值也要添加
+      // 传NULL值
+      lParam := QStepResult.FBuildParams.AddParameter;
+      lParam.Name := QApiFilter.FFilterField;
       if QApiFilter.FbOutParam then
       begin
+        lParam.ParamType := TParamType.ptInputOutput;
+      end
+      else
+      begin
+        lParam.ParamType := TParamType.ptInput;
+      end;
+      if QApiFilter.FFilterDataType = '字符串' then
+      begin
+        lParam.AsString := '';
+      end
+      else if QApiFilter.FFilterDataType = '整型' then
+      begin
+        // 传空就是传null值
+      end
+      else if QApiFilter.FFilterDataType = '数字' then
+      begin
+        // 传空就是传null值
+      end
+      else if QApiFilter.FFilterDataType = '布尔' then
+      begin
+        lParam.AsBoolean := false;
+      end
+      else if QApiFilter.FFilterDataType = '时间' then
+      begin
+        // 传空就是传null值
+      end
+      else
+      begin
+        // 传空就是传null值
+      end;
+    end
+    else if QApiData.DataOpenMode in [openData] then
+    begin
+      if (QApiData.FDataSQL.StartsWith('call',true))
+      or (QApiData.FDataSQL.StartsWith('exec',true)) then
+      begin
+        //脚本就是存储过程
         lParam := QStepResult.FBuildParams.AddParameter;
         lParam.Name := QApiFilter.FFilterField;
-        lParam.ParamType := TParamType.ptInputOutput;
+        lParam.ParamType := TParamType.ptInput;
+        if QApiFilter.FFilterDataType = '字符串' then
+        begin
+          lParam.AsString := '';
+        end
       end;
     end
     else if QApiData.DataOpenMode in [doDMLSQL] then
@@ -1450,7 +1520,9 @@ begin
   Result := false;
   if QApiFilter.FFilterDataType = '字符串' then
   begin
-    QParam.AsString := QValue;
+    //MYSQL必需用asWideString,干脆用 asWideString
+    QParam.AsWideString := QValue;
+    //QParam.AsString := QValue;
   end
   else if QApiFilter.FFilterDataType = '整型' then
   begin
@@ -1516,7 +1588,7 @@ begin
   end
   else
   begin
-    QParam.AsString := QValue;
+    QParam.AsWideString := QValue;
   end;
   Result := true;
 end;
@@ -1531,8 +1603,10 @@ var
   iField: integer;
   lFieldTemp: TApiFieldTemp;
   lFieldList: TList<TApiFieldTemp>;
+  isOK:boolean;
 begin
   Result := nil;
+  lJsonArray := nil;
   lFieldList := TList<TApiFieldTemp>.Create;
   try
     if (QApiData.ChildFields = nil) or (QApiData.ChildFields.Count = 0) then
@@ -1555,6 +1629,7 @@ begin
         lField := Query.FindField(lApiField.FFieldName);
         if lField = nil then
         begin
+          QApiAll.isDoOK := false;
           QApiAll.errMsg := '数据集[' + QApiData.FDataName + ']字段[' + lApiField.FFieldName + ']打开的数据集找不到相关字段';
           exit;
         end;
@@ -1567,6 +1642,7 @@ begin
       end;
     end;
     // 数据集转Json
+    isOK := false;
     lJsonArray := TJsonArray.Create;
     try
       Query.First;
@@ -1604,57 +1680,46 @@ begin
             TFieldType.ftDate:
               if lFieldTemp.FFormat <> '' then
               begin
-                lJsonObj.AddPair(lFieldTemp.FJsonName,
-                  TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
+                lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
               end
               else
               begin
-                lJsonObj.AddPair(lFieldTemp.FJsonName,
-                  TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+                lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
               end;
             TFieldType.ftTime:
               if lFieldTemp.FFormat <> '' then
               begin
-                lJsonObj.AddPair(lFieldTemp.FJsonName,
-                  TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
+                lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
               end
               else
               begin
-                lJsonObj.AddPair(lFieldTemp.FJsonName,
-                  TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+                lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
               end;
             TFieldType.ftDateTime:
               begin
                 if lFieldTemp.FFormat <> '' then
                 begin
-                  lJsonObj.AddPair(lFieldTemp.FJsonName,
-                    TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
+                  lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
                 end
                 else
                 begin
-                  lJsonObj.AddPair(lFieldTemp.FJsonName,
-                    TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+                  lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
                 end;
               end;
             TFieldType.ftBytes:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftVarBytes:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftAutoInc:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonNumber.Create(lField.AsInteger));
             TFieldType.ftBlob:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(BlobFieldToBase64(lField as TBlobField)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(BlobFieldToBase64(lField as TBlobField)));
             TFieldType.ftMemo:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(lField.AsString));
             TFieldType.ftGraphic:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftTypedBinary:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftFixedChar:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(lField.AsString));
             TFieldType.ftWideString:
@@ -1662,17 +1727,13 @@ begin
             TFieldType.ftLargeint:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonNumber.Create(lField.AsLargeInt));
             TFieldType.ftADT:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftArray:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftOraBlob:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftOraClob:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(TNetEncoding.Base64.EncodeBytesToString(lField.AsBytes)));
             TFieldType.ftVariant:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(lField.AsString));
             TFieldType.ftGuid:
@@ -1680,13 +1741,11 @@ begin
             TFieldType.ftTimeStamp:
               if lFieldTemp.FFormat <> '' then
               begin
-                lJsonObj.AddPair(lFieldTemp.FJsonName,
-                  TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
+                lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(FormatDateTime(lFieldTemp.FFormat, lField.AsDateTime)));
               end
               else
               begin
-                lJsonObj.AddPair(lFieldTemp.FJsonName,
-                  TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+                lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
               end;
             TFieldType.ftFMTBcd:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonNumber.Create(lField.AsFloat));
@@ -1695,8 +1754,7 @@ begin
             TFieldType.ftWideMemo:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(lField.AsString));
             TFieldType.ftOraTimeStamp:
-              lJsonObj.AddPair(lFieldTemp.FJsonName,
-                TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
+              lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(DateToISO8601(lField.AsDateTime, false)));
             TFieldType.ftOraInterval:
               lJsonObj.AddPair(lFieldTemp.FJsonName, TJsonString.Create(lField.AsString));
             TFieldType.ftLongWord:
@@ -1717,14 +1775,23 @@ begin
         Query.Next;
       end;
       Result := lJsonArray;
+      isOK := true;
     except
       on e: exception do
       begin
-        lJsonArray.Free;
+        QApiAll.isDoOK := false;
         QApiAll.errMsg := e.Message;
       end;
     end;
   finally
+    if not isOK then
+    begin
+      if lJsonArray<>nil then
+      begin
+        lJsonArray.Free;
+        lJsonArray := nil;
+      end;
+    end;
     for iField := 0 to lFieldList.Count - 1 do
     begin
       lFieldList[iField].Free;
@@ -1845,15 +1912,13 @@ begin
       end
       else
       begin
-        QApiAll.errMsg := '参数配置[' + QApiField.FFieldName +
-          '],类型[' + QApiField.FFieldDefaultValueType + ']值[' + QApiField.FFieldDefaultValue + ']未实现';
+        QApiAll.errMsg := '参数配置[' + QApiField.FFieldName + '],类型[' + QApiField.FFieldDefaultValueType + ']值[' + QApiField.FFieldDefaultValue + ']未实现';
         exit;
       end;
     end
     else
     begin
-      QApiAll.errMsg := '参数配置[' + QApiField.FFieldName +
-        '],类型[' + QApiField.FFieldDefaultValueType + ']未设计';
+      QApiAll.errMsg := '参数配置[' + QApiField.FFieldName + '],类型[' + QApiField.FFieldDefaultValueType + ']未设计';
       exit;
     end;
   end;

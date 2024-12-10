@@ -19,11 +19,11 @@ procedure SSL_Initripemd;
 begin
 	if @RIPEMD160_Init = nil then
 		begin
-			@RIPEMD160_Init:= LoadFunctionCLib('RIPEMD160_Init');
-			@RIPEMD160_Update:= LoadFunctionCLib('RIPEMD160_Update');
-			@RIPEMD160_Final:= LoadFunctionCLib('RIPEMD160_Final');
-			@RIPEMD160:= LoadFunctionCLib('RIPEMD160');
-			@RIPEMD160_Transform:= LoadFunctionCLib('RIPEMD160_Transform');
+			@RIPEMD160_Init:= LoadFuncCLibCrypto('RIPEMD160_Init');
+			@RIPEMD160_Update:= LoadFuncCLibCrypto('RIPEMD160_Update');
+			@RIPEMD160_Final:= LoadFuncCLibCrypto('RIPEMD160_Final');
+			@RIPEMD160:= LoadFuncCLibCrypto('RIPEMD160');
+			@RIPEMD160_Transform:= LoadFuncCLibCrypto('RIPEMD160_Transform');
 		end;
 end;
 

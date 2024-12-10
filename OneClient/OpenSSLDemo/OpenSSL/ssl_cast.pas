@@ -21,14 +21,14 @@ procedure SLL_InitCAST;
 begin
   if @CAST_set_key = nil then
   begin
-     @private_CAST_set_key:= LoadFunctionCLib('private_CAST_set_key', false);
-     @CAST_set_key:= LoadFunctionCLib('CAST_set_key');
-     @CAST_ecb_encrypt:= LoadFunctionCLib('CAST_ecb_encrypt');
-     @CAST_encrypt:= LoadFunctionCLib('CAST_encrypt');
-     @CAST_decrypt:= LoadFunctionCLib('CAST_decrypt');
-     @CAST_cbc_encrypt:= LoadFunctionCLib('CAST_cbc_encrypt');
-     @CAST_cfb64_encrypt:= LoadFunctionCLib('CAST_cfb64_encrypt');
-     @CAST_ofb64_encrypt:= LoadFunctionCLib('CAST_ofb64_encrypt');
+     @private_CAST_set_key:= LoadFuncCLibCrypto('private_CAST_set_key', false);
+     @CAST_set_key:= LoadFuncCLibCrypto('CAST_set_key');
+     @CAST_ecb_encrypt:= LoadFuncCLibCrypto('CAST_ecb_encrypt');
+     @CAST_encrypt:= LoadFuncCLibCrypto('CAST_encrypt');
+     @CAST_decrypt:= LoadFuncCLibCrypto('CAST_decrypt');
+     @CAST_cbc_encrypt:= LoadFuncCLibCrypto('CAST_cbc_encrypt');
+     @CAST_cfb64_encrypt:= LoadFuncCLibCrypto('CAST_cfb64_encrypt');
+     @CAST_ofb64_encrypt:= LoadFuncCLibCrypto('CAST_ofb64_encrypt');
   end;
 
 end;

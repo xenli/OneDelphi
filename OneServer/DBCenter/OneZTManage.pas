@@ -22,7 +22,7 @@ uses
 {$IF CompilerVersion >= 35}FireDAC.Phys.SQLiteWrapper.Stat, {$ENDIF}
   FireDAC.Phys.SQLiteDef, OneDataInfo,
   OneThread, OneGUID, OneFileHelper, System.Threading, OneNeonHelper,
-  OneStreamString, OneILog, System.DateUtils, System.IOUtils;
+  OneStreamString, OneILog, System.DateUtils, System.IOUtils, OneDate, Data.SqlTimSt;
 
 type
   TOneZTSet = class;
@@ -156,13 +156,13 @@ type
     FLockObj: TObject; // 锁
     FZTItems: TList<TOneZTItem>; // 账套池
   private
-
+    // 从池中锁定一个账套出来
+    function LockItem(var QErrMsg: string): TOneZTItem;
   public
     // 创建一个池
     constructor Create(QZTSet: TOneZTSet); overload;
     destructor Destroy; override;
-    // 从池中锁定一个账套出来
-    function LockZTItem(var QErrMsg: string): TOneZTItem;
+
     procedure UnLockWorkCount();
   public
 
@@ -184,13 +184,14 @@ type
     FZTPools: TDictionary<String, TOneZTPool>;
     FTranZTItemList: TDictionary<String, TOneZTItem>;
     FFileDataDict: TDictionary<String, TDateTime>;
-    FLockObject: TObject;
+    FLockZTObj, FLockFile: TCriticalSection;
     FLog: IOneLog;
     FKeepList: TList<TZTKeepInfo>;
     // 在事务太久的,自动最还连接
     FTimerThread: TOneTimerThread;
   private
     procedure onTimerWork(Sender: TObject);
+    procedure addFileDataDict(qID: string);
   public
     constructor Create(QOneLog: IOneLog); overload;
     destructor Destroy; override;
@@ -290,7 +291,6 @@ begin
 end;
 {$REGION 'TOneZTItem'}
 
-
 constructor TOneZTItem.Create(AOwner: TOneZTPool; QPhyDriver: string; QConnectionString: string);
 begin
   inherited Create;
@@ -329,7 +329,7 @@ begin
   FDQuery.ResourceOptions.MacroExpand := false;
   FDQuery.FormatOptions.StrsTrim2Len := true;
   // 错误绑定
-  FDQuery.OnError := FDQueryError;
+  FDQuery.OnError := self.FDQueryError;
   FDScript := TFDScript.Create(nil);
   FDScript.OnError := FDQueryError;
   FDStoredProc := TFDStoredProc.Create(nil);
@@ -341,7 +341,7 @@ begin
   FDStoredProc.ResourceOptions.EscapeExpand := false;
   FDStoredProc.ResourceOptions.MacroCreate := false;
   FDStoredProc.ResourceOptions.MacroExpand := false;
-  FDStoredProc.OnError := FDQueryError;
+  FDStoredProc.OnError := self.FDQueryError;
   // FDStoredProc.FetchOptions.Items := [fiBlobs,fiDetails,fiMeta];
   FTempStream := TMemoryStream.Create;
 
@@ -411,6 +411,7 @@ end;
 function TOneZTItem.CreateNewQuery(QIsOpenData: boolean = false): TFDQuery;
 begin
   Result := TFDQuery.Create(nil);
+  Result.OnError := self.FDQueryError;
   Result.CachedUpdates := true;
   Result.FetchOptions.RecsSkip := -1;
   Result.FetchOptions.RecsMax := -1;
@@ -570,7 +571,6 @@ end;
 // 一个账磁连接池
 {$REGION 'TOneZTPool'}
 
-
 constructor TOneZTPool.Create(QZTSet: TOneZTSet);
 var
   i: integer;
@@ -623,86 +623,83 @@ begin
   inherited Destroy;
 end;
 
-function TOneZTPool.LockZTItem(var QErrMsg: string): TOneZTItem;
+function TOneZTPool.LockItem(var QErrMsg: string): TOneZTItem;
 var
   i: integer;
   lZTItem: TOneZTItem;
   isCreateNew: boolean;
 begin
+  // 不要直接使用这个方法无锁，调用Mange里面的锁
   Result := nil;
   lZTItem := nil;
   QErrMsg := '';
-  if not TMonitor.TryEnter(self.FLockObj) then
-  begin
-    QErrMsg := '账套池[' + self.FZTCode + ']获取锁失败!!!';
-    exit;
-  end;
+  // if not TMonitor.Enter(self.FLockObj, 1000 * 10) then
+  // begin
+  // QErrMsg := '账套池[' + self.FZTCode + ']获取锁失败!!!';
+  // exit;
+  // end;
   isCreateNew := false;
-  try
-    if self.FPoolWorkCount >= self.FMaxPoolCount then
+  if self.FPoolWorkCount >= self.FMaxPoolCount then
+  begin
+    if not self.FPoolAuto then
     begin
-      if not self.FPoolAuto then
-      begin
-        QErrMsg := '账套池[' + self.FZTCode + ']已达到最大工作量[' + FPoolWorkCount.ToString() + ']';
-        exit;
-      end
-      else
-      begin
-        isCreateNew := true;
-      end;
-    end;
-    if isCreateNew then
+      QErrMsg := '账套池[' + self.FZTCode + ']已达到最大工作量[' + FPoolWorkCount.ToString() + ']';
+      exit;
+    end
     else
     begin
-      // 遍历看哪个是空闲的
-      for i := 0 to self.FZTItems.Count - 1 do
-      begin
-        if self.FZTItems[i].IsWorking then
-          continue;
-        lZTItem := self.FZTItems[i];
-        // 找到一个中断，同时如果很久没交互,重新断开连接交互
-        // 10分钟没交互,断开连接重新连
-        if SecondsBetween(Now(), lZTItem.FLastTime) > 600 then
-        begin
-          try
-            lZTItem.ADConnection.Close;
-            lZTItem.ADConnection.Open;
-          except
-
-          end;
-        end;
-        break;
-      end;
+      isCreateNew := true;
     end;
-    if lZTItem = nil then
-    begin
-      // 没找到就开始创建一个新的
-      lZTItem := TOneZTItem.Create(self, FPhyDriver, FConnectionStr);
-      if isCreateNew then
-      begin
-        // 不加入池中，新建的服完就释放
-        lZTItem.FUnLockFree := true;
-      end
-      else
-      begin
-        // 加入到池中
-        self.FZTItems.Add(lZTItem);
-        self.FPoolCreateCount := self.FPoolCreateCount + 1;
-      end;
-    end;
-    lZTItem.FLastTime := Now;
-    // 工作量加1
-    lZTItem.IsWorking := true;
-    self.FPoolWorkCount := self.FPoolWorkCount + 1;
-    if (not lZTItem.ADConnection.Connected) then
-    begin
-      // 判断状态如果未连接重新连接下
-      lZTItem.ADConnection.Open;
-    end;
-    Result := lZTItem;
-  finally
-    TMonitor.exit(self.FLockObj);
   end;
+  if isCreateNew then
+  else
+  begin
+    // 遍历看哪个是空闲的
+    for i := 0 to self.FZTItems.Count - 1 do
+    begin
+      if self.FZTItems[i].IsWorking then
+        continue;
+      lZTItem := self.FZTItems[i];
+      // 找到一个中断，同时如果很久没交互,重新断开连接交互
+      // 10分钟没交互,断开连接重新连
+      if SecondsBetweenNotAbs(Now(), lZTItem.FLastTime) > 600 then
+      begin
+        try
+          lZTItem.ADConnection.Close;
+          lZTItem.ADConnection.Open;
+        except
+
+        end;
+      end;
+      break;
+    end;
+  end;
+  if lZTItem = nil then
+  begin
+    // 没找到就开始创建一个新的
+    lZTItem := TOneZTItem.Create(self, FPhyDriver, FConnectionStr);
+    if isCreateNew then
+    begin
+      // 不加入池中，新建的服完就释放
+      lZTItem.FUnLockFree := true;
+    end
+    else
+    begin
+      // 加入到池中
+      self.FZTItems.Add(lZTItem);
+      self.FPoolCreateCount := self.FPoolCreateCount + 1;
+    end;
+  end;
+  lZTItem.FLastTime := Now;
+  // 工作量加1
+  lZTItem.IsWorking := true;
+  self.FPoolWorkCount := self.FPoolWorkCount + 1;
+  if (not lZTItem.ADConnection.Connected) then
+  begin
+    // 判断状态如果未连接重新连接下
+    lZTItem.ADConnection.Open;
+  end;
+  Result := lZTItem;
 end;
 
 procedure TOneZTPool.UnLockWorkCount();
@@ -717,7 +714,6 @@ end;
 {$ENDREGION}
 {$REGION 'TOneZTManage'}
 
-
 constructor TOneZTManage.Create(QOneLog: IOneLog);
 begin
   inherited Create;
@@ -725,7 +721,8 @@ begin
   FZTPools := TDictionary<String, TOneZTPool>.Create;
   FTranZTItemList := TDictionary<String, TOneZTItem>.Create;
   FFileDataDict := TDictionary<String, TDateTime>.Create;
-  FLockObject := TObject.Create;
+  FLockZTObj := TCriticalSection.Create;
+  FLockFile := TCriticalSection.Create;
   FKeepList := TList<TZTKeepInfo>.Create;
   FTimerThread := TOneTimerThread.Create(self.onTimerWork);
   // 加载驱动
@@ -771,7 +768,8 @@ begin
   except
 
   end;
-  FLockObject.Free;
+  FLockZTObj.Free;
+  FLockFile.Free;
   for i := 0 to FKeepList.Count - 1 do
   begin
     FKeepList[i].Free;
@@ -779,6 +777,17 @@ begin
   FKeepList.Clear;
   FKeepList.Free;
   inherited Destroy;
+end;
+
+procedure TOneZTManage.addFileDataDict(qID: string);
+begin
+  FLockFile.Enter;
+  try
+    if not self.FFileDataDict.ContainsKey(qID) then
+      self.FFileDataDict.Add(qID, Now);
+  finally
+    FLockFile.Leave;
+  end;
 end;
 
 procedure TOneZTManage.onTimerWork(Sender: TObject);
@@ -791,8 +800,9 @@ var
   lFileDateTime: TDateTime;
   tempList: TList<string>;
   iTemp: integer;
+  aTask: ITask;
 begin
-  TMonitor.Enter(FLockObject);
+  FLockZTObj.Enter;
   try
     lNow := Now;
     // 二层事务的
@@ -806,7 +816,7 @@ begin
         lZTItem.FCustTranMaxSpanSec := 30 * 60;
       end;
       // 事务到期了,还没操作归还
-      if SecondsBetween(lNow, lZTItem.FLastTime) >= lZTItem.FCustTranMaxSpanSec then
+      if SecondsBetweenNotAbs(lNow, lZTItem.FLastTime) >= lZTItem.FCustTranMaxSpanSec then
       begin
         if lZTItem.ADConnection.InTransaction then
         begin
@@ -818,6 +828,12 @@ begin
         FTranZTItemList.Remove(lZTItem.FCreateID);
       end;
     end;
+  finally
+    FLockZTObj.Leave;
+  end;
+
+  FLockFile.Enter;
+  try
     tempList := TList<string>.Create;
     try
       for lFileID in FFileDataDict.Keys do
@@ -825,27 +841,32 @@ begin
         if FFileDataDict.TryGetValue(lFileID, lFileDateTime) then
         begin
           // 临时保存文件的地方,10分钟后自动删除,保持硬盘健康
-          if SecondsBetween(lNow, lFileDateTime) >= 600 then
+          if SecondsBetweenNotAbs(lNow, lFileDateTime) >= 600 then
           begin
             lFileName := OneFileHelper.CombineExeRunPath('OnePlatform\OneDataTemp\' + lFileID + '.data');
-            TFile.Delete(lFileName);
+            // IO操作,尽量不卡当前线程    ,看后面要不要异步线程
+            aTask := TTask.Create(
+              procedure
+              begin
+                TFile.Delete(lFileName);
+              end);
+            aTask.Start;
             tempList.Add(lFileID);
           end;
         end;
       end;
       for iTemp := 0 to tempList.Count - 1 do
       begin
-        // 删除
         FFileDataDict.Remove(tempList[iTemp]);
       end;
     finally
       tempList.Clear;
       tempList.Free;
     end;
-
   finally
-    TMonitor.exit(FLockObject);
+    FLockFile.Leave;
   end;
+
 end;
 
 function TOneZTManage.GetZTMain: string;
@@ -859,11 +880,7 @@ var
 BEGIN
   Result := nil;
   QErrMsg := '';
-  if not TMonitor.TryEnter(self.FLockObject) then
-  begin
-    QErrMsg := '账套池[' + QZTCode + ']获取锁失败!!!';
-    exit;
-  end;
+  FLockZTObj.Enter;
   try
     if FStop then
     begin
@@ -886,7 +903,7 @@ BEGIN
         QErrMsg := '账套[' + QZTCode + ']池目前状态处于停止工作状态';
         exit;
       end;
-      Result := lZTPool.LockZTItem(QErrMsg);
+      Result := lZTPool.LockItem(QErrMsg);
       if Result = nil then
       begin
         exit;
@@ -897,7 +914,7 @@ BEGIN
       QErrMsg := '账套管理不存在账套代码[' + QZTCode + ']';
     end;
   finally
-    TMonitor.exit(FLockObject);
+    FLockZTObj.Leave;
   end;
   if Result <> nil then
   begin
@@ -924,14 +941,14 @@ begin
   begin
     exit;
   end;
-  TMonitor.Enter(FLockObject);
+  FLockZTObj.Enter;
   try
     lZTItem.FCustTran := true;
     lZTItem.FCustTranMaxSpanSec := QMaxSpanSec;
     self.FTranZTItemList.Add(lZTItem.FCreateID, lZTItem);
     Result := lZTItem.FCreateID;
   finally
-    TMonitor.exit(FLockObject);
+    FLockZTObj.Leave;
   end;
 end;
 
@@ -941,7 +958,7 @@ var
 BEGIN
   Result := false;
   QErrMsg := '';
-  TMonitor.Enter(FLockObject);
+  FLockZTObj.Enter;
   try
     if FTranZTItemList.TryGetValue(QTranID, lZTItem) then
     begin
@@ -961,7 +978,7 @@ BEGIN
     end;
   finally
     FTranZTItemList.Remove(QTranID);
-    TMonitor.exit(FLockObject);
+    FLockZTObj.Leave;
   end;
 
 END;
@@ -972,7 +989,7 @@ var
 BEGIN
   Result := nil;
   QErrMsg := '';
-  TMonitor.Enter(FLockObject);
+  FLockZTObj.Enter;
   try
     if FTranZTItemList.TryGetValue(QTranID, lZTItem) then
     begin
@@ -984,7 +1001,7 @@ BEGIN
       QErrMsg := '不存在此事务的账套连接';
     end;
   finally
-    TMonitor.exit(FLockObject);
+    FLockZTObj.Leave;
   end;
 END;
 
@@ -995,7 +1012,7 @@ var
 BEGIN
   Result := false;
   QErrMsg := '';
-  TMonitor.Enter(FLockObject);
+  FLockZTObj.Enter;
   try
     if FTranZTItemList.TryGetValue(QTranID, lZTItem) then
     begin
@@ -1009,7 +1026,7 @@ BEGIN
       Result := false;
     end;
   finally
-    TMonitor.exit(FLockObject);
+    FLockZTObj.Leave;
   end;
 END;
 
@@ -1106,7 +1123,7 @@ begin
     exit;
   QZTSet.ZTCode := QZTSet.ZTCode.ToUpper;
   lZTCode := QZTSet.ZTCode.ToUpper;
-  TMonitor.Enter(FLockObject);
+  FLockZTObj.Enter;
   try
     if FZTPools.TryGetValue(lZTCode, lZTPool) then
     begin
@@ -1117,7 +1134,7 @@ begin
     FZTPools.Add(lZTCode, lZTPool);
     Result := true;
   finally
-    TMonitor.exit(FLockObject);
+    FLockZTObj.Leave;
   end;
 end;
 
@@ -1127,7 +1144,6 @@ begin
   Result := FZTPools.ContainsKey(QZTCode);
 end;
 {$ENDREGION}
-
 
 function TOneZTManage.StarWork(QZTSetList: TList<TOneZTSet>; var QErrMsg: string): boolean;
 var
@@ -1139,7 +1155,7 @@ begin
   QErrMsg := '';
   try
     // 先释放原有的
-    TMonitor.Enter(FLockObject);
+    FLockZTObj.Enter;
     try
       for lZTPool in FZTPools.Values do
       begin
@@ -1157,7 +1173,7 @@ begin
       end;
       FZTPools.Clear;
     finally
-      TMonitor.exit(FLockObject);
+      FLockZTObj.Leave;
     end;
     //
     for i := 0 to QZTSetList.Count - 1 do
@@ -1289,6 +1305,8 @@ var
   //
   LFDParam: TFDParam;
   LOneParam: TOneParam;
+  //
+  lSQLTimeStamp: TSQLTimeStamp;
 begin
   Result := false;
   lErrMsg := '';
@@ -1382,6 +1400,19 @@ begin
                     OneStreamString.StreamWriteBase64Str(lParamStream, LOneParam.ParamValue);
                     LFDParam.AsStream := lParamStream;
                   end;
+                ftTimeStamp:
+                  begin
+                    // 转化成DateTime
+                    lSQLTimeStamp := OneStrToSQLTimeStamp(LOneParam.ParamValue);
+                    if lSQLTimeStamp.Fractions.ToString.Length <= 3 then
+                    begin
+                      LFDParam.AsString := OneSQLTimeStampToDateTimeStr(lSQLTimeStamp);
+                    end
+                    else
+                    begin
+                      LFDParam.AsSQLTimeStamp := OneStrToSQLTimeStamp(LOneParam.ParamValue);
+                    end;
+                  end
               else
                 begin
                   LFDParam.Value := LOneParam.ParamValue;
@@ -1414,7 +1445,7 @@ begin
               lZip.Open(lFileName, TZipMode.zmWrite);
               lZip.Add(lMemoryStream, lFileName);
               lDataResultItem.ResultContext := lFileGuid;
-              self.FFileDataDict.Add(lFileGuid, Now);
+              self.addFileDataDict(lFileGuid);
             finally
               lZip.Free;
               lMemoryStream.Free;
@@ -1435,7 +1466,7 @@ begin
                 lZip.Open(lFileName, TZipMode.zmWrite);
                 lZip.Add(lMemoryStream, lFileName);
                 lDataResultItem.ResultContext := lFileGuid;
-                self.FFileDataDict.Add(lFileGuid, Now);
+                self.addFileDataDict(lFileGuid);
               finally
                 lZip.Free;
                 lMemoryStream.Clear;
@@ -1468,8 +1499,8 @@ begin
             LZTQuery.FetchOptions.RecsSkip := -1;
             LZTQuery.FetchOptions.RecsMax := -1;
             lSQL := ClearOrderBySQL(lOpenData.OpenSQL);
-            //只要替换第一个星号
-            lSQL := lSQL.Replace(' * ', ' 1 as one_zsys_temp_aaa ',[]);
+            // 只要替换第一个星号
+            lSQL := lSQL.Replace(' * ', ' 1 as one_zsys_temp_aaa ', []);
             lSQL := 'select count(1) from ( ' + lSQL + ' ) tempCount';
             LZTQuery.SQL.Text := lSQL;
             for iParam := 0 to LZTQuery.Params.Count - 1 do
@@ -1816,7 +1847,8 @@ begin
             begin
               if LZTQuery.RowsAffected <> lDataSaveDML.AffectedMustCount then
               begin
-                QOneDataResult.ResultMsg := '执行DML语句异常,原因:必需影响行数[' + lDataSaveDML.AffectedMustCount.ToString + '],当前影响行数[' + LZTQuery.RowsAffected.ToString + ']';
+                QOneDataResult.ResultMsg := '执行DML语句异常,原因:必需影响行数[' + lDataSaveDML.AffectedMustCount.ToString + '],当前影响行数[' +
+                  LZTQuery.RowsAffected.ToString + ']';
                 exit
               end;
             end;
@@ -1824,7 +1856,8 @@ begin
             BEGIN
               if LZTQuery.RowsAffected > lDataSaveDML.AffectedMaxCount then
               BEGIN
-                QOneDataResult.ResultMsg := '执行DML语句异常,原因:最大影响行数[' + lDataSaveDML.AffectedMaxCount.ToString + '],当前影响行数[' + LZTQuery.RowsAffected.ToString + ']';
+                QOneDataResult.ResultMsg := '执行DML语句异常,原因:最大影响行数[' + lDataSaveDML.AffectedMaxCount.ToString + '],当前影响行数[' +
+                  LZTQuery.RowsAffected.ToString + ']';
                 exit
               END;
             END;
@@ -1876,7 +1909,7 @@ begin
       self.FLog.WriteSQLLog('总共用时:[' + lRequestMilSec.ToString + ']毫秒');
       if QOneDataResult.ResultOK then
       begin
-         self.FLog.WriteSQLLog('成功消息:[' + QOneDataResult.ResultMsg + ']');
+        self.FLog.WriteSQLLog('成功消息:[' + QOneDataResult.ResultMsg + ']');
       end
       else
       begin
@@ -1983,6 +2016,7 @@ var
   lPTResult: integer;
   lRequestMilSec: integer;
   lwatchTimer: TStopwatch;
+  lSQLTimeStamp:TSQLTimeStamp;
 begin
   Result := false;
   lPTResult := 0;
@@ -2112,6 +2146,19 @@ begin
           OneStreamString.StreamWriteBase64Str(lParamStream, LOneParam.ParamValue);
           LFDParam.AsStream := lParamStream;
         end
+        else if LFDParam.DataType = TFieldType.ftTimeStamp then
+        begin
+          // 转化成DateTime
+          lSQLTimeStamp := OneStrToSQLTimeStamp(LOneParam.ParamValue);
+          if lSQLTimeStamp.Fractions.ToString.Length <= 3 then
+          begin
+            LFDParam.AsString := OneSQLTimeStampToDateTimeStr(lSQLTimeStamp);
+          end
+          else
+          begin
+            LFDParam.AsSQLTimeStamp := OneStrToSQLTimeStamp(LOneParam.ParamValue);
+          end;
+        end
         else
           LFDParam.Value := LOneParam.ParamValue;
       end;
@@ -2174,7 +2221,14 @@ begin
     except
       on e: Exception do
       begin
-        lErrMsg := '执行存储过程异常:' + e.Message;
+        if lZTItem.FException.FErrmsg <> '' then
+        begin
+          lErrMsg := '执行存储过程异常:' + lZTItem.FException.FErrmsg;
+        end
+        else
+        begin
+          lErrMsg := '执行存储过程异常:' + e.Message;
+        end;
         exit;
       end;
     end;

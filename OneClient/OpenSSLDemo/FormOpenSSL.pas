@@ -39,6 +39,30 @@ type
     edAesOut: TMemo;
     Label10: TLabel;
     edAesPadding: TComboBox;
+    Label11: TLabel;
+    edSMIn: TMemo;
+    Label12: TLabel;
+    edSMOut: TMemo;
+    tbSM3: TButton;
+    Label13: TLabel;
+    edSMKey: TEdit;
+    Label14: TLabel;
+    edSMIV: TEdit;
+    Label15: TLabel;
+    tbSM4: TButton;
+    Label16: TLabel;
+    edSMMode: TComboBox;
+    Label17: TLabel;
+    edSMPadding: TComboBox;
+    tbSM4Decode: TButton;
+    edSMIn64: TCheckBox;
+    Button1: TButton;
+    Button2: TButton;
+    Label18: TLabel;
+    Edit1: TEdit;
+    Label19: TLabel;
+    Edit2: TEdit;
+    Label20: TLabel;
     procedure tbMD5Click(Sender: TObject);
     procedure tbMD4Click(Sender: TObject);
     procedure tbBase64EncodeClick(Sender: TObject);
@@ -46,6 +70,9 @@ type
     procedure tbFileMD5Click(Sender: TObject);
     procedure tbAesEncodeClick(Sender: TObject);
     procedure tbAesDecodeClick(Sender: TObject);
+    procedure tbSM3Click(Sender: TObject);
+    procedure tbSM4Click(Sender: TObject);
+    procedure tbSM4DecodeClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -54,22 +81,22 @@ type
 
 var
   Form1: TForm1;
-
 implementation
 
 {$R *.dfm}
 
 
-uses ssl_md5, ssl_md4, ssl_encode, ssl_const, ssl_types, ssl_aes;
+uses ssl_md5, ssl_md4, ssl_encode, ssl_const, ssl_types, ssl_aes,
+  ssl_sm3, ssl_sm4,ssl_conver;
 
 procedure TForm1.tbAesDecodeClick(Sender: TObject);
 var
   keyBytes, ivBytes, plainBytes, cipherBytes: TBytes;
-  lastByteValue:integer;
-  i: Integer;
+  lastByteValue: integer;
+  i: integer;
   aesKey: AES_KEY;
-  keyLen: Integer;
-  plainLen, cipherLen, Padding: Integer;
+  keyLen: integer;
+  plainLen, cipherLen, Padding: integer;
   tempStr: string;
 begin
   editOut.Lines.Clear;
@@ -81,13 +108,13 @@ begin
     showMessage('请输入要解密的字符串');
     exit;
   end;
-  //预设长度
-  setLength(cipherBytes,cipherLen);
-  //得到密文实际长度,HEX转byte
-  cipherLen := HexToBin(PWideChar(edAesInput.Text),@cipherBytes[0],cipherLen);
-  //重新设置长度
-  setLength(cipherBytes,cipherLen);
-  setLength(plainBytes,cipherLen);
+  // 预设长度
+  setLength(cipherBytes, cipherLen);
+  // 得到密文实际长度,HEX转byte
+  cipherLen := HexToBin(PWideChar(edAesInput.Text), @cipherBytes[0], cipherLen);
+  // 重新设置长度
+  setLength(cipherBytes, cipherLen);
+  setLength(plainBytes, cipherLen);
   // 128位密钥长度
   keyLen := 128;
   if edAeskyeLen.Text = '192' then
@@ -118,43 +145,40 @@ begin
     i := 0;
     while i <= cipherLen - 1 do
     begin
-      AES_decrypt(@cipherBytes[i],@plainBytes[i], @aesKey);
+      AES_decrypt(@cipherBytes[i], @plainBytes[i], @aesKey);
       i := i + AES_BLOCK_SIZE;
     end;
   end
   else
   begin
-     AES_cbc_encrypt(@cipherBytes[0],@plainBytes[0],
-      cipherLen, @aesKey, @ivBytes[0], ssl_const.AES_DECRYPT);
+    AES_cbc_encrypt(@cipherBytes[0], @plainBytes[0],
+      cipherLen, @aesKey, @ivBytes[0], ssl_const.AES_decrypt);
   end;
-  plainLen :=  cipherLen;
-  lastByteValue := plainBytes[plainLen-1];
-  //修正长度
-  if(lastByteValue>0) and (lastByteValue<=AES_BLOCK_SIZE) then
+  plainLen := cipherLen;
+  lastByteValue := plainBytes[plainLen - 1];
+  // 修正长度
+  if (lastByteValue > 0) and (lastByteValue <= AES_BLOCK_SIZE) then
   begin
-    for i := plainLen - 1  downto plainLen - lastByteValue do
+    for i := plainLen - 1 downto plainLen - lastByteValue do
     begin
-       if plainBytes[i] <> lastByteValue then
-       begin
-          showMessage('填充不一至');
-       end;
+      if plainBytes[i] <> lastByteValue then
+      begin
+        showMessage('填充不一至');
+      end;
     end;
-    //修正长度
-    setLength(plainBytes, plainLen-lastByteValue);
+    // 修正长度
+    setLength(plainBytes, plainLen - lastByteValue);
   end;
-
-  edAesOut.Text :=  TEncoding.UTF8.GetString(plainBytes);
-
+  edAesOut.Text := TEncoding.UTF8.GetString(plainBytes);
 end;
 
 procedure TForm1.tbAesEncodeClick(Sender: TObject);
 var
   keyBytes, ivBytes, plainBytes, cipherBytes: TBytes;
-  i: Integer;
+  i: integer;
   aesKey: AES_KEY;
-  keyLen: Integer;
-  plainLen, Padding: Integer;
-  tempStr: string;
+  keyLen: integer;
+  plainLen, Padding: integer;
 begin
   //
   editOut.Lines.Clear;
@@ -224,20 +248,16 @@ begin
     AES_cbc_encrypt(@plainBytes[0], @cipherBytes[0],
       plainLen, @aesKey, @ivBytes[0], ssl_const.AES_ENCRYPT);
   end;
-  tempStr := '';
-  for i := 0 to plainLen - 1 do
-  begin
-    tempStr := tempStr + IntToHex(cipherBytes[i], 2);
-  end;
-  edAesOut.Text := tempStr;
+  setLength(cipherBytes,plainLen);
+  edAesOut.Text := BinToHexStr(cipherBytes);
 end;
 
 procedure TForm1.tbBase64DecodeClick(Sender: TObject);
 var
   InputBytes: TBytes;
-  deCodedLength: Integer;
+  deCodedLength: integer;
   deCodedData: TBytes;
-  iOutLen: Integer;
+  iOutLen: integer;
 begin
   editOut.Lines.Clear;
   SSL_InitEncode();
@@ -264,9 +284,9 @@ end;
 procedure TForm1.tbBase64EncodeClick(Sender: TObject);
 var
   InputBytes: TBytes;
-  EncodedLength: Integer;
+  EncodedLength: integer;
   EncodedData: TBytes;
-  iOutLen: Integer;
+  iOutLen: integer;
 begin
   editOut.Lines.Clear;
   SSL_InitEncode();
@@ -294,10 +314,10 @@ procedure TForm1.tbFileMD5Click(Sender: TObject);
 var
   lFileName: string;
   outByte: array [0 .. MD5_DIGEST_LENGTH - 1] of Byte;
-  i: Integer;
+  i: integer;
   fileStream: TFileStream;
   mdContext: MD5_CTX;
-  bytes: Integer;
+  bytes: integer;
   data: array [0 .. 1023] of Byte;
   tempStr: string;
 begin
@@ -327,10 +347,11 @@ end;
 
 procedure TForm1.tbMD4Click(Sender: TObject);
 var
-  InputBytes, MD5Result: TBytes;
-  MD5Digest: array [0 .. 15] of Byte;
-  i: Integer;
-  tempStr: string;
+  InputBytes: TBytes;
+  MD5Digest: TBytes;
+  i: integer;
+  tempStr,tempStr2: string;
+  text: PWideChar;
 begin
   SSL_InitMD4();
   editOut.Lines.Clear;
@@ -340,21 +361,15 @@ begin
     showMessage('请输入要加密的字符串');
     exit;
   end;
+  setLength(MD5Digest,16);
   MD4(@InputBytes[0], length(InputBytes), @MD5Digest[0]);
-  tempStr := '';
-  for i := 0 to 15 do
-  begin
-    tempStr := tempStr + IntToHex(MD5Digest[i], 2);
-  end;
-  editOut.Text := tempStr;
+  editOut.Text := BinToHexStr(MD5Digest);
 end;
 
 procedure TForm1.tbMD5Click(Sender: TObject);
 var
-  InputBytes, MD5Result: TBytes;
-  MD5Digest: array [0 .. 15] of Byte;
-  i: Integer;
-  tempStr: string;
+  InputBytes: TBytes;
+  MD5Digest:TBytes;
 begin
   SSL_InitMD5();
   editOut.Lines.Clear;
@@ -364,13 +379,124 @@ begin
     showMessage('请输入要加密的字符串');
     exit;
   end;
+  setLength(MD5Digest,16);
   MD5(@InputBytes[0], length(InputBytes), @MD5Digest[0]);
-  tempStr := '';
-  for i := 0 to 15 do
+  editOut.Text := BinToHexStr(MD5Digest);
+end;
+
+procedure TForm1.tbSM3Click(Sender: TObject);
+var
+  plainBytes, cipherBytes: TBytes;
+  i: integer;
+  plainLen: integer;
+begin
+  //
+  edSMOut.Lines.Clear;
+  plainBytes := TEncoding.UTF8.GetBytes(edSMIn.Text);
+  plainLen := length(plainBytes);
+  if plainLen = 0 then
   begin
-    tempStr := tempStr + IntToHex(MD5Digest[i], 2);
+    showMessage('请输入要加密的字符串');
+    exit;
   end;
-  editOut.Text := tempStr;
+  SSL_InitSM3();
+  //
+  SM3Encrypt(plainBytes, cipherBytes);
+  edSMOut.Text := BinToHexStr(cipherBytes);
+end;
+
+procedure TForm1.tbSM4Click(Sender: TObject);
+var
+  plainBytes, cipherBytes, key, iv: TBytes;
+  plainLen: integer;
+  encryptMode:sm4_encrypt_mode;
+  paddingMode:sm4_padding_mode;
+begin
+  //
+  edSMOut.Lines.Clear;
+  plainBytes := TEncoding.UTF8.GetBytes(edSMIn.Text);
+  key := TEncoding.UTF8.GetBytes(edSMKey.Text);
+  iv := TEncoding.UTF8.GetBytes(edSMIV.Text);
+  plainLen := length(plainBytes);
+  if plainLen = 0 then
+  begin
+    showMessage('请输入要加密的字符串');
+    exit;
+  end;
+  SSL_InitSM4();
+  if edSMMode.Text='ECB' then
+    encryptMode := sm4_encrypt_mode.ecb
+  else
+    encryptMode := sm4_encrypt_mode.cbc;
+
+  if edSMPadding.Text='PKCS7' then
+    paddingMode := sm4_padding_mode.PKCS7
+  else
+    paddingMode := sm4_padding_mode.ZERO;
+  //
+  if SM4Encrypt(plainBytes, key, iv,cipherBytes,encryptMode,paddingMode) then
+  begin
+    edSMOut.Lines.Add('输出16进制字符串:');
+    edSMOut.Lines.Add(BinToHexStr(cipherBytes));
+    edSMOut.Lines.Add('输出Base64字符串:');
+    edSMOut.Lines.Add(BinToBase64Str(cipherBytes));
+  end
+  else
+  begin
+    showMessage('SM4Encrypt加密失败');
+  end;
+end;
+
+procedure TForm1.tbSM4DecodeClick(Sender: TObject);
+var
+  plainBytes, cipherBytes, key, iv: TBytes;
+  i: integer;
+  plainLen: integer;
+  tempStr: string;
+  ctx: SM3_CTX;
+  encryptMode:sm4_encrypt_mode;
+  paddingMode:sm4_padding_mode;
+begin
+  //
+  edSMOut.Lines.Clear;
+  key := TEncoding.UTF8.GetBytes(edSMKey.Text);
+  iv := TEncoding.UTF8.GetBytes(edSMIV.Text);
+  plainLen := length(edSMIn.Text);
+  if plainLen = 0 then
+  begin
+    showMessage('请输入要解密的字符串');
+    exit;
+  end;
+  //16进制字符串转bytes
+  if edSMIn64.Checked then
+  begin
+    plainBytes :=  Base64StrToBin(edSMIn.Text);
+  end
+  else
+  begin
+    plainBytes :=  HexStrToBin(edSMIn.Text);
+  end;
+
+  SSL_InitSM4();
+  if edSMMode.Text='ECB' then
+    encryptMode := sm4_encrypt_mode.ecb
+  else
+    encryptMode := sm4_encrypt_mode.cbc;
+
+  if edSMPadding.Text='PKCS7' then
+    paddingMode := sm4_padding_mode.PKCS7
+  else
+    paddingMode := sm4_padding_mode.ZERO;
+  //
+  if SM4Decrypt(plainBytes, key, iv,cipherBytes) then
+  begin
+    edSMOut.Text := TEncoding.UTF8.GetString(cipherBytes);
+  end
+  else
+  begin
+    showMessage('SM4Decrypt解密失败');
+  end;
+
 end;
 
 end.

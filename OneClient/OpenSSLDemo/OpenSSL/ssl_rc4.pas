@@ -18,10 +18,10 @@ procedure SSL_Initrc4;
 begin
 	if @RC4_options = nil then
 		begin
-			@RC4_options:= LoadFunctionCLib('RC4_options');
-			@RC4_set_key:= LoadFunctionCLib('RC4_set_key');
-			@private_RC4_set_key:= LoadFunctionCLib('private_RC4_set_key');
-			@RC4:= LoadFunctionCLib('RC4');
+			@RC4_options:= LoadFuncCLibCrypto('RC4_options');
+			@RC4_set_key:= LoadFuncCLibCrypto('RC4_set_key');
+			@private_RC4_set_key:= LoadFuncCLibCrypto('private_RC4_set_key');
+			@RC4:= LoadFuncCLibCrypto('RC4');
 		end;
 
 end;

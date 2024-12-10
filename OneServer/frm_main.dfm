@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 75
     Width = 882
     Height = 516
-    ActivePage = tabHTTPServer
+    ActivePage = tabToken
     Align = alClient
     TabOrder = 0
     ExplicitWidth = 880

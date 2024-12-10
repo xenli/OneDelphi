@@ -19,10 +19,10 @@ procedure SSL_InitMDC2;
 begin
 	if @MDC2_Init = nil then
 		begin
-			@MDC2_Init:= LoadFunctionCLib('MDC2_Init');
-			@MDC2_Update:= LoadFunctionCLib('MDC2_Update');
-			@MDC2_Final:= LoadFunctionCLib('MDC2_Final');
-			@MDC2:= LoadFunctionCLib('MDC2');
+			@MDC2_Init:= LoadFuncCLibCrypto('MDC2_Init');
+			@MDC2_Update:= LoadFuncCLibCrypto('MDC2_Update');
+			@MDC2_Final:= LoadFuncCLibCrypto('MDC2_Final');
+			@MDC2:= LoadFuncCLibCrypto('MDC2');
 		end;
 end;
 

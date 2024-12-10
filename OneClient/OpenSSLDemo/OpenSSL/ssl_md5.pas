@@ -1,5 +1,5 @@
 unit ssl_md5;
-//md5Ïà¹Ø¼Ó½âÃÜ
+//md5ï¿½ï¿½Ø¼Ó½ï¿½ï¿½ï¿½
 interface
 uses ssl_types;
 
@@ -19,11 +19,11 @@ procedure SSL_InitMD5;
 begin
   if @MD5_Init = nil then
   begin
-    @MD5_Init := LoadFunctionCLib('MD5_Init');
-    @MD5_Update := LoadFunctionCLib('MD5_Update');
-    @MD5_Final := LoadFunctionCLib('MD5_Final');
-    @MD5 := LoadFunctionCLib('MD5');
-    @MD5_Transform := LoadFunctionCLib('MD5_Transform');
+    @MD5_Init := LoadFuncCLibCrypto('MD5_Init');
+    @MD5_Update := LoadFuncCLibCrypto('MD5_Update');
+    @MD5_Final := LoadFuncCLibCrypto('MD5_Final');
+    @MD5 := LoadFuncCLibCrypto('MD5');
+    @MD5_Transform := LoadFuncCLibCrypto('MD5_Transform');
   end;
 end;
 

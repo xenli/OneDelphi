@@ -8,9 +8,14 @@ uses
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.Stan.Intf,
   FireDAC.Stan.Param, FireDAC.Phys.Intf, System.Threading,
   System.Generics.Collections, {$IFDEF MSWINDOWS} Vcl.Dialogs, System.UITypes, {$ENDIF}
-  OneClientConnect, OneClientDataInfo, OneClientConst;
+  OneClientConnect, OneClientDataInfo, OneClientConst, System.Variants, Data.SqlTimSt,
+  OneDate;
+
+const
+  const_open_version_whereSQL = 'and (120=120) ';
 
 type
+
   TOneDataSet = class;
   TOneDataInfo = class;
 
@@ -73,6 +78,9 @@ type
     FTranID: string;
     // 事务锁定时间 <=0,无限。
     FTranSpanSec: Integer;
+    // 本地缓存增量数据集,版本号字段
+    FOpenVersionField: string;
+    FOpenVersionCount: Integer;
     // 错误信息
     FErrMsg: string;
   private
@@ -139,6 +147,11 @@ type
     property TranID: string read FTranID write FTranID;
     /// <param name="TranSpanSec">默认0，不超时</param>
     property TranSpanSec: Integer read FTranSpanSec write FTranSpanSec;
+
+    /// <param name="FOpenVersionField">本地缓存增量数据集,版本号字段</param>
+    property OpenVersionField: string read FOpenVersionField write FOpenVersionField;
+    /// <param name="FOpenVersionField">本地缓存增量数据集,变动了几条数据</param>
+    property OpenVersionCount: Integer read FOpenVersionCount;
     /// <param name="ErrMsg">错误信息</param>
     property ErrMsg: string read FErrMsg write FErrMsg;
   end;
@@ -181,6 +194,13 @@ type
     /// </summary>
     /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
     function OpenData: boolean;
+
+    /// <summary>
+    /// 缓存在本地的数据,与服务端对比最新数据,增量更新本地缓存
+    /// 缓存数据一般是选择或查询数据，不参与保存的,请不要参与任何保存
+    /// </summary>
+    /// <returns>失败返回False,错误信息在ErrMsg属性</returns>
+    function OpenDataIncCache: boolean;
     function OpenDatas(QOpenDatas: array of TOneDataSet): boolean; overload;
     function OpenDatas(QOpenDatas: TList<TOneDataSet>): boolean; overload;
     /// <summary>
@@ -614,8 +634,7 @@ begin
       exit;
     end;
 {$IFDEF MSWINDOWS}
-    if MessageDlg('请认真检查SQL,防止打开大数据,确定要跟据以下SQL打开数据:' + Self.SQL.Text,
-      mtInformation, [mbOK, mbCancel], 0, mbOK) <> mrok then
+    if MessageDlg('请认真检查SQL,防止打开大数据,确定要跟据以下SQL打开数据:' + Self.SQL.Text, mtInformation, [mbOK, mbCancel], 0, mbOK) <> mrok then
     begin
       exit;
     end;
@@ -671,6 +690,292 @@ begin
   begin
     Result := Self.FDataInfo.FConnection.OpenData(Self);
   end;
+end;
+
+function TOneDataSet.OpenDataIncCache: boolean;
+var
+  lNewData: TOneDataSet;
+  lDataGetResult: boolean;
+  iSQL: Integer;
+  lLineSQL, lConstSQL, lVersionParamName: string;
+  //
+  lSourceKeyField, lVersionField, lNewKeyField: TField;
+  lVerMaxValue, lNewKeyValue: Variant;
+  lVerMaxSQLTimeStamp: TSQLTimeStamp;
+  iField: Integer;
+  lSourceField, lDestField: TField;
+  lSourceFieldList, lDestFieldList: TList<TField>;
+  //
+  lMaxNumber: double;
+  lMaxString: string;
+  lMaxDate: TDateTime;
+  lIsNumber: boolean;
+  lIsString: boolean;
+  lIsDateTime: boolean;
+  //
+  isFindVersionWhere: boolean;
+  iParam: Integer;
+  lParamName: string;
+  lNewParam, lSourceParam: TFDParam;
+begin
+  Result := False;
+  lDataGetResult := False;
+  isFindVersionWhere := False;
+  lSourceKeyField := nil;
+  lVersionField := nil;
+  Self.FDataInfo.FOpenVersionCount := 0;
+  if Self.FDataInfo.FPrimaryKey = '' then
+  begin
+    Self.FDataInfo.FErrMsg := '增量更新本地缓存,数据集DataInfo.PrimaryKey=空,无法定位数据进行对比';
+    exit;
+  end;
+  if Self.FDataInfo.FOpenVersionField = '' then
+  begin
+    Self.FDataInfo.FErrMsg := '增量更新本地缓存,数据集DataInfo.OpenVersionField=空';
+    exit;
+  end;
+  lVersionParamName := 'OneVersion' + Self.FDataInfo.FOpenVersionField;
+  if (not Self.Active) or (Self.RecordCount = 0) then
+  begin
+    // 本来是没打开的数据集,直接调用自已打开数据即可
+    Result := Self.OpenData();
+    exit;
+  end;
+  if Self.FDataInfo.FConnection = nil then
+    Self.FDataInfo.FConnection := OneClientConnect.Unit_Connection;
+  if Self.FDataInfo.FConnection = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集Connection=nil';
+    exit;
+  end;
+  if Self.SQL.Text = '' then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集DataInfo.SQL=空';
+    exit;
+  end;
+  if Self.FDataInfo.OpenMode = TDataOpenMode.localSQL then
+  begin
+    Self.FDataInfo.FErrMsg := '当数据集打开模式为localSQL时,只支持本地查询';
+    exit;
+  end;
+  lSourceKeyField := Self.FindField(Self.FDataInfo.FPrimaryKey);
+  if lSourceKeyField = nil then
+  begin
+    Self.FDataInfo.FErrMsg := '数据集找不到相关主键字段[' + Self.FDataInfo.FPrimaryKey + ']';
+    exit;
+  end;
+  //
+  lNewData := TOneDataSet.Create(nil);
+  try
+    lNewData.FDataInfo.FConnection := Self.FDataInfo.FConnection;
+    lNewData.FDataInfo.ZTCode := Self.FDataInfo.ZTCode;
+    lNewData.SQL.Text := Self.SQL.Text;
+    lNewData.DataInfo.OpenMode := Self.FDataInfo.OpenMode;
+    // 解读SQL是不是有固定的行,加上VersionField字段参数
+    lConstSQL := const_open_version_whereSQL.Replace(' ', '', [rfReplaceAll, rfIgnoreCase]);
+    for iSQL := 0 to lNewData.SQL.Count - 1 do
+    begin
+      lLineSQL := lNewData.SQL[iSQL];
+      lLineSQL := lLineSQL.Replace(' ', '', [rfReplaceAll, rfIgnoreCase]);
+      if lLineSQL.ToLower() = lConstSQL then
+      begin
+        // 改写这行
+        isFindVersionWhere := true;
+        lNewData.SQL[iSQL] := ' and ' + Self.FDataInfo.FOpenVersionField + ' > :' + lVersionParamName + ' ';
+        break;
+      end;
+    end;
+    if not isFindVersionWhere then
+    begin
+      Self.FDataInfo.FErrMsg := '增量打开数据集,需要有一个固定条件行且单独一行:' + lConstSQL;
+      exit;
+    end;
+    // 复制原本参数值
+    for iParam := 0 to lNewData.Params.Count - 1 do
+    begin
+      lNewParam := lNewData.Params[iParam];
+      lParamName := lNewParam.Name;
+      lSourceParam := Self.FindParam(lParamName);
+      if lSourceParam = nil then
+      begin
+        continue;
+      end;
+      lNewParam.value := lSourceParam.value;
+      lNewParam.ParamType := lSourceParam.ParamType;
+      lNewParam.DataType := lSourceParam.DataType;
+    end;
+    // 找出原来数据集原本最大值
+    lVersionField := Self.FindField(Self.FDataInfo.FOpenVersionField);
+    if lVersionField = nil then
+    begin
+      Self.FDataInfo.FErrMsg := '数据集不存在版本号字段[' + Self.FDataInfo.FOpenVersionField + ']';
+      exit;
+    end;
+    lIsNumber := False;
+    lIsString := False;
+    lIsDateTime := False;
+
+    case lVersionField.DataType of
+      ftSmallint, ftInteger, ftWord, ftFloat, ftCurrency, ftBCD, ftLargeint:
+        begin
+          lIsNumber := true;
+        end;
+      ftDateTime, ftTimeStamp, ftOraTimeStamp:
+        begin
+          lIsDateTime := true;
+        end
+    else
+      begin
+        lIsString := true;
+      end;
+    end;
+    lVerMaxValue := null;
+    InitSQLTimeStamp(lVerMaxSQLTimeStamp);
+    Self.DisableControls;
+    try
+      Self.First;
+      while not Self.Eof do
+      begin
+        if lIsDateTime then
+        begin
+          if CompareSQLTimeStamps(lVerMaxSQLTimeStamp, lVersionField.AsSQLTimeStamp) = -1 then
+          begin
+            lVerMaxSQLTimeStamp := lVersionField.AsSQLTimeStamp;
+          end;
+        end
+        else
+        begin
+          if VarIsNull(lVerMaxValue) then
+          begin
+            lVerMaxValue := lVersionField.AsVariant;
+          end
+          else if lVerMaxValue < lVersionField.AsVariant then
+          begin
+            lVerMaxValue := lVersionField.AsVariant;
+          end;
+        end;
+        Self.next;
+      end;
+    finally
+      Self.EnableControls;
+    end;
+    if lIsDateTime then
+    begin
+      if IsZeroSQLTimeStamp(lVerMaxSQLTimeStamp) then
+      begin
+        Self.FDataInfo.FErrMsg := '获取到的版本号字段值为null';
+        exit;
+      end;
+    end
+    else
+    begin
+      if VarIsNull(lVerMaxValue) then
+      begin
+        Self.FDataInfo.FErrMsg := '获取到的版本号字段值为null';
+        exit;
+      end;
+    end;
+    // 参数复值
+    lNewData.ParamByName(lVersionParamName).DataType := lVersionField.DataType;
+    if lIsDateTime then
+    begin
+      lNewData.ParamByName(lVersionParamName).AsSQLTimeStamp := lVerMaxSQLTimeStamp;
+    end
+    else
+    begin
+      lNewData.ParamByName(lVersionParamName).value := lVerMaxValue;
+    end;
+    // 打开数据
+    if lNewData.DataInfo.OpenMode = TDataOpenMode.OpenStored then
+    begin
+      lDataGetResult := lNewData.ExecStored();
+    end
+    else
+    begin
+      lDataGetResult := lNewData.OpenData();
+    end;
+    if not lDataGetResult then
+    begin
+      Self.FDataInfo.FErrMsg := lNewData.FDataInfo.FErrMsg;
+      exit;
+    end;
+    // 对比缓存,合并到本地数据集
+    lNewKeyField := lNewData.FindField(Self.FDataInfo.FPrimaryKey);
+    if lNewKeyField = nil then
+    begin
+      Self.FDataInfo.FErrMsg := '新的增量数据集找不到相关主键字段[' + Self.FDataInfo.FPrimaryKey + ']';
+      exit;
+    end;
+
+    lSourceFieldList := TList<TField>.Create;
+    lDestFieldList := TList<TField>.Create;
+    // 定位数据对比更新
+    Self.DisableControls;
+    try
+      for iField := 0 to Self.Fields.Count - 1 do
+      begin
+        lSourceField := Self.Fields[iField];
+        if lSourceField.FieldKind in [fkCalculated, fkInternalCalc] then
+        begin
+          // 计算字段不参与
+          continue;
+        end;
+        if not lSourceField.CanModify then
+        begin
+          continue;
+        end;
+
+        lDestField := nil;
+        lDestField := lNewData.FindField(lSourceField.FieldName);
+        if lDestField <> nil then
+        begin
+          lSourceFieldList.Add(lSourceField);
+          lDestFieldList.Add(lDestField);
+        end;
+      end;
+
+      while not lNewData.Eof do
+      begin
+        // 定位原始数据
+        lNewKeyValue := lNewKeyField.AsVariant;
+        if (Self.Locate(Self.FDataInfo.FPrimaryKey, lNewKeyValue)) then
+        begin
+          // 更新本地数据
+          Self.Edit;
+        end
+        else
+        begin
+          // 添加数据
+          Self.Append;
+        end;
+        // 字段赋值
+        for iField := 0 to lSourceFieldList.Count - 1 do
+        begin
+          lSourceField := lSourceFieldList[iField];
+          lDestField := lDestFieldList[iField];
+          // 赋值
+          lSourceField.AsVariant := lDestField.AsVariant;
+        end;
+        Self.FDataInfo.FOpenVersionCount := Self.FDataInfo.FOpenVersionCount + 1;
+        Self.Post;
+        lNewData.next;
+      end;
+      // 缓存数据一般是选择数据，不参与保存的
+      Self.MergeChangeLog();
+      Result := true;
+    finally
+      Self.EnableControls;
+      lSourceFieldList.Clear;
+      lSourceFieldList.Free;
+      lDestFieldList.Clear;
+      lDestFieldList.Free;
+    end;
+    lNewData.First;
+  finally
+    lNewData.Free;
+    lNewData := nil;
+  end;
+
 end;
 
 function TOneDataSet.OpenDatas(QOpenDatas: array of TOneDataSet): boolean;
@@ -831,7 +1136,7 @@ begin
   try
     lTempData.DataInfo.ZTCode := Self.DataInfo.ZTCode;
     lTempData.SQL.Text := QSQL;
-    if lTempData.Params.Count <> length(QParamValues) then
+    if lTempData.Params.Count <> Length(QParamValues) then
     begin
       Self.DataInfo.ErrMsg := 'SQL产生的参数个数与传进来的参数不相等,请检查';
       exit;
@@ -854,13 +1159,13 @@ begin
       Self.DataInfo.ErrMsg := '当前返回数据不是唯一的，当前返回条数:' + lTempData.RecordCount.ToString;
       exit;
     end;
-    for iField := 0 to lTempData.Fields.Count-1 do
+    for iField := 0 to lTempData.Fields.Count - 1 do
     begin
       lField := lTempData.Fields[iField];
       lFieldDict.Add(lField.FieldName.ToLower, lField);
     end;
     // 处理字段是否全部一至
-    for iField := 0 to Self.Fields.Count-1 do
+    for iField := 0 to Self.Fields.Count - 1 do
     begin
       lField := Self.Fields[iField];
       if not(lField.FieldKind = TFieldKind.fkData) then
@@ -880,7 +1185,7 @@ begin
     end;
     // 字段赋值
     Self.Edit;
-    for iField := 0 to Self.Fields.Count-1 do
+    for iField := 0 to Self.Fields.Count - 1 do
     begin
       lField := Self.Fields[iField];
       if not(lField.FieldKind = TFieldKind.fkData) then

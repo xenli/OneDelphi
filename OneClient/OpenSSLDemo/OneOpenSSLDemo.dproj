@@ -123,7 +123,7 @@
         <DCCReference Include="OpenSSL\ssl_ecdsa.pas"/>
         <DCCReference Include="OpenSSL\ssl_engine.pas"/>
         <DCCReference Include="OpenSSL\ssl_err.pas"/>
-        <DCCReference Include="OpenSSL\ssl_evp.pas"/>
+        <DCCReference Include="OpenSSL\ssl_evphis.pas"/>
         <DCCReference Include="OpenSSL\ssl_hmac.pas"/>
         <DCCReference Include="OpenSSL\ssl_idea.pas"/>
         <DCCReference Include="OpenSSL\ssl_init.pas"/>
@@ -151,6 +151,13 @@
         <DCCReference Include="OpenSSL\ssl_x509.pas"/>
         <DCCReference Include="OpenSSL\ssl_encode.pas"/>
         <DCCReference Include="OpenSSL\ssl_sm4.pas"/>
+        <DCCReference Include="OpenSSL\ssl_sm3.pas"/>
+        <DCCReference Include="OpenSSL\ssl_evpmdctx.pas"/>
+        <DCCReference Include="OpenSSL\ssl_evp.pas"/>
+        <DCCReference Include="OpenSSL\ssl_typepointers.pas"/>
+        <DCCReference Include="OpenSSL\ssl_conver.pas"/>
+        <DCCReference Include="OpenSSL\ssl_evppkey.pas"/>
+        <DCCReference Include="OpenSSL\ssl_sm2.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

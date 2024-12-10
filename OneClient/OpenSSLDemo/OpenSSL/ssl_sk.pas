@@ -61,11 +61,11 @@ procedure SSL_initSk;
 begin
   if @sk_value = nil then
    begin
-     @sk_value := LoadFunctionCLib('sk_value');
-     @sk_new_null := LoadFunctionCLib('sk_new_null');
-     @sk_push := LoadFunctionCLib('sk_push');
-     @sk_pop_free := LoadFunctionCLib('sk_pop_free');
-     @sk_free := LoadFunctionCLib('sk_free');
+     @sk_value := LoadFuncCLibCrypto('sk_value');
+     @sk_new_null := LoadFuncCLibCrypto('sk_new_null');
+     @sk_push := LoadFuncCLibCrypto('sk_push');
+     @sk_pop_free := LoadFuncCLibCrypto('sk_pop_free');
+     @sk_free := LoadFuncCLibCrypto('sk_free');
    end;
 end;
 

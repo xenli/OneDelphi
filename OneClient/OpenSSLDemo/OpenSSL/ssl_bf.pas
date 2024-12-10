@@ -25,15 +25,15 @@ begin
   if @BF_options = nil then
    begin
         
-      @private_BF_set_key:= LoadFunctionCLib('private_BF_set_key', false);
-      @BF_set_key:= LoadFunctionCLib('BF_set_key');
-      @BF_encrypt:= LoadFunctionCLib('BF_encrypt');
-      @BF_decrypt:= LoadFunctionCLib('BF_decrypt');
-      @BF_ecb_encrypt:= LoadFunctionCLib('BF_ecb_encrypt');
-      @BF_cbc_encrypt:= LoadFunctionCLib('BF_cbc_encrypt');
-      @BF_cfb64_encrypt:= LoadFunctionCLib('BF_cfb64_encrypt');
-      @BF_ofb64_encrypt:= LoadFunctionCLib('BF_ofb64_encrypt');
-      @BF_options:= LoadFunctionCLib('BF_options');
+      @private_BF_set_key:= LoadFuncCLibCrypto('private_BF_set_key', false);
+      @BF_set_key:= LoadFuncCLibCrypto('BF_set_key');
+      @BF_encrypt:= LoadFuncCLibCrypto('BF_encrypt');
+      @BF_decrypt:= LoadFuncCLibCrypto('BF_decrypt');
+      @BF_ecb_encrypt:= LoadFuncCLibCrypto('BF_ecb_encrypt');
+      @BF_cbc_encrypt:= LoadFuncCLibCrypto('BF_cbc_encrypt');
+      @BF_cfb64_encrypt:= LoadFuncCLibCrypto('BF_cfb64_encrypt');
+      @BF_ofb64_encrypt:= LoadFuncCLibCrypto('BF_ofb64_encrypt');
+      @BF_options:= LoadFuncCLibCrypto('BF_options');
 
    end;
 end;

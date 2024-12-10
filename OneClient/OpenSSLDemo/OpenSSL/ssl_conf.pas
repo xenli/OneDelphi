@@ -119,59 +119,59 @@ procedure SSL_InitCONF;
 begin
   if @NCONF_new = nil then
    begin
-    @CONF_set_default_method:= LoadFunctionCLib('CONF_set_default_method');
-    @CONF_set_nconf:= LoadFunctionCLib('CONF_set_nconf');
-    @CONF_load:= LoadFunctionCLib('CONF_load');
-    @CONF_load_bio:= LoadFunctionCLib('CONF_load_bio');
-    @CONF_get_section:= LoadFunctionCLib('CONF_get_section');
-    @CONF_get_string:= LoadFunctionCLib('CONF_get_string');
-    @CONF_get_number:= LoadFunctionCLib('CONF_get_number');
+    @CONF_set_default_method:= LoadFuncCLibCrypto('CONF_set_default_method');
+    @CONF_set_nconf:= LoadFuncCLibCrypto('CONF_set_nconf');
+    @CONF_load:= LoadFuncCLibCrypto('CONF_load');
+    @CONF_load_bio:= LoadFuncCLibCrypto('CONF_load_bio');
+    @CONF_get_section:= LoadFuncCLibCrypto('CONF_get_section');
+    @CONF_get_string:= LoadFuncCLibCrypto('CONF_get_string');
+    @CONF_get_number:= LoadFuncCLibCrypto('CONF_get_number');
     
-    @CONF_free:= LoadFunctionCLib('CONF_free');
-    @CONF_dump_bio:= LoadFunctionCLib('CONF_dump_bio');
+    @CONF_free:= LoadFuncCLibCrypto('CONF_free');
+    @CONF_dump_bio:= LoadFuncCLibCrypto('CONF_dump_bio');
 
-    @OPENSSL_config:= LoadFunctionCLib('OPENSSL_config');
-    @OPENSSL_no_config:= LoadFunctionCLib('OPENSSL_no_config');
+    @OPENSSL_config:= LoadFuncCLibCrypto('OPENSSL_config');
+    @OPENSSL_no_config:= LoadFuncCLibCrypto('OPENSSL_no_config');
 
-    @NCONF_new:= LoadFunctionCLib('NCONF_new');
-    @NCONF_default:= LoadFunctionCLib('NCONF_default');
-    @NCONF_WIN32:= LoadFunctionCLib('NCONF_WIN32');
-    @NCONF_free:= LoadFunctionCLib('NCONF_free');
-    @NCONF_free_data:= LoadFunctionCLib('NCONF_free_data');
+    @NCONF_new:= LoadFuncCLibCrypto('NCONF_new');
+    @NCONF_default:= LoadFuncCLibCrypto('NCONF_default');
+    @NCONF_WIN32:= LoadFuncCLibCrypto('NCONF_WIN32');
+    @NCONF_free:= LoadFuncCLibCrypto('NCONF_free');
+    @NCONF_free_data:= LoadFuncCLibCrypto('NCONF_free_data');
 
-    @NCONF_load:= LoadFunctionCLib('NCONF_load');
-    @NCONF_load_bio:= LoadFunctionCLib('NCONF_load_bio');
-    @NCONF_get_section:= LoadFunctionCLib('NCONF_get_section');
-    @NCONF_get_string:= LoadFunctionCLib('NCONF_get_string');
-    @NCONF_get_number_e:= LoadFunctionCLib('NCONF_get_number_e');
+    @NCONF_load:= LoadFuncCLibCrypto('NCONF_load');
+    @NCONF_load_bio:= LoadFuncCLibCrypto('NCONF_load_bio');
+    @NCONF_get_section:= LoadFuncCLibCrypto('NCONF_get_section');
+    @NCONF_get_string:= LoadFuncCLibCrypto('NCONF_get_string');
+    @NCONF_get_number_e:= LoadFuncCLibCrypto('NCONF_get_number_e');
 		       
-    @NCONF_dump_bio:= LoadFunctionCLib('NCONF_dump_bio');
+    @NCONF_dump_bio:= LoadFuncCLibCrypto('NCONF_dump_bio');
   
 
-    @CONF_modules_load:= LoadFunctionCLib('CONF_modules_load');
-    @CONF_modules_load_file:= LoadFunctionCLib('CONF_modules_load_file');
-    @CONF_modules_unload:= LoadFunctionCLib('CONF_modules_unload');
-    @CONF_modules_finish:= LoadFunctionCLib('CONF_modules_finish');
-    @CONF_modules_free:= LoadFunctionCLib('CONF_modules_free');
-    @CONF_module_add:= LoadFunctionCLib('CONF_module_add');
+    @CONF_modules_load:= LoadFuncCLibCrypto('CONF_modules_load');
+    @CONF_modules_load_file:= LoadFuncCLibCrypto('CONF_modules_load_file');
+    @CONF_modules_unload:= LoadFuncCLibCrypto('CONF_modules_unload');
+    @CONF_modules_finish:= LoadFuncCLibCrypto('CONF_modules_finish');
+    @CONF_modules_free:= LoadFuncCLibCrypto('CONF_modules_free');
+    @CONF_module_add:= LoadFuncCLibCrypto('CONF_module_add');
 
-    @CONF_imodule_get_name:= LoadFunctionCLib('CONF_imodule_get_name');
-    @CONF_imodule_get_value:= LoadFunctionCLib('CONF_imodule_get_value');
-    @CONF_imodule_get_usr_data:= LoadFunctionCLib('CONF_imodule_get_usr_data');
-    @CONF_imodule_set_usr_data:= LoadFunctionCLib('CONF_imodule_set_usr_data');
-    @CONF_imodule_get_module:= LoadFunctionCLib('CONF_imodule_get_module');
-    @CONF_imodule_get_flags:= LoadFunctionCLib('CONF_imodule_get_flags');
-    @CONF_imodule_set_flags:= LoadFunctionCLib('CONF_imodule_set_flags');
-    @CONF_module_get_usr_data:= LoadFunctionCLib('CONF_module_get_usr_data');
-    @CONF_module_set_usr_data:= LoadFunctionCLib('CONF_module_set_usr_data');
+    @CONF_imodule_get_name:= LoadFuncCLibCrypto('CONF_imodule_get_name');
+    @CONF_imodule_get_value:= LoadFuncCLibCrypto('CONF_imodule_get_value');
+    @CONF_imodule_get_usr_data:= LoadFuncCLibCrypto('CONF_imodule_get_usr_data');
+    @CONF_imodule_set_usr_data:= LoadFuncCLibCrypto('CONF_imodule_set_usr_data');
+    @CONF_imodule_get_module:= LoadFuncCLibCrypto('CONF_imodule_get_module');
+    @CONF_imodule_get_flags:= LoadFuncCLibCrypto('CONF_imodule_get_flags');
+    @CONF_imodule_set_flags:= LoadFuncCLibCrypto('CONF_imodule_set_flags');
+    @CONF_module_get_usr_data:= LoadFuncCLibCrypto('CONF_module_get_usr_data');
+    @CONF_module_set_usr_data:= LoadFuncCLibCrypto('CONF_module_set_usr_data');
 
-    @CONF_get1_default_config_file:= LoadFunctionCLib('CONF_get1_default_config_file');
+    @CONF_get1_default_config_file:= LoadFuncCLibCrypto('CONF_get1_default_config_file');
 
-    @CONF_parse_list := LoadFunctionCLib('CONF_parse_list');
+    @CONF_parse_list := LoadFuncCLibCrypto('CONF_parse_list');
 
-    @OPENSSL_load_builtin_modules:= LoadFunctionCLib('OPENSSL_load_builtin_modules');
+    @OPENSSL_load_builtin_modules:= LoadFuncCLibCrypto('OPENSSL_load_builtin_modules');
 
-    @ERR_load_CONF_strings:= LoadFunctionCLib('ERR_load_CONF_strings');
+    @ERR_load_CONF_strings:= LoadFuncCLibCrypto('ERR_load_CONF_strings');
    end;
 end;
-end.
+end.

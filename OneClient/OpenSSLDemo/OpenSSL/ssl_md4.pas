@@ -19,11 +19,11 @@ procedure SSL_InitMD4;
 begin
 	if @MD4_Init = nil then
 		begin
-			@MD4_Init:= LoadFunctionCLib('MD4_Init');
-			@MD4_Update:= LoadFunctionCLib('MD4_Update');
-			@MD4_Final:= LoadFunctionCLib('MD4_Final');
-			@MD4:= LoadFunctionCLib('MD4');
-			@MD4_Transform:= LoadFunctionCLib('MD4_Transform');
+			@MD4_Init:= LoadFuncCLibCrypto('MD4_Init');
+			@MD4_Update:= LoadFuncCLibCrypto('MD4_Update');
+			@MD4_Final:= LoadFuncCLibCrypto('MD4_Final');
+			@MD4:= LoadFuncCLibCrypto('MD4');
+			@MD4_Transform:= LoadFuncCLibCrypto('MD4_Transform');
 		end;
 end;
 

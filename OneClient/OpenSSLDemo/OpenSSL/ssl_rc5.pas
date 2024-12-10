@@ -21,13 +21,13 @@ procedure SSL_Initrc5;
 begin
 	if @RC5_32_encrypt = nil then
 		begin
-			@RC5_32_set_key:= LoadFunctionCLib('RC5_32_set_key', false);
-			@RC5_32_ecb_encrypt:= LoadFunctionCLib('RC5_32_ecb_encrypt', false);
-			@RC5_32_encrypt:= LoadFunctionCLib('RC5_32_encrypt', false);
-			@RC5_32_decrypt:= LoadFunctionCLib('RC5_32_decrypt', false);
-			@RC5_32_cbc_encrypt:= LoadFunctionCLib('RC5_32_cbc_encrypt', false);
-			@RC5_32_cfb64_encrypt:= LoadFunctionCLib('RC5_32_cfb64_encrypt', false);
-			@RC5_32_ofb64_encrypt:= LoadFunctionCLib('RC5_32_ofb64_encrypt', false);
+			@RC5_32_set_key:= LoadFuncCLibCrypto('RC5_32_set_key', false);
+			@RC5_32_ecb_encrypt:= LoadFuncCLibCrypto('RC5_32_ecb_encrypt', false);
+			@RC5_32_encrypt:= LoadFuncCLibCrypto('RC5_32_encrypt', false);
+			@RC5_32_decrypt:= LoadFuncCLibCrypto('RC5_32_decrypt', false);
+			@RC5_32_cbc_encrypt:= LoadFuncCLibCrypto('RC5_32_cbc_encrypt', false);
+			@RC5_32_cfb64_encrypt:= LoadFuncCLibCrypto('RC5_32_cfb64_encrypt', false);
+			@RC5_32_ofb64_encrypt:= LoadFuncCLibCrypto('RC5_32_ofb64_encrypt', false);
 		end;
 end;
 

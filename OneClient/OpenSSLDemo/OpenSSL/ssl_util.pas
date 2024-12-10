@@ -54,14 +54,14 @@ procedure SSL_InitUtil;
 begin
  if @CRYPTO_malloc = nil then
   begin
-    @CRYPTO_malloc := LoadFunctionCLib('CRYPTO_malloc');
-    @CRYPTO_free := LoadFunctionCLib('CRYPTO_free');
-    @CRYPTO_realloc := LoadFunctionCLib('CRYPTO_realloc', false);
-    @CRYPTO_set_mem_functions := LoadFunctionCLib('CRYPTO_set_mem_functions');
-    @fCRYPTO_lock := LoadFunctionCLib('CRYPTO_lock');
+    @CRYPTO_malloc := LoadFuncCLibCrypto('CRYPTO_malloc');
+    @CRYPTO_free := LoadFuncCLibCrypto('CRYPTO_free');
+    @CRYPTO_realloc := LoadFuncCLibCrypto('CRYPTO_realloc', false);
+    @CRYPTO_set_mem_functions := LoadFuncCLibCrypto('CRYPTO_set_mem_functions');
+    @fCRYPTO_lock := LoadFuncCLibCrypto('CRYPTO_lock');
     CRYPTO_set_mem_functions(_CR_alloc, _CR_realloc, _CR_free);
 
-    @OPENSSL_gmtime := LoadFunctionCLib('OPENSSL_gmtime', False);
+    @OPENSSL_gmtime := LoadFuncCLibCrypto('OPENSSL_gmtime', False);
   end;
 end;
 

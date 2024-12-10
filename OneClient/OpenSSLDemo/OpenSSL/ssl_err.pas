@@ -81,36 +81,36 @@ procedure SSL_InitERR;
 begin
    if @ERR_get_error = nil then
     begin
-       @ERR_put_error:= LoadFunctionCLib('ERR_put_error');
-       @ERR_set_error_data:= LoadFunctionCLib('ERR_set_error_data');
-       @ERR_get_error:= LoadFunctionCLib('ERR_get_error');
-       @ERR_get_error_line:= LoadFunctionCLib('ERR_get_error_line');
-       @ERR_get_error_line_data:= LoadFunctionCLib('ERR_get_error_line_data');
-       @ERR_peek_error:= LoadFunctionCLib('ERR_peek_error');
-       @ERR_peek_error_line:= LoadFunctionCLib('ERR_peek_error_line');
-       @ERR_peek_error_line_data:= LoadFunctionCLib('ERR_peek_error_line_data');
-       @ERR_peek_last_error:= LoadFunctionCLib('ERR_peek_last_error');
-       @ERR_peek_last_error_line:= LoadFunctionCLib('ERR_peek_last_error_line');
-       @ERR_peek_last_error_line_data:= LoadFunctionCLib('ERR_peek_last_error_line_data');
-       @ERR_clear_error:= LoadFunctionCLib('ERR_clear_error');
-       @ERR_error_string:= LoadFunctionCLib('ERR_error_string');
-       @ERR_error_string_n:= LoadFunctionCLib('ERR_error_string_n');
-       @ERR_lib_error_string:= LoadFunctionCLib('ERR_lib_error_string');
-       @ERR_func_error_string:= LoadFunctionCLib('ERR_func_error_string');
-       @ERR_reason_error_string:= LoadFunctionCLib('ERR_reason_error_string');
-       @ERR_print_errors_cb:= LoadFunctionCLib('ERR_print_errors_cb');
-       @ERR_print_errors:= LoadFunctionCLib('ERR_print_errors');
-       @ERR_load_ERR_strings:= LoadFunctionCLib('ERR_load_ERR_strings');
-       @ERR_load_crypto_strings:= LoadFunctionCLib('ERR_load_crypto_strings');
-       @ERR_free_strings:= LoadFunctionCLib('ERR_free_strings');
-       @ERR_remove_thread_state:= LoadFunctionCLib('ERR_remove_thread_state', false);
-       @ERR_remove_state:= LoadFunctionCLib('ERR_remove_state');
-       @ERR_get_state:= LoadFunctionCLib('ERR_get_state');
-       @ERR_get_next_error_library:= LoadFunctionCLib('ERR_get_next_error_library');
-       @ERR_set_mark:= LoadFunctionCLib('ERR_set_mark');
-       @ERR_pop_to_mark:= LoadFunctionCLib('ERR_pop_to_mark');
-       @ERR_get_implementation:= LoadFunctionCLib('ERR_get_implementation');
-       @ERR_set_implementation:= LoadFunctionCLib('ERR_set_implementation');
+       @ERR_put_error:= LoadFuncCLibCrypto('ERR_put_error');
+       @ERR_set_error_data:= LoadFuncCLibCrypto('ERR_set_error_data');
+       @ERR_get_error:= LoadFuncCLibCrypto('ERR_get_error');
+       @ERR_get_error_line:= LoadFuncCLibCrypto('ERR_get_error_line');
+       @ERR_get_error_line_data:= LoadFuncCLibCrypto('ERR_get_error_line_data');
+       @ERR_peek_error:= LoadFuncCLibCrypto('ERR_peek_error');
+       @ERR_peek_error_line:= LoadFuncCLibCrypto('ERR_peek_error_line');
+       @ERR_peek_error_line_data:= LoadFuncCLibCrypto('ERR_peek_error_line_data');
+       @ERR_peek_last_error:= LoadFuncCLibCrypto('ERR_peek_last_error');
+       @ERR_peek_last_error_line:= LoadFuncCLibCrypto('ERR_peek_last_error_line');
+       @ERR_peek_last_error_line_data:= LoadFuncCLibCrypto('ERR_peek_last_error_line_data');
+       @ERR_clear_error:= LoadFuncCLibCrypto('ERR_clear_error');
+       @ERR_error_string:= LoadFuncCLibCrypto('ERR_error_string');
+       @ERR_error_string_n:= LoadFuncCLibCrypto('ERR_error_string_n');
+       @ERR_lib_error_string:= LoadFuncCLibCrypto('ERR_lib_error_string');
+       @ERR_func_error_string:= LoadFuncCLibCrypto('ERR_func_error_string');
+       @ERR_reason_error_string:= LoadFuncCLibCrypto('ERR_reason_error_string');
+       @ERR_print_errors_cb:= LoadFuncCLibCrypto('ERR_print_errors_cb');
+       @ERR_print_errors:= LoadFuncCLibCrypto('ERR_print_errors');
+       @ERR_load_ERR_strings:= LoadFuncCLibCrypto('ERR_load_ERR_strings');
+       @ERR_load_crypto_strings:= LoadFuncCLibCrypto('ERR_load_crypto_strings');
+       @ERR_free_strings:= LoadFuncCLibCrypto('ERR_free_strings');
+       @ERR_remove_thread_state:= LoadFuncCLibCrypto('ERR_remove_thread_state', false);
+       @ERR_remove_state:= LoadFuncCLibCrypto('ERR_remove_state');
+       @ERR_get_state:= LoadFuncCLibCrypto('ERR_get_state');
+       @ERR_get_next_error_library:= LoadFuncCLibCrypto('ERR_get_next_error_library');
+       @ERR_set_mark:= LoadFuncCLibCrypto('ERR_set_mark');
+       @ERR_pop_to_mark:= LoadFuncCLibCrypto('ERR_pop_to_mark');
+       @ERR_get_implementation:= LoadFuncCLibCrypto('ERR_get_implementation');
+       @ERR_set_implementation:= LoadFuncCLibCrypto('ERR_set_implementation');
        ERR_load_crypto_strings;
     end;
 end;
@@ -132,4 +132,4 @@ begin
  Create(AErrorCode, sMsg);
 end;
 
-end.
+end.

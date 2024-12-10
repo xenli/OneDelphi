@@ -74,6 +74,8 @@ contains
   OneClientFastFile in 'OneFast\OneClientFastFile.pas',
   OneWebSocketClient in 'websocket\OneWebSocketClient.pas',
   OneFunc in 'baseLib\OneFunc.pas',
-  OneClientFastReport in 'OneFast\OneClientFastReport.pas';
+  OneClientFastReport in 'OneFast\OneClientFastReport.pas',
+  OneDate in 'baseLib\OneDate.pas',
+  OneClientFastBillLock in 'OneFast\OneClientFastBillLock.pas';
 
 end.

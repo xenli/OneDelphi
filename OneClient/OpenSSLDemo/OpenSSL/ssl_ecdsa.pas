@@ -49,26 +49,26 @@ procedure SSL_InitECDSA;
 begin
 	if @ECDSA_SIG_new = nil then
 	begin      
-		@ECDSA_SIG_new:= LoadFunctionCLib('ECDSA_SIG_new');
-		@ECDSA_SIG_free:= LoadFunctionCLib('ECDSA_SIG_free');
-		@i2d_ECDSA_SIG:= LoadFunctionCLib('i2d_ECDSA_SIG');
-		@d2i_ECDSA_SIG:= LoadFunctionCLib('d2i_ECDSA_SIG');
-		@ECDSA_do_sign:= LoadFunctionCLib('ECDSA_do_sign');
-		@ECDSA_do_sign_ex:= LoadFunctionCLib('ECDSA_do_sign_ex');
-		@ECDSA_do_verify:= LoadFunctionCLib('ECDSA_do_verify');
-		@ECDSA_OpenSSL:= LoadFunctionCLib('ECDSA_OpenSSL');
-		@ECDSA_set_default_method:= LoadFunctionCLib('ECDSA_set_default_method');
-		@ECDSA_get_default_method:= LoadFunctionCLib('ECDSA_get_default_method');
-		@ECDSA_set_method:= LoadFunctionCLib('ECDSA_set_method');
-		@ECDSA_size:= LoadFunctionCLib('ECDSA_size');
-		@ECDSA_sign_setup:= LoadFunctionCLib('ECDSA_sign_setup');
-		@ECDSA_sign:= LoadFunctionCLib('ECDSA_sign');
-		@ECDSA_sign_ex:= LoadFunctionCLib('ECDSA_sign_ex');
-		@ECDSA_verify:= LoadFunctionCLib('ECDSA_verify');
-		@ECDSA_get_ex_new_index:= LoadFunctionCLib('ECDSA_get_ex_new_index');
-		@ECDSA_set_ex_data:= LoadFunctionCLib('ECDSA_set_ex_data');
-		@ECDSA_get_ex_data:= LoadFunctionCLib('ECDSA_get_ex_data');
-		@ERR_load_ECDSA_strings:= LoadFunctionCLib('ERR_load_ECDSA_strings');
+		@ECDSA_SIG_new:= LoadFuncCLibCrypto('ECDSA_SIG_new');
+		@ECDSA_SIG_free:= LoadFuncCLibCrypto('ECDSA_SIG_free');
+		@i2d_ECDSA_SIG:= LoadFuncCLibCrypto('i2d_ECDSA_SIG');
+		@d2i_ECDSA_SIG:= LoadFuncCLibCrypto('d2i_ECDSA_SIG');
+		@ECDSA_do_sign:= LoadFuncCLibCrypto('ECDSA_do_sign');
+		@ECDSA_do_sign_ex:= LoadFuncCLibCrypto('ECDSA_do_sign_ex');
+		@ECDSA_do_verify:= LoadFuncCLibCrypto('ECDSA_do_verify');
+		@ECDSA_OpenSSL:= LoadFuncCLibCrypto('ECDSA_OpenSSL');
+		@ECDSA_set_default_method:= LoadFuncCLibCrypto('ECDSA_set_default_method');
+		@ECDSA_get_default_method:= LoadFuncCLibCrypto('ECDSA_get_default_method');
+		@ECDSA_set_method:= LoadFuncCLibCrypto('ECDSA_set_method');
+		@ECDSA_size:= LoadFuncCLibCrypto('ECDSA_size');
+		@ECDSA_sign_setup:= LoadFuncCLibCrypto('ECDSA_sign_setup');
+		@ECDSA_sign:= LoadFuncCLibCrypto('ECDSA_sign');
+		@ECDSA_sign_ex:= LoadFuncCLibCrypto('ECDSA_sign_ex');
+		@ECDSA_verify:= LoadFuncCLibCrypto('ECDSA_verify');
+		@ECDSA_get_ex_new_index:= LoadFuncCLibCrypto('ECDSA_get_ex_new_index');
+		@ECDSA_set_ex_data:= LoadFuncCLibCrypto('ECDSA_set_ex_data');
+		@ECDSA_get_ex_data:= LoadFuncCLibCrypto('ECDSA_get_ex_data');
+		@ERR_load_ECDSA_strings:= LoadFuncCLibCrypto('ERR_load_ECDSA_strings');
 
 	end;
 end;

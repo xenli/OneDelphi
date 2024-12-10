@@ -163,7 +163,7 @@ object frDemoMain: TfrDemoMain
         Caption = #24635#39029#25968
       end
       object Label5: TLabel
-        Left = 61
+        Left = 63
         Top = 175
         Width = 52
         Height = 15

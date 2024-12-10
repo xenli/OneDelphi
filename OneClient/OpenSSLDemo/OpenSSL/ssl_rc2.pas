@@ -21,13 +21,13 @@ procedure SSL_Initrc2;
 begin
   if @RC2_encrypt = nil then
 	  begin
-		 @RC2_set_key:= LoadFunctionCLib('RC2_set_key');
-		 @RC2_ecb_encrypt:= LoadFunctionCLib('RC2_ecb_encrypt');
-		 @RC2_encrypt:= LoadFunctionCLib('RC2_encrypt');
-		 @RC2_decrypt:= LoadFunctionCLib('RC2_decrypt');
-		 @RC2_cbc_encrypt:= LoadFunctionCLib('RC2_cbc_encrypt');
-		 @RC2_cfb64_encrypt:= LoadFunctionCLib('RC2_cfb64_encrypt');
-		 @RC2_ofb64_encrypt:= LoadFunctionCLib('RC2_ofb64_encrypt');
+		 @RC2_set_key:= LoadFuncCLibCrypto('RC2_set_key');
+		 @RC2_ecb_encrypt:= LoadFuncCLibCrypto('RC2_ecb_encrypt');
+		 @RC2_encrypt:= LoadFuncCLibCrypto('RC2_encrypt');
+		 @RC2_decrypt:= LoadFuncCLibCrypto('RC2_decrypt');
+		 @RC2_cbc_encrypt:= LoadFuncCLibCrypto('RC2_cbc_encrypt');
+		 @RC2_cfb64_encrypt:= LoadFuncCLibCrypto('RC2_cfb64_encrypt');
+		 @RC2_ofb64_encrypt:= LoadFuncCLibCrypto('RC2_ofb64_encrypt');
     end;
 
 end;

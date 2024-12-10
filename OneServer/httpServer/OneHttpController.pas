@@ -9,7 +9,7 @@ uses
   System.TypInfo, OneHttpControllerRtti, OneHttpCtxtResult, OneHttpRouterManage,
   System.JSON, System.JSON.Serializers, Rest.JSON, System.Variants,
   Neon.Core.Persistence.JSON, System.Contnrs, OneNeonHelper, OneHttpConst, OneMultipart,
-  OneTokenManage, OneAttribute;
+  OneTokenManage, OneAttribute,system.SyncObjs;
 
 type
 {$M+}
@@ -30,6 +30,7 @@ type
     // 多例模式下这个货才能用
     FHTTPResult: THTTPResult;
     FCurrentThreadLocks: TDictionary<TThreadID, THTTPCtxt>;
+    FThreadLockObj: TCriticalSection;
   private
     function AddCurrentThreadLock(QHTTPCtxt: THTTPCtxt): TThreadID;
     function GetCurrentThreadLock(): THTTPCtxt;
@@ -45,14 +46,13 @@ type
     { 验证Token 签名 合法性 }
     function CheckSign(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean; virtual;
     // 获取方法参数值   var QParamNewObjs: TList<Tobject>
-    function DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti; QParamObjRttiList: TList<TRttiType>; QParamNewObjList: TList<TObject>;
-      Var QErrMsg: string): TArray<TValue>;
+    function DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti; QParamObjRttiList: TList<TRttiType>;
+      QParamNewObjList: TList<TObject>; Var QErrMsg: string): TArray<TValue>;
     { 执行相关方法 }
     procedure DoMethodFreeParams(QParamObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>);
-    function DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult;
-      QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>): Boolean; virtual;
-    function DoAttribute(QOneMethodRtti: TOneMethodRtti; QHTTPCtxt: THTTPCtxt;
-      QHTTPResult: THTTPResult): Boolean;
+    function DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>)
+      : Boolean; virtual;
+    function DoAttribute(QOneMethodRtti: TOneMethodRtti; QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean;
     { 结果输出编码设置 }
     procedure EndCodeResultOut(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult); virtual;
     //
@@ -94,6 +94,7 @@ begin
   FAutoCheckToken := false;
   FAutoCheckSign := false;
   FCurrentThreadLocks := TDictionary<TThreadID, THTTPCtxt>.Create;
+  FThreadLockObj := TCriticalSection.Create;
 end;
 
 destructor TOneControllerBase.Destroy;
@@ -101,6 +102,7 @@ begin
   FRouterItem := nil;
   FCurrentThreadLocks.Clear;
   FCurrentThreadLocks.Free;
+  FThreadLockObj.Free;
   inherited Destroy;
 end;
 
@@ -120,7 +122,20 @@ begin
     end;
   end;
   lThreadID := TThread.CurrentThread.ThreadID;
-  FCurrentThreadLocks.Add(lThreadID, QHTTPCtxt);
+  FThreadLockObj.Enter;
+  try
+    // 线程复用时ID就可能重复了
+    if not FCurrentThreadLocks.ContainsKey(lThreadID) then
+    begin
+      FCurrentThreadLocks.Add(lThreadID, QHTTPCtxt);
+    end
+    else
+    begin
+
+    end;
+  finally
+    FThreadLockObj.Leave;
+  end;
   Result := lThreadID;
 end;
 
@@ -142,15 +157,25 @@ begin
   end;
   lThreadID := TThread.CurrentThread.ThreadID;
   lHTTPCtxt := nil;
-  FCurrentThreadLocks.TryGetValue(lThreadID, lHTTPCtxt);
+  FThreadLockObj.Enter;
+  try
+    FCurrentThreadLocks.TryGetValue(lThreadID, lHTTPCtxt);
+  finally
+    FThreadLockObj.Leave;
+  end;
   Result := lHTTPCtxt;
 end;
 
 procedure TOneControllerBase.RemoveCurrentThreadLock(QThreadID: TThreadID);
 begin
-  if QThreadID >= 0 then
+  if QThreadID > 0 then
   begin
-    FCurrentThreadLocks.Remove(QThreadID);
+    FThreadLockObj.Enter;
+    try
+      FCurrentThreadLocks.Remove(QThreadID);
+    finally
+      FThreadLockObj.Leave;
+    end;
   end;
 end;
 
@@ -272,8 +297,7 @@ begin
   begin
 
   end
-  else
-    if not self.FAutoCheckHeadAuthor then
+  else if not self.FAutoCheckHeadAuthor then
   begin
     Result := true;
     exit;
@@ -303,8 +327,7 @@ begin
   begin
 
   end
-  else
-    if not self.FAutoCheckToken then
+  else if not self.FAutoCheckToken then
   begin
     Result := true;
     exit;
@@ -373,6 +396,7 @@ begin
   self.FHTTPResult := nil;
   // 是否正确执行了Invoke事件
   isInvokeOK := false;
+  lThreadID := 0;
   if self.FRouterItem = nil then
   begin
     // 挂载RTTI信息
@@ -464,7 +488,8 @@ begin
     begin
       QHTTPCtxt.AddCustomerHead('Access-Control-Allow-Origin', '*');
       QHTTPCtxt.AddCustomerHead('Access-Control-Allow-Credentials', 'true');
-      QHTTPCtxt.AddCustomerHead('Access-Control-Allow-Headers', 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization');
+      QHTTPCtxt.AddCustomerHead('Access-Control-Allow-Headers',
+        'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization');
     end;
     if self.FRouterItem <> nil then
     begin
@@ -490,8 +515,8 @@ begin
 end;
 
 // ;var QParamNewObjs: TList<Tobject>
-function TOneControllerBase.DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti; QParamObjRttiList: TList<TRttiType>; QParamNewObjList: TList<TObject>;
-  Var QErrMsg: string): TArray<TValue>;
+function TOneControllerBase.DoMethodGetParams(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QOneMethodRtti: TOneMethodRtti;
+  QParamObjRttiList: TList<TRttiType>; QParamNewObjList: TList<TObject>; Var QErrMsg: string): TArray<TValue>;
 var
   lArgs: TArray<TValue>;
   lParameters: TArray<TRttiParameter>;
@@ -1167,8 +1192,8 @@ begin
   end;
 end;
 
-function TOneControllerBase.DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult;
-  QParamNewObjList: TList<TObject>; QParamObjRttiList: TList<TRttiType>): Boolean;
+function TOneControllerBase.DoMethod(QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult; QParamNewObjList: TList<TObject>;
+  QParamObjRttiList: TList<TRttiType>): Boolean;
 var
   lOneMethodRtti: TOneMethodRtti;
   lArgs: TArray<TValue>;
@@ -1321,8 +1346,7 @@ begin
   Result := true;
 end;
 
-function TOneControllerBase.DoAttribute(QOneMethodRtti: TOneMethodRtti;
-  QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean;
+function TOneControllerBase.DoAttribute(QOneMethodRtti: TOneMethodRtti; QHTTPCtxt: THTTPCtxt; QHTTPResult: THTTPResult): Boolean;
 var
   lAttributeList: TList<TCustomAttribute>;
   lAttribute: TCustomAttribute;

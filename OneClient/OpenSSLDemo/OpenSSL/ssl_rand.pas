@@ -36,27 +36,27 @@ procedure SSL_InitRAND;
 begin
   if @RAND_set_rand_method = nil then
    begin 
-    @RAND_set_rand_method:= LoadFunctionCLib('RAND_set_rand_method');
-    @RAND_get_rand_method:= LoadFunctionCLib('RAND_get_rand_method');
-    @RAND_set_rand_engine:= LoadFunctionCLib('RAND_set_rand_engine');
-    @RAND_SSLeay:= LoadFunctionCLib('RAND_SSLeay');
-    @RAND_cleanup:= LoadFunctionCLib('RAND_cleanup');
-    @RAND_bytes:= LoadFunctionCLib('RAND_bytes');
-    @RAND_pseudo_bytes:= LoadFunctionCLib('RAND_pseudo_bytes');
-    @RAND_seed:= LoadFunctionCLib('RAND_seed');
-    @RAND_add:= LoadFunctionCLib('RAND_add');
-    @RAND_load_file:= LoadFunctionCLib('RAND_load_file');
-    @RAND_write_file:= LoadFunctionCLib('RAND_write_file');
-    @RAND_file_name:= LoadFunctionCLib('RAND_file_name');
-    @RAND_status:= LoadFunctionCLib('RAND_status');
-    @RAND_query_egd_bytes:= LoadFunctionCLib('RAND_query_egd_bytes');
-    @RAND_egd:= LoadFunctionCLib('RAND_egd');
-    @RAND_egd_bytes:= LoadFunctionCLib('RAND_egd_bytes');
-    @RAND_poll:= LoadFunctionCLib('RAND_poll');
-    @RAND_screen:= LoadFunctionCLib('RAND_screen');
-    @RAND_set_fips_drbg_type:= LoadFunctionCLib('RAND_set_fips_drbg_type', false);
-    @RAND_init_fips:= LoadFunctionCLib('RAND_init_fips', false);
-    @ERR_load_RAND_strings:= LoadFunctionCLib('ERR_load_RAND_strings');
+    @RAND_set_rand_method:= LoadFuncCLibCrypto('RAND_set_rand_method');
+    @RAND_get_rand_method:= LoadFuncCLibCrypto('RAND_get_rand_method');
+    @RAND_set_rand_engine:= LoadFuncCLibCrypto('RAND_set_rand_engine');
+    @RAND_SSLeay:= LoadFuncCLibCrypto('RAND_SSLeay');
+    @RAND_cleanup:= LoadFuncCLibCrypto('RAND_cleanup');
+    @RAND_bytes:= LoadFuncCLibCrypto('RAND_bytes');
+    @RAND_pseudo_bytes:= LoadFuncCLibCrypto('RAND_pseudo_bytes');
+    @RAND_seed:= LoadFuncCLibCrypto('RAND_seed');
+    @RAND_add:= LoadFuncCLibCrypto('RAND_add');
+    @RAND_load_file:= LoadFuncCLibCrypto('RAND_load_file');
+    @RAND_write_file:= LoadFuncCLibCrypto('RAND_write_file');
+    @RAND_file_name:= LoadFuncCLibCrypto('RAND_file_name');
+    @RAND_status:= LoadFuncCLibCrypto('RAND_status');
+    @RAND_query_egd_bytes:= LoadFuncCLibCrypto('RAND_query_egd_bytes');
+    @RAND_egd:= LoadFuncCLibCrypto('RAND_egd');
+    @RAND_egd_bytes:= LoadFuncCLibCrypto('RAND_egd_bytes');
+    @RAND_poll:= LoadFuncCLibCrypto('RAND_poll');
+    @RAND_screen:= LoadFuncCLibCrypto('RAND_screen');
+    @RAND_set_fips_drbg_type:= LoadFuncCLibCrypto('RAND_set_fips_drbg_type', false);
+    @RAND_init_fips:= LoadFuncCLibCrypto('RAND_init_fips', false);
+    @ERR_load_RAND_strings:= LoadFuncCLibCrypto('ERR_load_RAND_strings');
    end;   
 end;
 

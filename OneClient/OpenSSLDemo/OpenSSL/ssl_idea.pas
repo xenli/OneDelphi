@@ -23,15 +23,15 @@ procedure SSL_InitIDEA;
 begin
 	if @idea_options = nil then
 		begin
-			@idea_options:= LoadFunctionCLib('idea_options');
-			@idea_ecb_encrypt:= LoadFunctionCLib('idea_ecb_encrypt');
-			@private_idea_set_encrypt_key:= LoadFunctionCLib('private_idea_set_encrypt_key', false);
-			@idea_set_encrypt_key:= LoadFunctionCLib('idea_set_encrypt_key');
-			@idea_set_decrypt_key:= LoadFunctionCLib('idea_set_decrypt_key');
-			@idea_cbc_encrypt:= LoadFunctionCLib('idea_cbc_encrypt');
-			@idea_cfb64_encrypt:= LoadFunctionCLib('idea_cfb64_encrypt');
-			@idea_ofb64_encrypt:= LoadFunctionCLib('idea_ofb64_encrypt');
-			@idea_encrypt:= LoadFunctionCLib('idea_encrypt');
+			@idea_options:= LoadFuncCLibCrypto('idea_options');
+			@idea_ecb_encrypt:= LoadFuncCLibCrypto('idea_ecb_encrypt');
+			@private_idea_set_encrypt_key:= LoadFuncCLibCrypto('private_idea_set_encrypt_key', false);
+			@idea_set_encrypt_key:= LoadFuncCLibCrypto('idea_set_encrypt_key');
+			@idea_set_decrypt_key:= LoadFuncCLibCrypto('idea_set_decrypt_key');
+			@idea_cbc_encrypt:= LoadFuncCLibCrypto('idea_cbc_encrypt');
+			@idea_cfb64_encrypt:= LoadFuncCLibCrypto('idea_cfb64_encrypt');
+			@idea_ofb64_encrypt:= LoadFuncCLibCrypto('idea_ofb64_encrypt');
+			@idea_encrypt:= LoadFuncCLibCrypto('idea_encrypt');
 		end;
 end;
 

@@ -27,17 +27,17 @@ procedure SSL_InitBuffer;
 begin
   if @BUF_MEM_new = nil then
    begin
-      @BUF_MEM_new:= LoadFunctionCLib('BUF_MEM_new');
-      @BUF_MEM_free:= LoadFunctionCLib('BUF_MEM_free');
-      @BUF_MEM_grow:= LoadFunctionCLib('BUF_MEM_grow');
-      @BUF_MEM_grow_clean:= LoadFunctionCLib('BUF_MEM_grow_clean');
-      @BUF_strdup:= LoadFunctionCLib('BUF_strdup');
-      @BUF_strndup:= LoadFunctionCLib('BUF_strndup');
-      @BUF_memdup:= LoadFunctionCLib('BUF_memdup');
-      @BUF_reverse:= LoadFunctionCLib('BUF_reverse');
-      @BUF_strlcpy:= LoadFunctionCLib('BUF_strlcpy');
-      @BUF_strlcat:= LoadFunctionCLib('BUF_strlcat');
-      @ERR_load_BUF_strings:= LoadFunctionCLib('ERR_load_BUF_strings');
+      @BUF_MEM_new:= LoadFuncCLibCrypto('BUF_MEM_new');
+      @BUF_MEM_free:= LoadFuncCLibCrypto('BUF_MEM_free');
+      @BUF_MEM_grow:= LoadFuncCLibCrypto('BUF_MEM_grow');
+      @BUF_MEM_grow_clean:= LoadFuncCLibCrypto('BUF_MEM_grow_clean');
+      @BUF_strdup:= LoadFuncCLibCrypto('BUF_strdup');
+      @BUF_strndup:= LoadFuncCLibCrypto('BUF_strndup');
+      @BUF_memdup:= LoadFuncCLibCrypto('BUF_memdup');
+      @BUF_reverse:= LoadFuncCLibCrypto('BUF_reverse');
+      @BUF_strlcpy:= LoadFuncCLibCrypto('BUF_strlcpy');
+      @BUF_strlcat:= LoadFuncCLibCrypto('BUF_strlcat');
+      @ERR_load_BUF_strings:= LoadFuncCLibCrypto('ERR_load_BUF_strings');
 
    end;
 end;

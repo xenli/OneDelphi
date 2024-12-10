@@ -7,7 +7,7 @@ uses
   System.Diagnostics, Web.HTTPApp, System.ZLib,
   mormot.Net.server, mormot.Net.http, mormot.Net.async, mormot.core.os,
   mormot.Net.sock, mormot.core.buffers, oneILog, OneFileHelper, mormot.core.zip, mormot.core.base,
-  OneHttpConst;
+  OneHttpConst, System.Threading;
 
 type
   TOneHttpServer = class
@@ -26,7 +26,7 @@ type
     FKeepAliveTimeOut: integer;
     // 队列默认1000,请求放进队列,然后有线程消费完成
     FHttpQueueLength: integer;
-    FHttpServer: THttpServerSocketGeneric;
+    FHttpServer: THttpServerGeneric;
     FHttpsServer: THttpServerSocketGeneric;
     // 错误消息
     FErrMsg: string;
@@ -63,23 +63,10 @@ type
   end;
 
 function CreateNewHTTPCtxt(Ctxt: THttpServerRequestAbstract): THTTPCtxt;
-function GetCustContentType(QFileType: string): string;
 
 implementation
 
 uses OneHttpRouterManage, OneHttpController, OneGlobal;
-
-function GetCustContentType(QFileType: string): string;
-var
-  vFileType: string;
-begin
-  //一些特别的头部扩展 :
-  Result := '';
-  vFileType := QFileType.ToLower();
-  // Content-Type
-  if vFileType = '.mjs' then
-    Result := 'Content-Type: application/javascript';
-end;
 
 { TOneHttpServer }
 function TOneHttpServer.OnRequest(Ctxt: THttpServerRequestAbstract): cardinal;
@@ -99,32 +86,30 @@ var
   lHTTPResult: THTTPResult; // HTTP执行结果，统一接口格式化
   lHTTPCtxt: THTTPCtxt; // HTTP请求相关信息,转成内部一个类处理
   // 静态文件输出
-  lFilePath, lFileName, lFileCode, lPhy, lFileTag: string;
-  fs: TStringStream;
+  lFileName, lFileCode, lPhy: string;
   tempI: integer;
   lTThreadID: string;
+  aTask: ITask;
+  taskResult: cardinal;
+  lTaskException: string;
 begin
   lErrMsg := '';
   lHTTPResult := nil;
   lHTTPCtxt := nil;
   lRouterUrlPath := nil;
   Result := 200;
+  taskResult := 200;
+  lTaskException := '';
   if self.FStopRequest then
   begin
     // 停止请求，返回404
     Result := HTTP_NOTFOUND;
     exit;
   end;
-  if (Ctxt.Host = '') then
-  begin
-    // 有些恶意的这个为空
-    Result := HTTP_NOTFOUND;
-    exit;
-  end;
   try
     lURI := System.Net.URLClient.TURI.Create('http://' + Ctxt.Host + Ctxt.Url);
   except
-    on e: exception do
+    on e: Exception do
     begin
       Ctxt.OutContent := UTF8Encode(e.Message);
       Ctxt.OutContentType := TEXT_CONTENT_TYPE;
@@ -182,7 +167,35 @@ begin
                 exit;
               end;
               lOneControllerWork := TOneControllerBase(lWorkObj);
-              Result := lOneControllerWork.DoWork(lHTTPCtxt, lHTTPResult, lRouterWorkItem);
+              if lRouterWorkItem.RouterMode = emRouterMode.single then
+              begin
+                // 单例模式,线程复用时 TThread.CurrentThread.ThreadID 可能一样，造成上下文环境问题冲突
+                // 采用任务形式，产生新的  TThread.CurrentThread.ThreadID
+                aTask := TTask.Create(
+                  procedure
+                  begin
+                    try
+                      taskResult := lOneControllerWork.DoWork(lHTTPCtxt, lHTTPResult, lRouterWorkItem);
+                    except
+                      on e: Exception do
+                      begin
+                        lTaskException := e.Message;
+                      end;
+                    end;
+                  end);
+                aTask.Start;
+                aTask.Wait();
+                Result := taskResult;
+                if lTaskException <> '' then
+                begin
+                  raise Exception.Create(lTaskException);
+                end;
+              end
+              else
+              begin
+                // 多例模式，本身上下文就是独立的无需和线程挂勾
+                Result := lOneControllerWork.DoWork(lHTTPCtxt, lHTTPResult, lRouterWorkItem);
+              end;
             finally
               // 归还控制器
               lRouterWorkItem.UnLockWorkItem(lWorkObj);
@@ -233,7 +246,7 @@ begin
             begin
               Ctxt.OutContent := lHTTPCtxt.OutContent;
               Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
-              Ctxt.OutCustomHeaders :=   GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
+              Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', Ctxt.OutContent) + #13#10 + 'OneOutMode: OUTFILE';
               if lHTTPCtxt.ResponCustHeaderList <> '' then
               begin
                 Ctxt.OutCustomHeaders := Ctxt.OutCustomHeaders + #13#10 + lHTTPCtxt.ResponCustHeaderList;
@@ -267,50 +280,14 @@ begin
         Result := HTTP_SUCCESS;
         exit;
       end
-      else if lUrlPath.StartsWith('/onefile/') then
-      begin
-        lFileName := lUrlPath.Substring(8, lUrlPath.Length - 8);
-        // 有中文进行解码
-        lFileName := HTTPDecode(lFileName);
-        lFileName := OneFileHelper.CombineExeRunPathB('OnePlatform\onefile', lFileName);
-        Ctxt.OutContent := UTF8Encode(lFileName);
-        Ctxt.OutContentType := HTTP_RESP_STATICFILE;
-        Result := HTTP_SUCCESS;
-        exit;
-      end
       else if lUrlPath.StartsWith('/oneweb/') then
       begin
         lFileName := lUrlPath.Substring(8, lUrlPath.Length - 8);
         // 有中文进行解码
         lFileName := HTTPDecode(lFileName);
-        lFilePath := OneFileHelper.CombineExeRunPathB('OnePlatform\OneWeb', lFileName);
-        lFileTag := Extractfileext(lFileName);
-        if lFileTag = '' then
-        begin
-          lFileName := lFileName + '.html';
-          lFileTag := '.html';
-        end;
-        if lFileTag = '.html' then
-        begin
-          // Ctxt.OutContent := StringToUTF8(vFileName);
-          fs := TStringStream.Create('', TEncoding.UTF8);
-          try
-            fs.LoadFromFile(lFilePath);
-            Ctxt.OutContent := UTF8Encode(fs.DataString);
-          finally
-            fs.Free;
-          end;
-          Ctxt.OutContentType := HTML_CONTENT_TYPE;
-        end
-        else
-        begin
-          Ctxt.OutCustomHeaders := GetCustContentType(lFileTag);
-          if Ctxt.OutCustomHeaders='' then
-            Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', lFileName);
-          // GetContentType(lFileTag);
-          Ctxt.OutContent := UTF8Encode(lFilePath);
-          Ctxt.OutContentType := HTTP_RESP_STATICFILE;
-        end;
+        lFileName := OneFileHelper.CombineExeRunPathB('OnePlatform\OneWeb', lFileName);
+        Ctxt.OutContent := UTF8Encode(lFileName);
+        Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
         Result := HTTP_SUCCESS;
         exit;
       end
@@ -332,33 +309,9 @@ begin
           exit;
         end;
         lFileName := HTTPDecode(lFileName);
-        lFilePath := OneFileHelper.CombinePath(lPhy, lFileName);
-        lFileTag := Extractfileext(lFileName);
-        if lFileTag = '' then
-        begin
-          lFileName := lFileName + '.html';
-          lFileTag := '.html';
-        end;
-        if lFileTag = '.html' then
-        begin
-          // Ctxt.OutContent := StringToUTF8(vFileName);
-          fs := TStringStream.Create('', TEncoding.UTF8);
-          try
-            fs.LoadFromFile(lFilePath);
-            Ctxt.OutContent := UTF8Encode(fs.DataString);
-          finally
-            fs.Free;
-          end;
-          Ctxt.OutContentType := HTML_CONTENT_TYPE;
-        end
-        else
-        begin
-          Ctxt.OutCustomHeaders := GetCustContentType(lFileTag);
-          if Ctxt.OutCustomHeaders='' then
-            Ctxt.OutCustomHeaders := GetMimeContentTypeHeader('', lFileName);
-          Ctxt.OutContent := UTF8Encode(lFilePath);
-          Ctxt.OutContentType := HTTP_RESP_STATICFILE;
-        end;
+        lFileName := OneFileHelper.CombinePath(lPhy, lFileName);
+        Ctxt.OutContent := UTF8Encode(lFileName);
+        Ctxt.OutContentType := STATICFILE_CONTENT_TYPE;
         Result := HTTP_SUCCESS;
         exit;
       end
@@ -369,7 +322,7 @@ begin
         exit;
       end;
     except
-      on e: exception do
+      on e: Exception do
       begin
         self.FLog.WriteLog('ExceptAll', e.Message);
         Ctxt.OutContent := UTF8Encode(e.Message);
@@ -395,7 +348,7 @@ begin
   self.FStarted := False;
   self.FStopRequest := False;
   self.FPort := 9090;
-  self.FThreadPoolCount := 100;
+  self.FThreadPoolCount := 32;
   // HTTP短连接即来即去没必要保持请求完后，还保持连接
   self.FKeepAliveTimeOut := 0;
   self.FHttpQueueLength := 1000;
@@ -413,6 +366,7 @@ begin
   begin
     FHttpsServer.Free;
   end;
+  FLog := nil;
   inherited Destroy;
 end;
 
@@ -441,41 +395,61 @@ begin
     self.FHttpQueueLength := 1000;
   // 创建HTTP服务
   try
-    lHttpServerOptions := [];
+    // hsoEnableTls开始ssl证书 //THttpAsyncServer改为THttpAServer
+    lHttpServerOptions := [hsoNoXPoweredHeader];
     lServerSet := TOneGlobal.GetInstance().ServerSet;
-    // hsoEnableTls开始ssl证书
-    self.FHttpServer := THttpServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi',
-      self.FThreadPoolCount, self.FKeepAliveTimeOut, lHttpServerOptions);
+
+{$IFDEF MSWINDOWS}
+    self.FHttpServer := THttpApiServer.Create('oneDelphi'+self.FPort.ToString(), nil, nil, 'oneDelphi', lHttpServerOptions);
+    self.FHttpServer.OnRequest := self.OnRequest;
+    self.FHttpServer.RegisterCompress(CompressDeflate);
+    self.FHttpServer.RegisterCompress(CompressGZip);
+    self.FHttpServer.RegisterCompress(CompressZLib);
+    self.FHttpServer.RegisterCompress(CompressSynLZ);
+    THttpApiServer(self.FHttpServer).AddUrl('', self.FPort.ToString(), False, '+', True);
+    if self.FThreadPoolCount = 0 then
+    begin
+      self.FThreadPoolCount := 32;
+    end;
+    THttpApiServer(self.FHttpServer).Clone(self.FThreadPoolCount);
+
+{$ELSE}
+    self.FHttpServer := THttpServer.Create(self.FPort.ToString(), nil, nil, 'oneDelphi', self.FThreadPoolCount, self.FKeepAliveTimeOut,
+      lHttpServerOptions);
     self.FHttpServer.HttpQueueLength := self.FHttpQueueLength;
     self.FHttpServer.OnRequest := self.OnRequest;
     self.FHttpServer.RegisterCompress(CompressDeflate);
     self.FHttpServer.RegisterCompress(CompressGZip);
     self.FHttpServer.RegisterCompress(CompressZLib);
     self.FHttpServer.RegisterCompress(CompressSynLZ);
-    self.FHttpServer.WaitStarted();
+    THttpServer(self.FHttpServer).WaitStarted();
+{$ENDIF}
+
+    //
+
+    // self.FHttpServer.wa;
     if lServerSet.IsHttps then
     begin
       // 启动https
       lHttpServerOptions := lHttpServerOptions + [hsoEnableTls];
-      self.FHttpsServer := THttpServer.Create(self.FHttpsPort.ToString(), nil, nil, 'oneDelphi',
-        self.FThreadPoolCount, self.FKeepAliveTimeOut, lHttpServerOptions);
+      // THttpAsyncServer改为THttpAServer
+      self.FHttpsServer := THttpServer.Create(self.FHttpsPort.ToString(), nil, nil, 'oneDelphi', self.FThreadPoolCount, self.FKeepAliveTimeOut,
+        lHttpServerOptions);
       self.FHttpsServer.HttpQueueLength := self.FHttpQueueLength;
       self.FHttpsServer.OnRequest := self.OnRequest;
       self.FHttpsServer.RegisterCompress(CompressDeflate);
       self.FHttpsServer.RegisterCompress(CompressGZip);
       self.FHttpsServer.RegisterCompress(CompressZLib);
       self.FHttpsServer.RegisterCompress(CompressSynLZ);
-      //fHttpServer.WaitStarted('cert.pem', 'privkey.pem', '');
-      self.FHttpsServer.WaitStarted(10, lServerSet.CertificateFile, lServerSet.PrivateKeyFile,
-        lServerSet.PrivateKeyPassword, lServerSet.CACertificatesFile)
+      self.FHttpsServer.WaitStarted(10, lServerSet.CertificateFile, lServerSet.PrivateKeyFile, lServerSet.PrivateKeyPassword,
+        lServerSet.CACertificatesFile)
     end;
-
     // raise exception e.g. on binding issue
     self.FStopRequest := False;
     self.FStarted := True;
     Result := True;
   except
-    on e: exception do
+    on e: Exception do
     begin
       self.FErrMsg := '启动服务器失败,原因:' + e.Message + ';解决方案可偿试管理员启动程序或换个端口临听（端口重复绑定）。';
       self.FHttpServer.Free;

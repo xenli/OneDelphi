@@ -24,16 +24,16 @@ procedure SSL_InitCAMELLIA;
 begin
  if @Camellia_encrypt = nil then
   begin
-	@Camellia_set_key:= LoadFunctionCLib('Camellia_set_key');
-	@Camellia_encrypt:= LoadFunctionCLib('Camellia_encrypt');
-	@Camellia_decrypt:= LoadFunctionCLib('Camellia_decrypt');
-	@Camellia_ecb_encrypt:= LoadFunctionCLib('Camellia_ecb_encrypt');
-	@Camellia_cbc_encrypt:= LoadFunctionCLib('Camellia_cbc_encrypt');
-	@Camellia_cfb128_encrypt:= LoadFunctionCLib('Camellia_cfb128_encrypt');
-	@Camellia_cfb1_encrypt:= LoadFunctionCLib('Camellia_cfb1_encrypt');
-	@Camellia_cfb8_encrypt:= LoadFunctionCLib('Camellia_cfb8_encrypt');
-	@Camellia_ofb128_encrypt:= LoadFunctionCLib('Camellia_ofb128_encrypt');
-	@Camellia_ctr128_encrypt:= LoadFunctionCLib('Camellia_ctr128_encrypt');  
+	@Camellia_set_key:= LoadFuncCLibCrypto('Camellia_set_key');
+	@Camellia_encrypt:= LoadFuncCLibCrypto('Camellia_encrypt');
+	@Camellia_decrypt:= LoadFuncCLibCrypto('Camellia_decrypt');
+	@Camellia_ecb_encrypt:= LoadFuncCLibCrypto('Camellia_ecb_encrypt');
+	@Camellia_cbc_encrypt:= LoadFuncCLibCrypto('Camellia_cbc_encrypt');
+	@Camellia_cfb128_encrypt:= LoadFuncCLibCrypto('Camellia_cfb128_encrypt');
+	@Camellia_cfb1_encrypt:= LoadFuncCLibCrypto('Camellia_cfb1_encrypt');
+	@Camellia_cfb8_encrypt:= LoadFuncCLibCrypto('Camellia_cfb8_encrypt');
+	@Camellia_ofb128_encrypt:= LoadFuncCLibCrypto('Camellia_ofb128_encrypt');
+	@Camellia_ctr128_encrypt:= LoadFuncCLibCrypto('Camellia_ctr128_encrypt');  
   end;
 end;
 

@@ -20,14 +20,14 @@ procedure SSL_InitEncode;
 begin
   if @EVP_EncodeInit = nil then
   begin
-    @EVP_EncodeInit := LoadFunctionCLib('EVP_EncodeInit');
-    @EVP_EncodeUpdate := LoadFunctionCLib('EVP_EncodeUpdate');
-    @EVP_EncodeFinal := LoadFunctionCLib('EVP_EncodeFinal');
-    @EVP_EncodeBlock := LoadFunctionCLib('EVP_EncodeBlock');
-    @EVP_DecodeInit := LoadFunctionCLib('EVP_DecodeInit');
-    @EVP_DecodeUpdate := LoadFunctionCLib('EVP_DecodeUpdate');
-    @EVP_DecodeFinal := LoadFunctionCLib('EVP_DecodeFinal');
-    @EVP_DecodeBlock := LoadFunctionCLib('EVP_DecodeBlock');
+    @EVP_EncodeInit := LoadFuncCLibCrypto('EVP_EncodeInit');
+    @EVP_EncodeUpdate := LoadFuncCLibCrypto('EVP_EncodeUpdate');
+    @EVP_EncodeFinal := LoadFuncCLibCrypto('EVP_EncodeFinal');
+    @EVP_EncodeBlock := LoadFuncCLibCrypto('EVP_EncodeBlock');
+    @EVP_DecodeInit := LoadFuncCLibCrypto('EVP_DecodeInit');
+    @EVP_DecodeUpdate := LoadFuncCLibCrypto('EVP_DecodeUpdate');
+    @EVP_DecodeFinal := LoadFuncCLibCrypto('EVP_DecodeFinal');
+    @EVP_DecodeBlock := LoadFuncCLibCrypto('EVP_DecodeBlock');
   end;
 end;
 end.

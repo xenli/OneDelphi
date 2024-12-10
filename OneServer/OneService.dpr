@@ -1,13 +1,13 @@
 program OneService;
 {$R *.res}
 {$I Neon.inc}
-
+{$I One.inc}
 
 uses
   Vcl.Forms,
   Winapi.Windows,
   system.IOUtils,
-  frm_main in 'frm_main.pas' {frmMain},
+  frm_main in 'frm_main.pas' {frmMain} ,
   OneTokenManage in 'basLib\token\OneTokenManage.pas',
   OneHttpServer in 'httpServer\OneHttpServer.pas',
   OneHttpController in 'httpServer\OneHttpController.pas',
@@ -108,12 +108,19 @@ uses
   DemoWorkCustErrResult in 'httpServer\Controller\Demo\DemoWorkCustErrResult.pas',
   OneFastPlatManage in 'OneFastCleint\OneFastPlatManage.pas',
   TestApiController in 'httpServer\Controller\TestApiController.pas',
+{$IFDEF One_FastReport}
+  // 在One.inc配置文件开启，默认关闭
+  // One_NOFastReport改成One_FastReport即可
   OneFastReportController in 'OneFastApi\OneFastReportController.pas',
+{$ENDIF}
   Vcl.Themes,
   Vcl.Styles,
   UniFileDownController in 'OneUniDemo\UniFileDownController.pas',
   DemoAttributeController in 'httpServer\Controller\Demo\DemoAttributeController.pas',
-  DemoAuthorController in 'httpServer\Controller\Demo\DemoAuthorController.pas';
+  DemoAuthorController in 'httpServer\Controller\Demo\DemoAuthorController.pas',
+  OneDate in 'basLib\OneDate.pas',
+  OneFastBillLockManage in 'OneFastBillLock\OneFastBillLockManage.pas',
+  OneFastBillLockController in 'OneFastBillLock\OneFastBillLockController.pas';
 
 var
   lpStartupInfo: TStartupInfo;
